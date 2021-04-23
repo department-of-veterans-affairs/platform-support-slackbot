@@ -9,6 +9,7 @@ const app = new App({
 async function buildSupportModal(client, user, trigger_id) {
   const view = {
     type: "modal",
+    callback_id: "support_modal_view",
     submit: {
       type: "plain_text",
       text: "Submit",
@@ -39,6 +40,7 @@ async function buildSupportModal(client, user, trigger_id) {
       },
       {
         type: "input",
+        block_id: "users_requesting_support",
         element: {
           type: "multi_users_select",
           placeholder: {
@@ -46,7 +48,7 @@ async function buildSupportModal(client, user, trigger_id) {
             text: "Select users",
             emoji: true,
           },
-          action_id: "multi_users_select-action",
+          action_id: "users",
           initial_users: [user],
         },
         label: {
@@ -57,6 +59,7 @@ async function buildSupportModal(client, user, trigger_id) {
       },
       {
         type: "input",
+        block_id: "topic",
         element: {
           type: "static_select",
           placeholder: {
@@ -202,7 +205,7 @@ async function buildSupportModal(client, user, trigger_id) {
               value: "Something else",
             },
           ],
-          action_id: "static_select-action",
+          action_id: "selected",
         },
         label: {
           type: "plain_text",
@@ -212,6 +215,7 @@ async function buildSupportModal(client, user, trigger_id) {
       },
       {
         type: "input",
+        block_id: "summary",
         label: {
           type: "plain_text",
           text: "Summary of request",
@@ -220,6 +224,7 @@ async function buildSupportModal(client, user, trigger_id) {
         element: {
           type: "plain_text_input",
           multiline: true,
+          action_id: "value",
         },
       },
     ],
@@ -230,7 +235,7 @@ async function buildSupportModal(client, user, trigger_id) {
     view,
   });
 
-  console.log(result);
+  //   console.log(result);
 }
 
 // Listens to incoming messages that contain "hello"
@@ -249,6 +254,45 @@ app.command("/support", async (args) => {
   try {
     // Call views.open with the built-in client
     buildSupportModal(client, body.user_id, body.trigger_id);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+// Handle Form Submission
+app.view("support_modal_view", async ({ ack, body, view, client }) => {
+  // Acknowledge the view_submission event
+  await ack();
+
+  const { id, username } = body.user;
+  const { users_requesting_support, topic, summary } = view.state.values;
+
+  const usersRequestingSupport = users_requesting_support.users.selected_users;
+  const selectedTopic = topic.selected.selected_option.value;
+  const summaryDescription = summary.value.value;
+
+  console.log("usersRequestingSupport", usersRequestingSupport);
+  console.log("selectedTopic", selectedTopic);
+  console.log("summaryDescription", summaryDescription);
+
+  // Message to send user
+  let msg = "";
+
+  let results = true;
+
+  if (results) {
+    // DB save was successful
+    msg = "Your submission was successful";
+  } else {
+    msg = "There was an error with your submission";
+  }
+
+  // Message the user
+  try {
+    await client.chat.postMessage({
+      channel: id,
+      text: msg,
+    });
   } catch (error) {
     console.error(error);
   }

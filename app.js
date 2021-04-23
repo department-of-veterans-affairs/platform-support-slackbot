@@ -240,9 +240,28 @@ async function buildSupportModal(client, user, trigger_id) {
 
 // Listens to incoming messages that contain "hello"
 app.message("hello", async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
   console.log(message.user);
   await say(`Hey there <@${message.user}>!`);
+});
+
+app.command("/help", async (args) => {
+//   console.log(args);
+
+  const { ack, body, client, command } = args;
+
+  await ack();
+
+    let msg = `Hey there <@${body.user_id}>!  To submit a new support request, use the /support command.  Simply type /support in the chat.`;
+
+  // Message the user
+  try {
+    await client.chat.postMessage({
+      channel: body.channel_id,
+      text: msg,
+    });
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 app.command("/support", async (args) => {

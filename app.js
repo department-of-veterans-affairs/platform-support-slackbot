@@ -245,13 +245,13 @@ app.message("hello", async ({ message, say }) => {
 });
 
 app.command("/help", async (args) => {
-//   console.log(args);
+  //   console.log(args);
 
   const { ack, body, client, command } = args;
 
   await ack();
 
-    let msg = `Hey there <@${body.user_id}>!  To submit a new support request, use the /support command.  Simply type /support in the chat.`;
+  let msg = `Hey there <@${body.user_id}>!  To submit a new support request, use the /support command.  Simply type /support in the chat.`;
 
   // Message the user
   try {
@@ -300,7 +300,6 @@ app.view("support_modal_view", async ({ ack, body, view, client }) => {
   let results = true;
 
   if (results) {
-    // DB save was successful
     msg = "Your submission was successful";
   } else {
     msg = "There was an error with your submission";
@@ -310,7 +309,53 @@ app.view("support_modal_view", async ({ ack, body, view, client }) => {
   try {
     await client.chat.postMessage({
       channel: id,
-      text: msg,
+      link_names: 1,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `Hey there <@${id}>! We've recieved your Platform support request.`,
+          },
+        //   accessory: {
+        //     type: "button",
+        //     text: {
+        //       type: "plain_text",
+        //       text: "Click Me",
+        //     },
+        //     action_id: "button_click",
+        //   },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*New platform request from*\n${usersRequestingSupport.map(u => `<@${u}>`).join(', ')}`,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*Need help with*\n${selectedTopic}`,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*Summary*\n${summaryDescription}`,
+          },
+        },
+        {
+            type: "section",
+            text: {
+                type: "mrkdwn",
+                text: "Tagging: <@U01T9CL8PEK>"
+            }
+        }
+      ],
+      text: `Hey there <@${id}>!`,
     });
   } catch (error) {
     console.error(error);

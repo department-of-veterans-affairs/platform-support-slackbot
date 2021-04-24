@@ -2,9 +2,9 @@
   "name": "supportbot",
   "version": "1.0.0",
   "description": "A slack support ticket app",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

@@ -1,4 +1,16 @@
-# Local Development with ngrok
+# Platform Support Slack Bot
+
+To start the slack bot locally:
+
+`$ yarn start`
+
+or
+
+`$ npm run start`
+
+Note: In order for Slack to communicate with the slack bot, you must either deploy it or use a tunneling tool like ngrok.
+
+## Local Development with ngrok
 
 ngrok exposes a external URL and tunnels HTTP requests to your local machine for development so you don't have to stand up a server for development.
 
@@ -10,9 +22,7 @@ If you have ngrok setup, start the localhost tunnel by using the following comma
 $ ngrok http 3000
 ```
 
-#### 💡NOTE!💡
-
-Each time you restart `ngrok`, a new URL will be generated.
+#### 💡NOTE Each time you restart `ngrok`, a new URL will be generated. 💡
 
 Here's an example:
 

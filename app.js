@@ -295,17 +295,6 @@ app.view("support_modal_view", async ({ ack, body, view, client }) => {
   console.log("selectedTopic", selectedTopic);
   console.log("summaryDescription", summaryDescription);
 
-  // Message to send user
-  let msg = "";
-
-  let results = true;
-
-  if (results) {
-    msg = "Your submission was successful";
-  } else {
-    msg = "There was an error with your submission";
-  }
-
   // Message the user
   try {
     await client.chat.postMessage({

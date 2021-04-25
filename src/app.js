@@ -1,3 +1,4 @@
+// Environment Variables
 require('dotenv').config();
 
 const { App } = require("@slack/bolt");

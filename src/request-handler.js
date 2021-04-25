@@ -1,3 +1,4 @@
+const logger = require('pino')();
 const modalBuilder = require('./modal-builder');
 
 function requestHandler(app) {
@@ -10,20 +11,16 @@ function requestHandler(app) {
       view,
     });
 
-    //   console.log(result);
+    logger.debug(result);
   }
 
   // Listens to incoming messages that contain "hello"
   app.message("hello", async ({ message, say }) => {
-    console.log(message.user);
+    logger.debug(message.user);
     await say(`Hey there <@${message.user}>!`);
   });
 
-  app.command("/help", async (args) => {
-    //   console.log(args);
-
-    const { ack, body, client, command } = args;
-
+  app.command("/help", async ({ ack, body, client, command }) => {
     await ack();
 
     let msg = `Hey there <@${body.user_id}>!  To submit a new support request, use the /support command.  Simply type /support in the chat.`;
@@ -39,9 +36,7 @@ function requestHandler(app) {
     }
   });
 
-  app.command("/support", async (args) => {
-    const { ack, body, client } = args;
-    //console.log(args);
+  app.command("/support", async ({ ack, body, client }) => {
     // Acknowledge the command request
     await ack();
 
@@ -66,9 +61,9 @@ function requestHandler(app) {
     const selectedTopic = topic.selected.selected_option.value;
     const summaryDescription = summary.value.value;
 
-    console.log("usersRequestingSupport", usersRequestingSupport);
-    console.log("selectedTopic", selectedTopic);
-    console.log("summaryDescription", summaryDescription);
+    logger.trace("usersRequestingSupport", usersRequestingSupport);
+    logger.trace("selectedTopic", selectedTopic);
+    logger.trace("summaryDescription", summaryDescription);
 
     // Message the user
     try {

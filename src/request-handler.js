@@ -1,5 +1,6 @@
 const logger = require("pino")();
 const modalBuilder = require("./block-kit/modal-builder");
+const responseBuilder = require("./block-kit/response-builder");
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
@@ -83,53 +84,7 @@ function requestHandler(app) {
       await client.chat.postMessage({
         channel: SUPPORT_CHANNEL_ID,
         link_names: 1,
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `Hey there <@${id}>! We've recieved your Platform support request.`,
-            },
-            //   accessory: {
-            //     type: "button",
-            //     text: {
-            //       type: "plain_text",
-            //       text: "Click Me",
-            //     },
-            //     action_id: "button_click",
-            //   },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `*New platform request from*\n${usersRequestingSupport
-                .map((u) => `<@${u}>`)
-                .join(", ")}`,
-            },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `*Need help with*\n${selectedTopic}`,
-            },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `*Summary*\n${summaryDescription}`,
-            },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "Tagging: <@U01T9CL8PEK>",
-            },
-          },
-        ],
+        blocks: responseBuilder.buildSupportResponse(id, usersRequestingSupport, selectedTopic, summaryDescription),
         text: `Hey there <@${id}>!`,
       });
     } catch (error) {

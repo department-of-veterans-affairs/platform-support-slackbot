@@ -1,3 +1,5 @@
+// TODO: Load topics from Google Sheet
+
 const buildSupportModal = (user) => {
   return {
     type: "modal",

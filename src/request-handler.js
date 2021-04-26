@@ -1,8 +1,7 @@
-const logger = require('pino')();
-const modalBuilder = require('./modal-builder');
+const logger = require("pino")();
+const modalBuilder = require("./modal-builder");
 
 function requestHandler(app) {
-
   async function buildSupportModal(client, user, trigger_id) {
     const view = modalBuilder.buildSupportModal(user);
 
@@ -43,6 +42,19 @@ function requestHandler(app) {
     try {
       // Call views.open with the built-in client
       buildSupportModal(client, body.user_id, body.trigger_id);
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
+  // The open_modal shortcut opens a plain old modal
+  app.shortcut("support", async ({ shortcut, ack, client }) => {
+    try {
+      // Acknowledge shortcut request
+      await ack();
+
+      // Call views.open with the built-in client
+      buildSupportModal(client, shortcut.user.id, shortcut.trigger_id);
     } catch (error) {
       logger.error(error);
     }

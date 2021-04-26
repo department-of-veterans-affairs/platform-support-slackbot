@@ -4,7 +4,7 @@
   "description": "A slack support ticket app",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
+    "start": "node src/app.js | pino-pretty",
     "test": "mocha"
   },
   "author": "",
@@ -12,7 +12,8 @@
   "dependencies": {
     "@slack/bolt": "^3.3.0",
     "dotenv": "^8.2.0",
-    "pino": "^6.11.3"
+    "pino": "^6.11.3",
+    "pino-pretty": "^4.7.1"
   },
   "devDependencies": {
     "chai": "^4.3.4",

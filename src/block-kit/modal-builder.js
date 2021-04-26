@@ -1,5 +1,38 @@
 // TODO: Load topics from Google Sheet
 
+const topics = [
+  { text: 'PR Review', value: 'PR_Review' },
+  { text: 'SOCKS', value: 'SOCKS' },
+  { text: 'Access to something', value: 'Access' },
+  { text: 'Deployment', value: 'Deployment' },
+  { text: 'Troubleshooting', value: 'Troubleshooting' },
+  { text: 'Local environment', value: 'Local_Environment' },
+  { text: 'Platform Architecture', value: 'Platform_Architecture' },
+  { text: 'Deploy', value: 'Deploy' },
+  { text: 'Forms system', value: 'Forms_System' },
+  { text: 'Design system', value: 'Design_System' },
+  { text: 'Analytics', value: 'Analytics' },
+  { text: 'Accessibility', value: 'Accessibility' },
+  { text: 'IA', value: 'IA' },
+  { text: 'Design', value: 'Design' },
+  { text: 'Security', value: 'Security' },
+  { text: 'QA', value: 'QA' },
+  { text: 'Something else', value: 'Something_Else' }
+];
+
+const buildDropDownOptions = (topics) => {
+  return topics.map(topic => {
+      return {
+        text: {
+          type: "plain_text",
+          text: topic.text,
+          emoji: true,
+        },
+        value: topic.value,
+      };
+  });
+}
+
 const buildSupportModal = (user) => {
   return {
     type: "modal",
@@ -61,144 +94,7 @@ const buildSupportModal = (user) => {
             text: "Select an item",
             emoji: true,
           },
-          options: [
-            {
-              text: {
-                type: "plain_text",
-                text: "PR Review",
-                emoji: true,
-              },
-              value: "PR_Review",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "SOCKS",
-                emoji: true,
-              },
-              value: "SOCKS",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Access to something",
-                emoji: true,
-              },
-              value: "Access",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Deployment",
-                emoji: true,
-              },
-              value: "Deployment",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Troubleshooting",
-                emoji: true,
-              },
-              value: "Troubleshooting",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Local environment",
-                emoji: true,
-              },
-              value: "Local_Environment",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Platform Architecture",
-                emoji: true,
-              },
-              value: "Platform_Architecture",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Deploy",
-                emoji: true,
-              },
-              value: "Deploy",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Forms system",
-                emoji: true,
-              },
-              value: "Forms_System",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Design system",
-                emoji: true,
-              },
-              value: "Design_System",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Analytics",
-                emoji: true,
-              },
-              value: "Analytics",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Accessibility",
-                emoji: true,
-              },
-              value: "Accessibility",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "IA",
-                emoji: true,
-              },
-              value: "IA",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Design",
-                emoji: true,
-              },
-              value: "Design",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Security",
-                emoji: true,
-              },
-              value: "Security",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "QA",
-                emoji: true,
-              },
-              value: "QA",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Something else",
-                emoji: true,
-              },
-              value: "Something else",
-            },
-          ],
+          options: buildDropDownOptions(topics),
           action_id: "selected",
         },
         label: {

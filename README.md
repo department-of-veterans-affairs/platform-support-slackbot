@@ -42,6 +42,12 @@ If you have ngrok setup, start the localhost tunnel by using the following comma
 $ ngrok http 3000
 ```
 
+A script is built to execute ngrok.  Launch a separate terminal window and execute:
+
+```
+$ ./ngrok.sh
+```
+
 #### 💡NOTE Each time you restart `ngrok`, a new URL will be generated. 💡
 
 Here's an example:

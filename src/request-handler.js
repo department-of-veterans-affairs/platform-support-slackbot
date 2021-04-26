@@ -1,6 +1,8 @@
 const logger = require("pino")();
 const modalBuilder = require("./modal-builder");
 
+const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
+
 function requestHandler(app) {
   async function buildSupportModal(client, user, trigger_id) {
     const view = modalBuilder.buildSupportModal(user);
@@ -79,7 +81,7 @@ function requestHandler(app) {
     // Message the user
     try {
       await client.chat.postMessage({
-        channel: id,
+        channel: SUPPORT_CHANNEL_ID,
         link_names: 1,
         blocks: [
           {

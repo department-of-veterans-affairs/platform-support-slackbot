@@ -1,5 +1,5 @@
 const logger = require("pino")();
-const modalBuilder = require("./modal-builder");
+const modalBuilder = require("./block-kit/modal-builder");
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 

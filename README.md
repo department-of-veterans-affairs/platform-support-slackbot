@@ -64,3 +64,9 @@ Take the URL above and update the [Slack API Portal](https://api.slack.com) at t
 * Event Subscriptions
 * Slack Commands (All of them)
 * Interactivity and Shortcuts
+
+
+# Logging
+
+Log levels are defined [here](https://getpino.io/#/docs/api?id=levels)
+

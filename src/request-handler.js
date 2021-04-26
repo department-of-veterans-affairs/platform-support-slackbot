@@ -32,7 +32,7 @@ function requestHandler(app) {
         text: msg,
       });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   });
 
@@ -44,13 +44,12 @@ function requestHandler(app) {
       // Call views.open with the built-in client
       buildSupportModal(client, body.user_id, body.trigger_id);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   });
 
   // Handle Form Submission
   app.view("support_modal_view", async ({ ack, body, view, client }) => {
-    // Acknowledge the view_submission event
     await ack();
 
     const { id, username } = body.user;
@@ -120,7 +119,7 @@ function requestHandler(app) {
         text: `Hey there <@${id}>!`,
       });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   });
 }

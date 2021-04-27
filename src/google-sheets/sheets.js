@@ -2,7 +2,7 @@ const { GoogleSpreadsheet } = require("google-spreadsheet");
 const creds = require("../../client_secret.json");
 
 const getTopics = async () => {
-    const doc = new GoogleSpreadsheet('1k9P921Hdo654631HmX9WovGaYRIFAhO3QRg3EN3F9gI');
+    const doc = new GoogleSpreadsheet(process.env.TOPIC_SPREADSHEET_ID);
 
     // Authentication using Google Service Account (See client_secret.json)
     doc.useServiceAccountAuth(creds);

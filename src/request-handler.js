@@ -1,12 +1,15 @@
 const logger = require("pino")();
 const modalBuilder = require("./block-kit/modal-builder");
 const responseBuilder = require("./block-kit/response-builder");
+const sheets = require('./google-sheets/sheets');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 function requestHandler(app) {
   async function buildSupportModal(client, user, trigger_id) {
-    const view = modalBuilder.buildSupportModal(user);
+    const topics = await sheets.getTopics();
+
+    const view = modalBuilder.buildSupportModal(user, topics);
 
     const result = await client.views.open({
       trigger_id,

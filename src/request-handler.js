@@ -92,7 +92,7 @@ function requestHandler(app) {
       await client.chat.postMessage({
         channel: SUPPORT_CHANNEL_ID,
         link_names: 1,
-        blocks: responseBuilder.buildSupportResponse(ticketId, currentTime, id, whoNeedsSupport, selectedTopic, summaryDescription),
+        blocks: responseBuilder.buildSupportResponse(id, selectedTopic, summaryDescription),
         text: `Hey there <@${id}>!`,
       });
     } catch (error) {

@@ -1,4 +1,4 @@
-const buildSupportResponse = (ticketId, currentTime, userId, usersRequestingSupport, selectedTopic, summaryDescription) => {
+const buildSupportResponse = (userId, selectedTopic, summaryDescription) => {
   return [
     {
       type: "section",
@@ -14,29 +14,6 @@ const buildSupportResponse = (ticketId, currentTime, userId, usersRequestingSupp
           },
           action_id: "reassign_button_click",
         },
-    },
-    {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: `*Ticket Id*\n${ticketId}`,
-        },
-    },
-    {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: `*Submitted Time*\n${currentTime.toString()}`,
-        },
-    },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `*New platform request for*\n${usersRequestingSupport
-          .map((u) => `<@${u}>`)
-          .join(", ")}`,
-      },
     },
     {
       type: "section",

@@ -94,6 +94,7 @@ function requestHandler(app) {
         link_names: 1,
         blocks: responseBuilder.buildSupportResponse(id, selectedTopic, summaryDescription),
         text: `Hey there <@${id}>!`,
+        unfurl_links: false,
       });
     } catch (error) {
       logger.error(error);

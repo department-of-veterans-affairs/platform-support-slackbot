@@ -82,6 +82,8 @@ function requestHandler(app) {
     logger.trace("selectedTopic", selectedTopic);
     logger.trace("summaryDescription", summaryDescription);
 
+    sheets.captureResponses(id, usersRequestingSupport, selectedTopic, summaryDescription);
+
     // Message the user
     try {
       await client.chat.postMessage({

@@ -1,25 +1,3 @@
-// TODO: Load topics from Google Sheet
-
-// const topics = [
-//   { text: 'PR Review', value: 'PR_Review' },
-//   { text: 'SOCKS', value: 'SOCKS' },
-//   { text: 'Access to something', value: 'Access' },
-//   { text: 'Deployment', value: 'Deployment' },
-//   { text: 'Troubleshooting', value: 'Troubleshooting' },
-//   { text: 'Local environment', value: 'Local_Environment' },
-//   { text: 'Platform Architecture', value: 'Platform_Architecture' },
-//   { text: 'Deploy', value: 'Deploy' },
-//   { text: 'Forms system', value: 'Forms_System' },
-//   { text: 'Design system', value: 'Design_System' },
-//   { text: 'Analytics', value: 'Analytics' },
-//   { text: 'Accessibility', value: 'Accessibility' },
-//   { text: 'IA', value: 'IA' },
-//   { text: 'Design', value: 'Design' },
-//   { text: 'Security', value: 'Security' },
-//   { text: 'QA', value: 'QA' },
-//   { text: 'Something else', value: 'Something_Else' }
-// ];
-
 const buildDropDownOptions = (topics) => {
   return topics.map(topic => {
       return {

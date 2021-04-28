@@ -74,5 +74,25 @@ Take the URL above and update the [Slack API Portal](https://api.slack.com) at t
 
 # Logging
 
+## TODO: Add to readme
+
 Log levels are defined [here](https://getpino.io/#/docs/api?id=levels)
 
+
+# Google Sheets Setup
+
+TODO: 
+* Setting up a Service Account with Google Developer Console
+* Getting the Spreadsheet ID and setting it up as an environment variable
+* Top row is the header row, ideally don't use spaces since they become JavaScript properties
+
+
+## Giving Permissions
+
+To give the service account permissions, create a new Google sheet in your account and give the following account `edit` permission access.
+
+```
+platform-support-bot@platform-support-bot-312013.iam.gserviceaccount.com
+```
+
+This is the service account created for the Platform Service Bot.  Google Sheets will ask you if you want to give write permissions to this spreadsheet outside of the organization.  Click Yes.

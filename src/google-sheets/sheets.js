@@ -24,6 +24,30 @@ const getTopics = async () => {
     return result;
 };
 
+const captureResponses = async (id, usersRequestingSupport, selectedTopic, summaryDescription) => {
+    const doc = new GoogleSpreadsheet(process.env.RESPONSES_SPREADSHEET_ID);
+
+    // Authentication using Google Service Account (See client_secret.json)
+    doc.useServiceAccountAuth(creds);
+
+    // loads document properties and worksheets
+    await doc.loadInfo();
+
+    const sheet = doc.sheetsByIndex[0];
+
+    //Users	Topic	Summary	ForwardedTeam
+
+    const userList = usersRequestingSupport.join(', ');
+
+    const row = await sheet.addRow({ 
+        Users: userList, 
+        Topic: selectedTopic, 
+        Summary: summaryDescription, 
+        ForwardedTeam: 'none' 
+    });
+};
+
 module.exports = {
-    getTopics
+    getTopics,
+    captureResponses
 };

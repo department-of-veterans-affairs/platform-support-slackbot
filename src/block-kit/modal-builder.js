@@ -45,25 +45,6 @@ const buildSupportModal = (user, topics) => {
       },
       {
         type: "input",
-        block_id: "users_requesting_support",
-        element: {
-          type: "multi_users_select",
-          placeholder: {
-            type: "plain_text",
-            text: "Select users",
-            emoji: true,
-          },
-          action_id: "users",
-          initial_users: [user],
-        },
-        label: {
-          type: "plain_text",
-          text: "User requesting support",
-          emoji: true,
-        },
-      },
-      {
-        type: "input",
         block_id: "topic",
         element: {
           type: "static_select",
@@ -93,6 +74,25 @@ const buildSupportModal = (user, topics) => {
           type: "plain_text_input",
           multiline: true,
           action_id: "value",
+        },
+      },
+      {
+        type: "input",
+        block_id: "users_requesting_support",
+        element: {
+          type: "multi_users_select",
+          placeholder: {
+            type: "plain_text",
+            text: "Select users",
+            emoji: true,
+          },
+          action_id: "users",
+          initial_users: [user],
+        },
+        label: {
+          type: "plain_text",
+          text: "User(s) requesting support",
+          emoji: true,
         },
       },
     ],

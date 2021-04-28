@@ -46,7 +46,7 @@ const captureResponses = async (ticketId, username, currentTime, usersRequesting
         Users: userList, 
         Topic: selectedTopic, 
         Summary: summaryDescription, 
-        ForwardedTeam: 'none' 
+        AssignedTeam: 'none' 
     });
 };
 

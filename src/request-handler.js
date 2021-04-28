@@ -71,29 +71,28 @@ function requestHandler(app) {
   app.view("support_modal_view", async ({ ack, body, view, client }) => {
     await ack();
 
-    const { id, username } = body.user;
-    const { users_requesting_support, topic, summary } = view.state.values;
+    const { id, username: whoSubmitted } = body.user;
+    const { users_requesting_support : users, topic, summary } = view.state.values;
 
-    const usersRequestingSupport =
-      users_requesting_support.users.selected_users;
+    const whoNeedsSupport = users.users.selected_users;
     const selectedTopic = topic.selected.selected_option.value;
     const summaryDescription = summary.value.value;
 
-    logger.trace("usersRequestingSupport", usersRequestingSupport);
+    logger.trace("whoNeedsSupport", whoNeedsSupport);
     logger.trace("selectedTopic", selectedTopic);
     logger.trace("summaryDescription", summaryDescription);
 
     const ticketId = uuidv4();
     const currentTime = new Date(Date.now());
 
-    sheets.captureResponses(ticketId, currentTime, username, usersRequestingSupport, selectedTopic, summaryDescription);
+    sheets.captureResponses(ticketId, currentTime, whoSubmitted, whoNeedsSupport, selectedTopic, summaryDescription);
 
     // Message the user
     try {
       await client.chat.postMessage({
         channel: SUPPORT_CHANNEL_ID,
         link_names: 1,
-        blocks: responseBuilder.buildSupportResponse(ticketId, currentTime, id, usersRequestingSupport, selectedTopic, summaryDescription),
+        blocks: responseBuilder.buildSupportResponse(ticketId, currentTime, id, whoNeedsSupport, selectedTopic, summaryDescription),
         text: `Hey there <@${id}>!`,
       });
     } catch (error) {

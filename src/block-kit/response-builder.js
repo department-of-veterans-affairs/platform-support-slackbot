@@ -6,14 +6,14 @@ const buildSupportResponse = (id, usersRequestingSupport, selectedTopic, summary
         type: "mrkdwn",
         text: `Hey there <@${id}>! We've recieved your Platform support request.`,
       },
-      //   accessory: {
-      //     type: "button",
-      //     text: {
-      //       type: "plain_text",
-      //       text: "Click Me",
-      //     },
-      //     action_id: "button_click",
-      //   },
+        accessory: {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Reassign Ticket",
+          },
+          action_id: "reassign_button_click",
+        },
     },
     {
       type: "section",

@@ -2,6 +2,7 @@ const logger = require("pino")();
 const modalBuilder = require("./block-kit/modal-builder");
 const responseBuilder = require("./block-kit/response-builder");
 const sheets = require('./google-sheets/sheets');
+const { v4: uuidv4 } = require('uuid');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
@@ -82,14 +83,17 @@ function requestHandler(app) {
     logger.trace("selectedTopic", selectedTopic);
     logger.trace("summaryDescription", summaryDescription);
 
-    sheets.captureResponses(id, usersRequestingSupport, selectedTopic, summaryDescription);
+    const ticketId = uuidv4();
+    const currentTime = new Date(Date.now());
+
+    sheets.captureResponses(ticketId, currentTime, username, usersRequestingSupport, selectedTopic, summaryDescription);
 
     // Message the user
     try {
       await client.chat.postMessage({
         channel: SUPPORT_CHANNEL_ID,
         link_names: 1,
-        blocks: responseBuilder.buildSupportResponse(id, usersRequestingSupport, selectedTopic, summaryDescription),
+        blocks: responseBuilder.buildSupportResponse(ticketId, currentTime, id, usersRequestingSupport, selectedTopic, summaryDescription),
         text: `Hey there <@${id}>!`,
       });
     } catch (error) {

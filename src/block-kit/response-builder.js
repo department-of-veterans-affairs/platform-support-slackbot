@@ -1,10 +1,10 @@
-const buildSupportResponse = (id, usersRequestingSupport, selectedTopic, summaryDescription) => {
+const buildSupportResponse = (ticketId, currentTime, userId, usersRequestingSupport, selectedTopic, summaryDescription) => {
   return [
     {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `Hey there <@${id}>! We've recieved your Platform support request.`,
+        text: `Hey there <@${userId}>! We've recieved your Platform support request.`,
       },
         accessory: {
           type: "button",
@@ -16,10 +16,24 @@ const buildSupportResponse = (id, usersRequestingSupport, selectedTopic, summary
         },
     },
     {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*Ticket Id*\n${ticketId}`,
+        },
+    },
+    {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*Submitted Time*\n${currentTime.toString()}`,
+        },
+    },
+    {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*New platform request from*\n${usersRequestingSupport
+        text: `*New platform request for*\n${usersRequestingSupport
           .map((u) => `<@${u}>`)
           .join(", ")}`,
       },

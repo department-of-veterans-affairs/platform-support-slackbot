@@ -115,11 +115,30 @@ function requestHandler(app, logger) {
       logger.trace(postedMessage);
       logger.debug(`Posted Message ID: ${messageId}`);
 
-      sheets.captureResponses(messageId, whoSubmitted, dateTime, whoNeedsSupport, selectedTopic, summaryDescription);
+      const slackUsers = await Promise.all(whoNeedsSupport.map(async id => await getSlackUser(client, id)));
+
+      const usernames = slackUsers.map(user => user.user.name);
+
+      sheets.captureResponses(messageId, whoSubmitted, dateTime, usernames, selectedTopic, summaryDescription);
     } catch (error) {
       logger.error(error);
     }
   });
+
+  const getSlackUser = async (client, userId) => {
+    try {
+      // Call the users.info method using the WebClient
+      return await client.users.info({
+        user: userId
+      });
+    }
+    catch (error) {
+      // If it fails to retreive the username, just return the user Id
+      logger.error(error);
+  
+      return userId;
+    }
+  }
 }
 
 module.exports = requestHandler;

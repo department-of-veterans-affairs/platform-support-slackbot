@@ -30,7 +30,14 @@ function requestHandler(app, logger) {
   // Listens to any message
   app.message('', async (obj) => {
     const { message, say } = obj;
-    await say(`Hello, <@${message.user}>`);
+
+    // TODO:
+    // If the message is a reply, check to see if the thread hasn't been
+    // replied to.  If not, update a timestamp.
+    if (message.thread_ts) {
+      logger.debug(message);
+      await say(`Hello, <@${message.user}>`);
+    }
   });
 
   app.command("/help", async ({ ack, body, client, command }) => {

@@ -8,9 +8,9 @@ function requestHandler(app, logger) {
   async function buildSupportModal(client, user, trigger_id) {
     logger.debug('buildSupportModal()');
 
-    const topics = await sheets.getTopics();
+    const options = await sheets.getOptions();
 
-    const view = modalBuilder.buildSupportModal(user, topics);
+    const view = modalBuilder.buildSupportModal(user, options);
 
     const result = await client.views.open({
       trigger_id,
@@ -95,11 +95,11 @@ function requestHandler(app, logger) {
       const { users_requesting_support : users, topic, summary } = view.state.values;
   
       const whoNeedsSupport = users.users.selected_users;
-      const selectedTopic = topic.selected.selected_option.value;
+      const selectedTeam = topic.selected.selected_option.value;
       const summaryDescription = summary.value.value;
   
       logger.trace("whoNeedsSupport", whoNeedsSupport);
-      logger.trace("selectedTopic", selectedTopic);
+      logger.trace("selectedTeam", selectedTeam);
       logger.trace("summaryDescription", summaryDescription);
   
       const dateTime = new Date(Date.now());
@@ -107,7 +107,7 @@ function requestHandler(app, logger) {
       const postedMessage = await client.chat.postMessage({
         channel: SUPPORT_CHANNEL_ID,
         link_names: 1,
-        blocks: responseBuilder.buildSupportResponse(id, selectedTopic, summaryDescription),
+        blocks: responseBuilder.buildSupportResponse(id, selectedTeam, summaryDescription),
         text: `Hey there <@${id}>!`,
         unfurl_links: false,
       });
@@ -126,7 +126,7 @@ function requestHandler(app, logger) {
 
       const usernames = slackUsers.map(user => user.user.name);
 
-      sheets.captureResponses(messageId, whoSubmitted, dateTime, usernames, selectedTopic, summaryDescription);
+      sheets.captureResponses(messageId, whoSubmitted, dateTime, usernames, selectedTeam, summaryDescription);
     } catch (error) {
       logger.error(error);
     }

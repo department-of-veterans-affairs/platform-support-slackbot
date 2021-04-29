@@ -14,8 +14,8 @@ const getGoogleSheet = async (spreadsheetId) => {
     return doc;
 }
 
-const getTopics = async () => {
-    const doc = await getGoogleSheet(process.env.TOPIC_SPREADSHEET_ID);
+const getOptions = async () => {
+    const doc = await getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
 
     const sheet = doc.sheetsByIndex[0];
 
@@ -31,7 +31,7 @@ const getTopics = async () => {
     return result;
 };
 
-const captureResponses = async (messageId, username, currentTime, usersRequestingSupport, selectedTopic, summaryDescription) => {
+const captureResponses = async (messageId, username, currentTime, usersRequestingSupport, selectedTeam, summaryDescription) => {
     const doc = await getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
 
     const sheet = doc.sheetsByIndex[0];
@@ -46,13 +46,12 @@ const captureResponses = async (messageId, username, currentTime, usersRequestin
         DateTimeUTC: currentTime,
         DateTimeEST: dateFormatted,
         Users: userList, 
-        Topic: selectedTopic, 
-        Summary: summaryDescription, 
-        AssignedTeam: 'none' 
+        Team: selectedTeam, 
+        Summary: summaryDescription
     });
 };
 
 module.exports = {
-    getTopics,
+    getOptions,
     captureResponses
 };

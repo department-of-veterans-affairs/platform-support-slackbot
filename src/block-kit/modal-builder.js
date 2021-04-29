@@ -1,17 +1,17 @@
-const buildDropDownOptions = (topics) => {
-  return topics.map(topic => {
+const buildDropDownOptions = (options) => {
+  return options.map(option => {
       return {
         text: {
           type: "plain_text",
-          text: topic.text,
+          text: option.text,
           emoji: true,
         },
-        value: topic.value,
+        value: option.value,
       };
   });
 }
 
-const buildSupportModal = (user, topics) => {
+const buildSupportModal = (user, options) => {
   return {
     type: "modal",
     callback_id: "support_modal_view",
@@ -53,12 +53,12 @@ const buildSupportModal = (user, topics) => {
             text: "Select an item",
             emoji: true,
           },
-          options: buildDropDownOptions(topics),
+          options: buildDropDownOptions(options),
           action_id: "selected",
         },
         label: {
           type: "plain_text",
-          text: "I need help with",
+          text: "I need help from",
           emoji: true,
         },
       },

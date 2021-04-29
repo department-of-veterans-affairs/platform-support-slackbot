@@ -36,8 +36,6 @@ const captureResponses = async (messageId, username, currentTime, usersRequestin
 
     const sheet = doc.sheetsByIndex[0];
 
-    //Users	Topic	Summary	ForwardedTeam
-
     const userList = usersRequestingSupport.join(', ');
 
     const dateFormatted = moment.tz(currentTime, "America/New_York").format('LLLL');

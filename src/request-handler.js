@@ -83,9 +83,9 @@ function requestHandler(app) {
     logger.trace("summaryDescription", summaryDescription);
 
     const ticketId = uuidv4();
-    const currentTime = new Date(Date.now());
+    const dateTime = new Date(Date.now());
 
-    sheets.captureResponses(ticketId, currentTime, whoSubmitted, whoNeedsSupport, selectedTopic, summaryDescription);
+    sheets.captureResponses(ticketId, whoSubmitted, dateTime, whoNeedsSupport, selectedTopic, summaryDescription);
 
     // Message the user
     try {

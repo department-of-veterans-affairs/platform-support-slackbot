@@ -1,5 +1,6 @@
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 const creds = require("../../client_secret.json");
+const moment = require('moment-timezone');
 
 const getTopics = async () => {
     const doc = new GoogleSpreadsheet(process.env.TOPIC_SPREADSHEET_ID);
@@ -39,10 +40,13 @@ const captureResponses = async (ticketId, username, currentTime, usersRequesting
 
     const userList = usersRequestingSupport.join(', ');
 
+    const dateFormatted = moment.tz(currentTime, "America/New_York").format('LLLL');
+
     const row = await sheet.addRow({ 
         TicketId: ticketId,
         SubmittedBy: username,
-        DateTime: currentTime.toString(),
+        DateTimeUTC: currentTime,
+        DateTimeEST: dateFormatted,
         Users: userList, 
         Topic: selectedTopic, 
         Summary: summaryDescription, 

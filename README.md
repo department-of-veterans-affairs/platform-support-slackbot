@@ -74,10 +74,24 @@ Take the URL above and update the [Slack API Portal](https://api.slack.com) at t
 
 # Logging
 
-## TODO: Add to readme
-
 Log levels are defined [here](https://getpino.io/#/docs/api?id=levels)
 
+| Level | Number |
+| ----- | ------ |
+| trace |     10 |
+| debug |     20 |
+| info  |     30 |
+| warn  |     40 |
+| error |     50 |
+| fatal |     60 |
+
+To set the current log level, set the environment variable: `LOG_LEVEL`.
+
+```
+$ export LOG_LEVEL=debug  # Set log level to trace
+```
+
+Note: By default the log level is `info` if not provided.
 
 # Google Sheets Setup
 

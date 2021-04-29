@@ -25,7 +25,7 @@ const getTopics = async () => {
     return result;
 };
 
-const captureResponses = async (ticketId, username, currentTime, usersRequestingSupport, selectedTopic, summaryDescription) => {
+const captureResponses = async (messageId, username, currentTime, usersRequestingSupport, selectedTopic, summaryDescription) => {
     const doc = new GoogleSpreadsheet(process.env.RESPONSES_SPREADSHEET_ID);
 
     // Authentication using Google Service Account (See client_secret.json)
@@ -43,7 +43,7 @@ const captureResponses = async (ticketId, username, currentTime, usersRequesting
     const dateFormatted = moment.tz(currentTime, "America/New_York").format('LLLL');
 
     const row = await sheet.addRow({ 
-        TicketId: ticketId,
+        MessageId: messageId,
         SubmittedBy: username,
         DateTimeUTC: currentTime,
         DateTimeEST: dateFormatted,

@@ -82,20 +82,29 @@ function requestHandler(app) {
     logger.trace("selectedTopic", selectedTopic);
     logger.trace("summaryDescription", summaryDescription);
 
-    const ticketId = uuidv4();
     const dateTime = new Date(Date.now());
-
-    sheets.captureResponses(ticketId, whoSubmitted, dateTime, whoNeedsSupport, selectedTopic, summaryDescription);
 
     // Message the user
     try {
-      await client.chat.postMessage({
+      const postedMessage = await client.chat.postMessage({
         channel: SUPPORT_CHANNEL_ID,
         link_names: 1,
         blocks: responseBuilder.buildSupportResponse(id, selectedTopic, summaryDescription),
         text: `Hey there <@${id}>!`,
         unfurl_links: false,
       });
+      
+      if (!postedMessage.ok) {
+        logger.error(`Unable to post message. ${JSON.stringify(postedMessage)}`);
+        return;
+      }
+
+      const messageId = postedMessage.ts;
+      
+      logger.trace(postedMessage);
+      logger.debug(messageId);
+
+      sheets.captureResponses(messageId, whoSubmitted, dateTime, whoNeedsSupport, selectedTopic, summaryDescription);
     } catch (error) {
       logger.error(error);
     }

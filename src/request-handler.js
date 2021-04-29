@@ -6,6 +6,8 @@ const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 function requestHandler(app, logger) {
   async function buildSupportModal(client, user, trigger_id) {
+    logger.debug('buildSupportModal()');
+
     const topics = await sheets.getTopics();
 
     const view = modalBuilder.buildSupportModal(user, topics);
@@ -15,7 +17,8 @@ function requestHandler(app, logger) {
       view,
     });
 
-    logger.debug(result);
+    logger.debug(`user: ${user}`);
+    logger.trace(result);
   }
 
   // Listens to incoming messages that contain "hello"

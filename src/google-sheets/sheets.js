@@ -2,14 +2,20 @@ const { GoogleSpreadsheet } = require("google-spreadsheet");
 const creds = require("../../client_secret.json");
 const moment = require('moment-timezone');
 
-const getTopics = async () => {
-    const doc = new GoogleSpreadsheet(process.env.TOPIC_SPREADSHEET_ID);
+const getGoogleSheet = async (spreadsheetId) => {
+    const doc = new GoogleSpreadsheet(spreadsheetId);
 
     // Authentication using Google Service Account (See client_secret.json)
     doc.useServiceAccountAuth(creds);
 
     // loads document properties and worksheets
     await doc.loadInfo(); 
+
+    return doc;
+}
+
+const getTopics = async () => {
+    const doc = await getGoogleSheet(process.env.TOPIC_SPREADSHEET_ID);
 
     const sheet = doc.sheetsByIndex[0];
 
@@ -26,13 +32,7 @@ const getTopics = async () => {
 };
 
 const captureResponses = async (messageId, username, currentTime, usersRequestingSupport, selectedTopic, summaryDescription) => {
-    const doc = new GoogleSpreadsheet(process.env.RESPONSES_SPREADSHEET_ID);
-
-    // Authentication using Google Service Account (See client_secret.json)
-    doc.useServiceAccountAuth(creds);
-
-    // loads document properties and worksheets
-    await doc.loadInfo();
+    const doc = await getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
 
     const sheet = doc.sheetsByIndex[0];
 

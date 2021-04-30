@@ -31,7 +31,7 @@ const getOptions = async () => {
     return result;
 };
 
-const captureResponses = async (messageId, username, currentTime, usersRequestingSupport, selectedTeam, summaryDescription) => {
+const captureResponses = async (messageId, username, currentTime, usersRequestingSupport, selectedTeam, summaryDescription, messageLink) => {
     const doc = await getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
 
     const sheet = doc.sheetsByIndex[0];
@@ -47,7 +47,8 @@ const captureResponses = async (messageId, username, currentTime, usersRequestin
         DateTimeEST: dateFormatted,
         Users: userList, 
         Team: selectedTeam, 
-        Summary: summaryDescription
+        Summary: summaryDescription,
+        MessageLink: messageLink
     });
 };
 

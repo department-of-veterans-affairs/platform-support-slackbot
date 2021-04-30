@@ -118,6 +118,7 @@ function requestHandler(app, logger) {
       }
 
       const messageId = postedMessage.ts;
+      const messageLink = `https://adhoc.slack.com/archives/${postedMessage.channel}/p${postedMessage.ts.replace('.', '')}`;
 
       logger.trace(postedMessage);
       logger.debug(`Posted Message ID: ${messageId}`);
@@ -126,7 +127,7 @@ function requestHandler(app, logger) {
 
       const usernames = slackUsers.map(user => user.user.name);
 
-      sheets.captureResponses(messageId, whoSubmitted, dateTime, usernames, selectedTeam, summaryDescription);
+      sheets.captureResponses(messageId, whoSubmitted, dateTime, usernames, selectedTeam, summaryDescription, messageLink);
     } catch (error) {
       logger.error(error);
     }

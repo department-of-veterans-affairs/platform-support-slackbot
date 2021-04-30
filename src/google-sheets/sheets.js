@@ -50,6 +50,9 @@ const captureResponses = async (messageId, username, currentTime, usersRequestin
         Summary: summaryDescription,
         MessageLink: messageLink
     });
+
+    logger.debug('captureResponses()');
+    logger.trace(row);
 };
 
 module.exports = {

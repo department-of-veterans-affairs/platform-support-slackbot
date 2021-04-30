@@ -1,6 +1,7 @@
 const modalBuilder = require("./block-kit/modal-builder");
 const responseBuilder = require("./block-kit/response-builder");
 const sheets = require('./google-sheets/sheets');
+const { createHash } = require('crypto');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
@@ -36,7 +37,8 @@ function requestHandler(app, logger) {
     // replied to.  If not, update a timestamp.
     if (message.thread_ts) {
       logger.debug(message);
-      await say(`Hello, <@${message.user}>`);
+      // await say(`Hello, <@${message.user}>`);
+      sheets.updateReplyTimeStampForMessage(hashMessageId(message.thread_ts.replace('.', '')));
     }
   });
 
@@ -117,17 +119,20 @@ function requestHandler(app, logger) {
         return;
       }
 
-      const messageId = postedMessage.ts;
-      const messageLink = `https://adhoc.slack.com/archives/${postedMessage.channel}/p${postedMessage.ts.replace('.', '')}`;
+      const messageId = postedMessage.ts.replace('.', '');
+      const messageLink = `https://adhoc.slack.com/archives/${postedMessage.channel}/p${messageId}`;
+
+      const hashedMessageId = hashMessageId(messageId);
 
       logger.trace(postedMessage);
       logger.debug(`Posted Message ID: ${messageId}`);
+      logger.debug(`Posted Message ID Hashed: ${hashedMessageId}`);
 
       const slackUsers = await Promise.all(whoNeedsSupport.map(async id => await getSlackUser(client, id)));
 
       const usernames = slackUsers.map(user => user.user.name);
 
-      sheets.captureResponses(messageId, whoSubmitted, dateTime, usernames, selectedTeam, summaryDescription, messageLink);
+      sheets.captureResponses(hashedMessageId, whoSubmitted, dateTime, usernames, selectedTeam, summaryDescription, messageLink);
     } catch (error) {
       logger.error(error);
     }
@@ -146,6 +151,11 @@ function requestHandler(app, logger) {
   
       return userId;
     }
+  }
+
+  const hashMessageId = (messageId) => {
+    const hash = createHash('md5');
+    return hash.update(messageId).digest('hex');
   }
 }
 

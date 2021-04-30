@@ -50,12 +50,34 @@ const captureResponses = async (messageId, username, currentTime, usersRequestin
         Summary: summaryDescription,
         MessageLink: messageLink
     });
+};
 
-    logger.debug('captureResponses()');
-    logger.trace(row);
+const updateReplyTimeStampForMessage = async (messageId) => {
+    const doc = await getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
+
+    const sheet = doc.sheetsByIndex[0];
+
+    const rows = await sheet.getRows();
+
+    let row = null;
+
+    for (let i = 0; i < sheet.rowCount; i++) {
+        if (!rows[i]) break;
+        if (rows[i].MessageId === messageId) {
+            row = rows[i];
+            break;
+        }
+    }
+
+    if (row == null) console.log('NULL!!!');
+
+    row.FirstReplyTimeUTC = new Date(Date.now()).toISOString();
+
+    await row.save();
 };
 
 module.exports = {
     getOptions,
-    captureResponses
+    captureResponses,
+    updateReplyTimeStampForMessage
 };

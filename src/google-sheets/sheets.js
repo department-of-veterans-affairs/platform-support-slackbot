@@ -59,7 +59,10 @@ const updateReplyTimeStampForMessage = async (messageId) => {
 
     const rows = await sheet.getRows();
 
-    let row = null;
+    let row;
+
+    // TODO: Find the best approach for updating the reply time stamp.
+    console.log(sheet.rowCount);
 
     for (let i = 0; i < sheet.rowCount; i++) {
         if (!rows[i]) break;
@@ -69,11 +72,11 @@ const updateReplyTimeStampForMessage = async (messageId) => {
         }
     }
 
-    if (row == null) console.log('NULL!!!');
+    if (row && typeof(row.FirstReplyTimeUTC) === 'undefined') {
+        row.FirstReplyTimeUTC = new Date(Date.now()).toISOString();
 
-    row.FirstReplyTimeUTC = new Date(Date.now()).toISOString();
-
-    await row.save();
+        await row.save();
+    }
 };
 
 module.exports = {

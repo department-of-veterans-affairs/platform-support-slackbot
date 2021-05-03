@@ -1,5 +1,5 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const creds = require('../../client_secret.json');
+const creds = require('../../../client_secret.json');
 const moment = require('moment-timezone');
 
 module.exports = function (logger) {

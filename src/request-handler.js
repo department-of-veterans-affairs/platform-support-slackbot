@@ -1,10 +1,10 @@
-const responseBuilder = require('./block-kit/response-builder');
+const responseBuilder = require('./api/slack/block-kit/response-builder');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 function requestHandler(app, logger) {
   const util = require('./util')(logger);
-  const sheets = require('./google-sheets/sheets')(logger);
+  const sheets = require('./api/google/sheets')(logger);
 
   app.event('reaction_added', async ({ payload }) => {
     try {

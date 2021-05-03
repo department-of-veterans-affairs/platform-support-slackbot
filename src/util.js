@@ -1,8 +1,9 @@
 const modalBuilder = require('./block-kit/modal-builder');
-const sheets = require('./google-sheets/sheets');
 const { createHash } = require('crypto');
 
 module.exports = function (logger) {
+  const sheets = require('./google-sheets/sheets')(logger);
+
   let util = {};
 
   util.buildSupportModal = async (client, user, trigger_id) => {

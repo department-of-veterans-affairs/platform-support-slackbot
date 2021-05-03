@@ -1,10 +1,10 @@
 const responseBuilder = require('./block-kit/response-builder');
-const sheets = require('./google-sheets/sheets');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 function requestHandler(app, logger) {
   const util = require('./util')(logger);
+  const sheets = require('./google-sheets/sheets')(logger);
 
   app.message('hello', async ({ message, say }) => {
     try {

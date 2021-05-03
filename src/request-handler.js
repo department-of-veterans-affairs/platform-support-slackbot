@@ -6,6 +6,21 @@ function requestHandler(app, logger) {
   const util = require('./util')(logger);
   const sheets = require('./google-sheets/sheets')(logger);
 
+  app.event('reaction_added', async ({ payload }) => {
+    try {
+      if (payload.item.ts) {
+        logger.debug(payload);
+        const hashedMessageId = util.hashMessageId(
+          payload.item.ts.replace('.', '')
+        );
+        logger.debug(hashedMessageId);
+        sheets.updateReplyTimeStampForMessage(hashedMessageId);
+      }
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
   app.message('hello', async ({ message, say }) => {
     try {
       logger.debug(message.user);

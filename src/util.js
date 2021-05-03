@@ -41,5 +41,10 @@ module.exports = function (logger) {
     return hash.update(messageId).digest('hex');
   };
 
+  util.createMessageLink = (channel, messageId) => {
+    const updatedId = messageId.replace('.', '');
+    return `https://adhoc.slack.com/archives/${channel}/p${updatedId}`;
+  };
+
   return util;
 };

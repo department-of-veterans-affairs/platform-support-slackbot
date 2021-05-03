@@ -10,9 +10,7 @@ function requestHandler(app, logger) {
     try {
       if (payload.item.ts) {
         logger.debug(payload);
-        const hashedMessageId = util.hashMessageId(
-          payload.item.ts.replace('.', '')
-        );
+        const hashedMessageId = util.hashMessageId(payload.item.ts);
         logger.debug(hashedMessageId);
         sheets.updateReplyTimeStampForMessage(hashedMessageId);
       }
@@ -35,9 +33,7 @@ function requestHandler(app, logger) {
     try {
       if (message.thread_ts) {
         logger.debug(message);
-        const hashedMessageId = util.hashMessageId(
-          message.thread_ts.replace('.', '')
-        );
+        const hashedMessageId = util.hashMessageId(message.thread_ts);
         logger.debug(hashedMessageId);
         sheets.updateReplyTimeStampForMessage(hashedMessageId);
       }
@@ -46,7 +42,7 @@ function requestHandler(app, logger) {
     }
   });
 
-  app.command('/help', async ({ ack, body, client, command }) => {
+  app.command('/help', async ({ ack, body, client }) => {
     // Message the user
     try {
       await ack();
@@ -133,8 +129,12 @@ function requestHandler(app, logger) {
         return;
       }
 
-      const messageId = postedMessage.ts.replace('.', '');
-      const messageLink = `https://adhoc.slack.com/archives/${postedMessage.channel}/p${messageId}`;
+      const messageId = postedMessage.ts;
+
+      const messageLink = util.createMessageLink(
+        postedMessage.channel,
+        messageId
+      );
 
       const hashedMessageId = util.hashMessageId(messageId);
 

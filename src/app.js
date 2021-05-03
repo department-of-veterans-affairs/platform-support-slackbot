@@ -1,11 +1,12 @@
-// Environment Variables
+// Load Environment Variables
 require('dotenv').config();
 
-const logger = require("pino")();
-
+// Setup Logger
+const logger = require('pino')();
 logger.level = process.env.LOG_LEVEL || 'info';
 
-const { App } = require("@slack/bolt");
+// Initialize Platform Support Slack Bot
+const { App } = require('@slack/bolt');
 const requestHandler = require('./request-handler');
 
 // Initializes bot with Slack API token and signing secret
@@ -20,5 +21,5 @@ requestHandler(app, logger);
 (async () => {
   await app.start(process.env.PORT || 3000);
 
-  logger.info("⚡️Platform Support Bot is running! ⚡️");
+  logger.info('⚡️Platform Support Bot is running! ⚡️');
 })();

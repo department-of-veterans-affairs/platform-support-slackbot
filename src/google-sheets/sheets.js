@@ -5,6 +5,15 @@ const moment = require('moment-timezone');
 module.exports = function (logger) {
   let sheets = {};
 
+  /**
+   * Loads the Google Sheet into memory based on the Sheet Id.
+   * You can find the Google Sheet ID in the URL of an open spreadsheet.
+   * @example
+   *    https://docs.google.com/spreadsheets/d/1k9P921Hdo654631HmX9WovGaYRIFAhO3QRg3EN3F9gI
+   *    Spreadsheet ID: 1k9P921Hdo654631HmX9WovGaYRIFAhO3QRg3EN3F9gI
+   * @param {string} spreadsheetId
+   * @returns Google Spreadsheet Instance
+   */
   const getGoogleSheet = async (spreadsheetId) => {
     const doc = new GoogleSpreadsheet(spreadsheetId);
 
@@ -65,6 +74,12 @@ module.exports = function (logger) {
     });
   };
 
+  /**
+   * Updates the Google Sheet with the first reply time stamp.
+   * Note: Since Google Sheet is not a database, the code does a "table scan" to find
+   *       the right Message ID.
+   * @param {string} messageId - Message ID in Google Sheet to be updated.
+   */
   sheets.updateReplyTimeStampForMessage = async (messageId) => {
     const doc = await getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
 
@@ -87,7 +102,6 @@ module.exports = function (logger) {
 
     if (row && row.FirstReplyTimeUTC === '') {
       row.FirstReplyTimeUTC = new Date(Date.now()).toISOString();
-
       await row.save();
     } else {
       logger.debug('Row not found...');

@@ -83,6 +83,12 @@ module.exports = function (logger) {
     return hash.update(messageId).digest('hex');
   };
 
+  /**
+   * Generates a Slack Message Link
+   * @param {string} channelId
+   * @param {string} messageId
+   * @returns
+   */
   util.createMessageLink = (channel, messageId) => {
     const updatedId = messageId.replace('.', '');
     return `https://adhoc.slack.com/archives/${channel}/p${updatedId}`;

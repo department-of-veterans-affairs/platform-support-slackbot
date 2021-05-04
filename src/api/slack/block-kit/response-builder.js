@@ -39,6 +39,43 @@ const buildSupportResponse = (userId, selectedTeam, summaryDescription) => {
   ];
 };
 
+const buildHelpResponse = (userId = null) => {
+  const user = userId == null ? '' : ` <@${userId}>`;
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Hey there${user}! You can create a support request by clicking on the button below.`,
+      },
+    },
+    {
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            emoji: true,
+            text: 'Platform Support Request',
+          },
+          style: 'primary',
+          action_id: 'platform_support',
+        },
+      ],
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text:
+          'You can also create a support request by typing `/support` command in the message field.',
+      },
+    },
+  ];
+};
+
 module.exports = {
   buildSupportResponse,
+  buildHelpResponse,
 };

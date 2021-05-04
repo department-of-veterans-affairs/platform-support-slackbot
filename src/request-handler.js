@@ -1,4 +1,3 @@
-const PinoPretty = require('pino-pretty');
 const responseBuilder = require('./api/slack/block-kit/response-builder');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
@@ -14,11 +13,9 @@ module.exports = function (app, logger) {
     logger.info(obj);
 
     try {
-      let msg = `Hey there <@${payload.user}>!  To submit a new support request, use the /support command.  Simply type /support in the chat.`;
-
       await client.chat.postMessage({
         channel: payload.channel,
-        text: msg,
+        blocks: responseBuilder.buildHelpResponse(payload.user),
       });
     } catch (error) {
       logger.error(error);
@@ -67,12 +64,10 @@ module.exports = function (app, logger) {
     const { ack, body, client } = obj;
 
     try {
-      // Acknowledge the command request
       await ack();
 
       logger.info('platform_support action invoked.');
 
-      // Call views.open with the built-in client
       util.buildSupportModal(client, body.user.id, body.trigger_id);
     } catch (error) {
       logger.error(error);
@@ -80,15 +75,12 @@ module.exports = function (app, logger) {
   });
 
   app.command('/help', async ({ ack, body, client }) => {
-    // Message the user
     try {
       await ack();
 
-      let msg = `Hey there <@${body.user_id}>!  To submit a new support request, use the /support command.  Simply type /support in the chat.`;
-
       await client.chat.postMessage({
         channel: body.channel_id,
-        text: msg,
+        blocks: responseBuilder.buildHelpResponse(body.user_id),
       });
     } catch (error) {
       logger.error(error);
@@ -97,12 +89,10 @@ module.exports = function (app, logger) {
 
   app.command('/support', async ({ ack, body, client }) => {
     try {
-      // Acknowledge the command request
       await ack();
 
       logger.info('/support command invoked.');
 
-      // Call views.open with the built-in client
       util.buildSupportModal(client, body.user_id, body.trigger_id);
     } catch (error) {
       logger.error(error);
@@ -112,12 +102,10 @@ module.exports = function (app, logger) {
   // The open_modal shortcut opens a plain old modal
   app.shortcut('support', async ({ shortcut, ack, client }) => {
     try {
-      // Acknowledge shortcut request
       await ack();
 
       logger.info('support shortcut invoked.');
 
-      // Call views.open with the built-in client
       util.buildSupportModal(client, shortcut.user.id, shortcut.trigger_id);
     } catch (error) {
       logger.error(error);

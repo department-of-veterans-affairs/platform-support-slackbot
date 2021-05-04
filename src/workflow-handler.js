@@ -1,4 +1,5 @@
 const { WorkflowStep } = require('@slack/bolt');
+const responseBuilder = require('./api/slack/block-kit/response-builder');
 
 const WORKFLOW_CALLBACK_ID = 'platform_support_request';
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
@@ -66,38 +67,7 @@ module.exports = function (app, logger) {
 
         client.chat.postMessage({
           channel: SUPPORT_CHANNEL_ID,
-          blocks: [
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `Hey there! You can create a support request by clicking on the button below.`,
-              },
-            },
-            {
-              type: 'actions',
-              elements: [
-                {
-                  type: 'button',
-                  text: {
-                    type: 'plain_text',
-                    emoji: true,
-                    text: 'Platform Support Request',
-                  },
-                  style: 'primary',
-                  action_id: 'platform_support',
-                },
-              ],
-            },
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text:
-                  'You can also create a support request by typing `/support` in the message field.',
-              },
-            },
-          ],
+          blocks: responseBuilder.buildHelpResponse(),
         });
       } catch (error) {
         logger.error(error);

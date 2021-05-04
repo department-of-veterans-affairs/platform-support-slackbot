@@ -6,6 +6,12 @@ module.exports = function (logger) {
 
   let util = {};
 
+  /**
+   * Build Support Modal
+   * @param {*} client Slack Client Object
+   * @param {*} user Current User Id
+   * @param {*} trigger_id Trigger Id to generate modal
+   */
   util.buildSupportModal = async (client, user, trigger_id) => {
     logger.debug('buildSupportModal()');
 
@@ -26,7 +32,7 @@ module.exports = function (logger) {
    * Returns Slack Username from Slack User Id
    * @param {object} client Slack Client Object
    * @param {string} userId Slack User Id
-   * @returns
+   * @returns Slack userName
    */
   util.getSlackUser = async (client, userId) => {
     try {
@@ -45,8 +51,8 @@ module.exports = function (logger) {
   /**
    * Returns Slack Username and Id from Email
    * @param {object} client Slack Client Object
-   * @param {*} email Email Address
-   * @returns
+   * @param {string} email Email Address
+   * @returns object with userId and userName properties
    */
   util.getSlackUserByEmail = async (client, email) => {
     try {
@@ -63,6 +69,15 @@ module.exports = function (logger) {
     }
   };
 
+  /**
+   * Hash a message id to store in Google Sheet.
+   *
+   * Note: Message Id is double and causes issues
+   * when referencing the Id.  Convert it to a string
+   * for better comparison.
+   * @param {string} messageId Message Id
+   * @returns hashed string
+   */
   util.hashMessageId = (messageId) => {
     const hash = createHash('md5');
     return hash.update(messageId).digest('hex');

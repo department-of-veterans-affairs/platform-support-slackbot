@@ -37,7 +37,6 @@ module.exports = function (app, logger) {
 
   app.message('hello', async ({ message, say }) => {
     try {
-      logger.debug(message.user_id);
       logger.debug(message.user);
       await say(`Hey there <@${message.user}>!`);
     } catch (error) {

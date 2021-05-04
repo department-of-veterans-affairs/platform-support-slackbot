@@ -8,6 +8,7 @@ logger.level = process.env.LOG_LEVEL || 'info';
 // Initialize Platform Support Slack Bot
 const { App } = require('@slack/bolt');
 const requestHandler = require('./request-handler');
+const workflowHandler = require('./workflow-handler');
 
 // Initializes bot with Slack API token and signing secret
 const app = new App({
@@ -16,6 +17,7 @@ const app = new App({
 });
 
 requestHandler(app, logger);
+workflowHandler(app, logger);
 
 // Start Platform Support Slack Bot
 (async () => {

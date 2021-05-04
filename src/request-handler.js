@@ -1,3 +1,4 @@
+const PinoPretty = require('pino-pretty');
 const responseBuilder = require('./api/slack/block-kit/response-builder');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
@@ -5,6 +6,24 @@ const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 module.exports = function (app, logger) {
   const util = require('./util')(logger);
   const sheets = require('./api/google/sheets')(logger);
+
+  app.event('app_mention', async (obj) => {
+    const { body, client, payload } = obj;
+
+    logger.debug('app_mention');
+    logger.info(obj);
+
+    try {
+      let msg = `Hey there <@${payload.user}>!  To submit a new support request, use the /support command.  Simply type /support in the chat.`;
+
+      await client.chat.postMessage({
+        channel: payload.channel,
+        text: msg,
+      });
+    } catch (error) {
+      logger.error(error);
+    }
+  });
 
   app.event('reaction_added', async ({ payload }) => {
     try {

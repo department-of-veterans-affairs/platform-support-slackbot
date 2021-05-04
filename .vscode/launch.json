@@ -7,11 +7,14 @@
         {
             "type": "pwa-node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Debug Bot",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/src/app.js"
+            "program": "${workspaceFolder}/src/app.js",
+            "runtimeArgs": [
+                "--trace-warnings"
+            ]
         },
         {
             "name": "Run Mocha Tests (Debug)",

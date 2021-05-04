@@ -55,7 +55,7 @@ module.exports = function (app, logger) {
                     text: 'Platform Support Request',
                   },
                   style: 'primary',
-                  value: 'click_me_123',
+                  action_id: 'platform_support',
                 },
               ],
             },

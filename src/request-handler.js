@@ -43,6 +43,23 @@ module.exports = function (app, logger) {
     }
   });
 
+  app.action('platform_support', async (obj) => {
+    logger.info(obj);
+    const { ack, body, client } = obj;
+
+    try {
+      // Acknowledge the command request
+      await ack();
+
+      logger.info('platform_support action invoked.');
+
+      // Call views.open with the built-in client
+      util.buildSupportModal(client, body.user.id, body.trigger_id);
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
   app.command('/help', async ({ ack, body, client }) => {
     // Message the user
     try {

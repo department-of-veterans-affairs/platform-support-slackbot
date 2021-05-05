@@ -65,11 +65,14 @@ const buildHelpResponse = (userId = null) => {
       ],
     },
     {
+      type: 'divider',
+    },
+    {
       type: 'section',
       text: {
         type: 'mrkdwn',
         text:
-          'You can also create a support request by typing `/support` command in the message field.',
+          'You can create a support request by typing `/support` command in the message field\nor\n clicking on the *shortcut menu* → *Platform Support* → *Need Platform Support*',
       },
     },
   ];

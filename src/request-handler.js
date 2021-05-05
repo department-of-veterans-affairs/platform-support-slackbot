@@ -47,6 +47,24 @@ module.exports = function (app, logger) {
     }
   });
 
+  /**
+   * EVENT: member_joined_channel
+   * Sends a help message when a user joins the channel.
+   */
+  app.event('member_joined_channel', async ({ event, client }) => {
+    try {
+      logger.info('EVENT: member_joined_channel');
+
+      client.chat.postEphemeral({
+        channel: event.channel,
+        user: event.user,
+        blocks: responseBuilder.buildHelpResponse(event.user),
+      });
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
   /* MESSAGE LISTENERS */
 
   /**

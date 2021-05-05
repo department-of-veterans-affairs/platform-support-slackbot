@@ -6,12 +6,14 @@ module.exports = function (app, logger) {
   const util = require('./util')(logger);
   const sheets = require('./api/google/sheets')(logger);
 
-  app.event('app_mention', async (obj) => {
-    const { body, client, payload } = obj;
+  /* EVENT LISTENERS */
 
-    logger.debug('app_mention');
-    logger.info(obj);
-
+  /**
+   * EVENT: app_mention
+   * Responds with a help message anytime someone mentions
+   * the support bot.
+   */
+  app.event('app_mention', async ({ client, payload }) => {
     try {
       logger.info('EVENT: app_mention');
 
@@ -24,8 +26,15 @@ module.exports = function (app, logger) {
     }
   });
 
+  /**
+   * EVENT: reaction_added
+   * Captures the current time the first emoji reaction to a
+   * support ticket.
+   */
   app.event('reaction_added', async ({ payload }) => {
     try {
+      logger.info('EVENT: reaction_added');
+
       if (payload.item.ts) {
         logger.debug(payload);
         const hashedMessageId = util.hashMessageId(payload.item.ts);
@@ -37,22 +46,40 @@ module.exports = function (app, logger) {
     }
   });
 
+  /* MESSAGE LISTENERS */
+
+  /**
+   * MESSAGE: Hello
+   * Just responds to the message "hello"
+   */
   app.message('hello', async ({ message, say }) => {
     try {
+      logger.info('MESSAGE: hello');
       logger.debug(message.user);
+
       await say(`Hey there <@${message.user}>!`);
     } catch (error) {
       logger.error(error);
     }
   });
 
-  // Listens to any message
+  /**
+   * MESSAGE: any
+   * Listens to any messages on the channel to determine if
+   * the message is a reply to a support ticket.  If the reply
+   * is the first reply, capture the current time of the reply.
+   */
   app.message('', async ({ message }) => {
     try {
+      logger.info('MESSAGE: *');
+
+      // If message is a reply
       if (message.thread_ts) {
-        logger.debug(message);
         const hashedMessageId = util.hashMessageId(message.thread_ts);
+
+        logger.debug(message.thread_ts);
         logger.debug(hashedMessageId);
+
         sheets.updateReplyTimeStampForMessage(hashedMessageId);
       }
     } catch (error) {
@@ -60,11 +87,15 @@ module.exports = function (app, logger) {
     }
   });
 
-  app.action('platform_support', async (obj) => {
-    logger.info(obj);
-    const { ack, body, client } = obj;
-
+  /**
+   * Action: platform_support
+   * This function gets called when the green button "Platform Support Request"
+   * is clicked on.  It brings up the platform support request modal.
+   */
+  app.action('platform_support', async ({ ack, body, client }) => {
     try {
+      logger.info('ACTION: platform_support');
+
       await ack();
 
       logger.info('platform_support action invoked.');
@@ -75,12 +106,22 @@ module.exports = function (app, logger) {
     }
   });
 
+  /* COMMAND LISTENERS */
+
+  /**
+   * Command: /help
+   * Respond with Ephemeral help message anytime someone
+   * types in the /help command.
+   */
   app.command('/help', async ({ ack, body, client }) => {
     try {
+      logger.info('COMMAND: /help');
+
       await ack();
 
-      await client.chat.postMessage({
+      await client.chat.postEphemeral({
         channel: body.channel_id,
+        user: body.user_id,
         blocks: responseBuilder.buildHelpResponse(body.user_id),
       });
     } catch (error) {
@@ -88,11 +129,16 @@ module.exports = function (app, logger) {
     }
   });
 
+  /**
+   * Command: /support
+   * Brings up the platform support request modal when someone
+   * types the /support command.
+   */
   app.command('/support', async ({ ack, body, client }) => {
     try {
-      await ack();
+      logger.info('COMMAND: /support');
 
-      logger.info('/support command invoked.');
+      await ack();
 
       util.buildSupportModal(client, body.user_id, body.trigger_id);
     } catch (error) {
@@ -100,12 +146,19 @@ module.exports = function (app, logger) {
     }
   });
 
-  // The open_modal shortcut opens a plain old modal
+  /* COMMAND LISTENERS */
+
+  /**
+   * Shortcut: support
+   * Brings up the platform support request modal when someone
+   * clicks on the Platform Support bot's shortcut in the app.
+   * (Note: Not the channel specific shortcut, the global one.)
+   */
   app.shortcut('support', async ({ shortcut, ack, client }) => {
     try {
-      await ack();
+      logger.info('SHORTCUT: support');
 
-      logger.info('support shortcut invoked.');
+      await ack();
 
       util.buildSupportModal(client, shortcut.user.id, shortcut.trigger_id);
     } catch (error) {
@@ -113,10 +166,17 @@ module.exports = function (app, logger) {
     }
   });
 
-  // Handle Form Submission
+  /* VIEW LISTENERS */
+
+  /**
+   * View: support_modal_view
+   * Handles the form submission when someone submits the Platform Support
+   * form.
+   */
   app.view('support_modal_view', async ({ ack, body, view, client }) => {
-    // Message the user
     try {
+      logger.info('VIEW: support_modal_view (FORM SUBMISSION)');
+
       await ack();
 
       const { id, username: whoSubmitted } = body.user;

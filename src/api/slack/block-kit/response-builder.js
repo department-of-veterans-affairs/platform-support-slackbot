@@ -33,7 +33,7 @@ const buildSupportResponse = (userId, selectedTeam, summaryDescription) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: 'Person being tagged for support: <@U01T9CL8PEK>',
+        text: 'Assigned to: <@U01T9CL8PEK>',
       },
     },
   ];

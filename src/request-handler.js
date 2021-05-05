@@ -13,7 +13,9 @@ module.exports = function (app, logger) {
     logger.info(obj);
 
     try {
-      await client.chat.postMessage({
+      logger.info('EVENT: app_mention');
+
+      await client.chat.postEphemeral({
         channel: payload.channel,
         blocks: responseBuilder.buildHelpResponse(payload.user),
       });

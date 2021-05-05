@@ -20,9 +20,27 @@ module.exports = function (app, logger) {
       try {
         await ack();
 
-        logger.debug(`${WORKFLOW_CALLBACK_ID} workflow edit callback.`);
+        logger.info(`WORKFLOW STEP: Edit - ${WORKFLOW_CALLBACK_ID}`);
 
-        const blocks = [];
+        const blocks = [
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: 'Current User',
+            },
+            block_id: 'user_input',
+            accessory: {
+              type: 'users_select',
+              placeholder: {
+                type: 'plain_text',
+                text: 'Select a user',
+                emoji: true,
+              },
+              action_id: 'value',
+            },
+          },
+        ];
 
         await configure({ blocks });
       } catch (error) {
@@ -38,13 +56,23 @@ module.exports = function (app, logger) {
      *
      * @param {object} param Slack Workflow Save Parameter
      */
-    save: async ({ ack, update }) => {
+    save: async ({ ack, view, update }) => {
       try {
         await ack();
 
-        logger.debug(`${WORKFLOW_CALLBACK_ID} workflow save callback.`);
+        logger.info(`WORKFLOW STEP: Save - ${WORKFLOW_CALLBACK_ID}`);
 
-        await update({});
+        const { values } = view.state;
+        const username = values.user_input.value;
+
+        const outputs = {};
+        const inputs = {
+          username: {
+            value: username.selected_user,
+          },
+        };
+
+        await update({ inputs, outputs });
       } catch (error) {
         logger.error(error);
       }
@@ -59,15 +87,18 @@ module.exports = function (app, logger) {
      *
      * @param {object} param Slack Workflow Execute Parameter
      */
-    execute: async ({ complete, client }) => {
+    execute: async ({ step, complete, client }) => {
+      const inputs = step.inputs;
       const outputs = {};
 
       try {
-        logger.debug(`${WORKFLOW_CALLBACK_ID} workflow step executed.`);
+        logger.info(inputs);
+        logger.info(`WORKFLOW STEP: execute - ${WORKFLOW_CALLBACK_ID}`);
 
-        client.chat.postMessage({
+        client.chat.postEphemeral({
           channel: SUPPORT_CHANNEL_ID,
-          blocks: responseBuilder.buildHelpResponse(),
+          user: inputs.username.value,
+          blocks: responseBuilder.buildHelpResponse(inputs.username.value),
         });
       } catch (error) {
         logger.error(error);

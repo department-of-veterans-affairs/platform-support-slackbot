@@ -19,6 +19,7 @@ module.exports = function (app, logger) {
 
       await client.chat.postEphemeral({
         channel: payload.channel,
+        user: payload.user,
         blocks: responseBuilder.buildHelpResponse(payload.user),
       });
     } catch (error) {

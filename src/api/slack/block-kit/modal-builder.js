@@ -1,4 +1,4 @@
-const buildDropDownOptions = (options) => {
+const buildDropDown = (options) => {
   return options.map((option) => {
     return {
       text: {
@@ -53,7 +53,7 @@ const buildSupportModal = (user, options) => {
             text: 'Select an item',
             emoji: true,
           },
-          options: buildDropDownOptions(options),
+          options: buildDropDown(options),
           action_id: 'selected',
         },
         label: {
@@ -99,6 +99,62 @@ const buildSupportModal = (user, options) => {
   };
 };
 
+const buildReassignmentModal = (options) => {
+  return {
+    type: 'modal',
+    callback_id: 'reassign_modal_view',
+    submit: {
+      type: 'plain_text',
+      text: 'Submit',
+      emoji: true,
+    },
+    close: {
+      type: 'plain_text',
+      text: 'Cancel',
+      emoji: true,
+    },
+    title: {
+      type: 'plain_text',
+      text: 'Reassign Ticket',
+      emoji: true,
+    },
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'plain_text',
+          text:
+            ':wave: Hey there!\n\nPlease route your support request to the correct team.',
+          emoji: true,
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        type: 'input',
+        block_id: 'topic',
+        element: {
+          type: 'static_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select an item',
+            emoji: true,
+          },
+          options: buildDropDown(options),
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'Assigned Team',
+          emoji: true,
+        },
+      },
+    ],
+  };
+};
+
 module.exports = {
   buildSupportModal,
+  buildReassignmentModal,
 };

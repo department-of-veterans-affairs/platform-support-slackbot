@@ -106,6 +106,8 @@ module.exports = function (app, logger) {
     }
   });
 
+  /* ACTION LISTENERS (BUTTON CLICK HANDLERS) */
+
   /**
    * Action: platform_support
    * This function gets called when the green button "Platform Support Request"
@@ -117,9 +119,24 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      logger.info('platform_support action invoked.');
-
       util.buildSupportModal(client, body.user.id, body.trigger_id);
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
+  /**
+   * Action: reassign_ticket
+   * This function gets called when the "Reassign Ticket" button
+   * is clicked on.  It brings up a reassign ticket modal.
+   */
+  app.action('reassign_ticket', async ({ ack, body, client }) => {
+    try {
+      logger.info('ACTION: reassign_ticket');
+
+      await ack();
+
+      util.buildReassignmentModal(client, body.trigger_id);
     } catch (error) {
       logger.error(error);
     }
@@ -262,6 +279,24 @@ module.exports = function (app, logger) {
         summaryDescription,
         messageLink
       );
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
+  /**
+   * View: reassign_modal_view
+   * Handles the form submission when someone submits the reassigns
+   * a ticket
+   */
+  app.view('reassign_modal_view', async (obj) => {
+    try {
+      logger.info('VIEW: reassign_modal_view (FORM SUBMISSION)');
+      logger.info(obj);
+
+      const { ack } = obj;
+
+      await ack();
     } catch (error) {
       logger.error(error);
     }

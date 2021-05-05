@@ -28,6 +28,21 @@ module.exports = function (logger) {
     logger.trace(result);
   };
 
+  util.buildReassignmentModal = async (client, trigger_id) => {
+    logger.debug('buildReassignmentModal()');
+
+    const options = await sheets.getOptions();
+
+    const view = modalBuilder.buildReassignmentModal(options);
+
+    const result = await client.views.open({
+      trigger_id,
+      view,
+    });
+
+    logger.trace(result);
+  };
+
   /**
    * Returns Slack Username from Slack User Id
    * @param {object} client Slack Client Object

@@ -12,7 +12,7 @@ const buildSupportResponse = (userId, selectedTeam, summaryDescription) => {
           type: 'plain_text',
           text: 'Reassign Ticket',
         },
-        action_id: 'reassign_button_click',
+        action_id: 'reassign_ticket',
       },
     },
     {

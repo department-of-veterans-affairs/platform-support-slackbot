@@ -26,6 +26,11 @@ module.exports = function (logger) {
     return doc;
   };
 
+  /**
+   * Reads the team Google Spreadsheet and returns an array of
+   * teams and associated values.
+   * @returns Array of text/values
+   */
   sheets.getOptions = async () => {
     const doc = await getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
 
@@ -43,6 +48,17 @@ module.exports = function (logger) {
     return result;
   };
 
+  /**
+   * Capture form responses and saves them to the Support Responses
+   * Spreadsheet.
+   * @param {string} messageId Message Id
+   * @param {string} username Current user name
+   * @param {date} currentTime JavaScript date object
+   * @param {array} usersRequestingSupport Users requesting support
+   * @param {string} selectedTeam Selected team
+   * @param {string} summaryDescription Summary description
+   * @param {string} messageLink Link to support ticket/message
+   */
   sheets.captureResponses = async (
     messageId,
     username,

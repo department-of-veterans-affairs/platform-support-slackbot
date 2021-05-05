@@ -72,7 +72,7 @@ const buildHelpResponse = (userId = null) => {
       text: {
         type: 'mrkdwn',
         text:
-          'You can create a support request by typing `/support` command in the message field\nor\n clicking on the *shortcut menu* → *Platform Support* → *Need Platform Support*',
+          'You can create a support request by typing `/support` command in the message field\nor by\n clicking on the *shortcut menu ⚡* → *Platform Support* → *Need Platform Support*',
       },
     },
   ];

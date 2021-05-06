@@ -1,4 +1,10 @@
-const buildSupportResponse = (userId, selectedTeam, summaryDescription) => {
+const buildSupportResponse = (
+  userId,
+  selectedTeam,
+  summaryDescription,
+  mention,
+  team
+) => {
   return [
     {
       type: 'section',
@@ -19,7 +25,7 @@ const buildSupportResponse = (userId, selectedTeam, summaryDescription) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*Need help with*\n${selectedTeam}`,
+        text: `*Need help from*\n${selectedTeam}`,
       },
     },
     {
@@ -33,7 +39,7 @@ const buildSupportResponse = (userId, selectedTeam, summaryDescription) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: 'Assigned to: <@U01T9CL8PEK>',
+        text: mention ? `Assigned to: <@${mention}>` : `Assigned to: ${team}`,
       },
     },
   ];

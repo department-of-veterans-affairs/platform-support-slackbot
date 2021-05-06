@@ -245,14 +245,16 @@ module.exports = function (app, logger) {
     };
   }
 
-  async function postSupportTicket(client, formData) {
+  async function postSupportTicket(client, formData, routeData) {
     const postedMessage = await client.chat.postMessage({
       channel: SUPPORT_CHANNEL_ID,
       link_names: 1,
       blocks: responseBuilder.buildSupportResponse(
         formData.submittedBy.id,
         formData.selectedTeam.name,
-        formData.summaryDescription
+        formData.summaryDescription,
+        routeData.oncallUser ?? routeData.slackGroup,
+        formData.selectedTeam.name
       ),
       text: `Hey there <@${formData.submittedBy.id}>, you have a new Platform Support ticket!`,
       unfurl_links: false, // Remove Link Previews
@@ -275,6 +277,27 @@ module.exports = function (app, logger) {
     };
   }
 
+  async function routeSupport(client, formData) {
+    let oncallUser = null;
+
+    // Attempt to check PagerDuty API
+    if (formData.selectedTeam.pagerDutySchedule) {
+      const email = await schedule.getOnCallPersonEmailForSchedule(
+        formData.selectedTeam.pagerDutySchedule
+      );
+      logger.info('Oncall Email');
+      logger.info(email);
+      oncallUser = await util.getSlackUserByEmail(client, email);
+      logger.info('Route To User');
+      logger.info(oncallUser);
+    }
+
+    return {
+      oncallUser: oncallUser?.userId,
+      slackGroup: formData.selectedTeam.slackGroup,
+    };
+  }
+
   /**
    * View: support_modal_view
    * Handles the form submission when someone submits the Platform Support
@@ -290,16 +313,9 @@ module.exports = function (app, logger) {
 
       logger.debug(formData);
 
-      if (formData.selectedTeam.pagerDutySchedule) {
-        const email = await schedule.getOnCallPersonEmailForSchedule(
-          formData.selectedTeam.pagerDutySchedule
-        );
-        const user = await util.getSlackUserByEmail(client, email);
-        logger.info('Slack User');
-        logger.info(user);
-      }
+      const routeData = await routeSupport(client, formData);
 
-      const messageData = await postSupportTicket(client, formData);
+      const messageData = await postSupportTicket(client, formData, routeData);
 
       const messageLink = util.createMessageLink(
         messageData.channel,

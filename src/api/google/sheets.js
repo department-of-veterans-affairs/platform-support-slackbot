@@ -48,6 +48,11 @@ module.exports = function (logger) {
     return result;
   };
 
+  /**
+   * Get team based on teamId (1-based index)
+   * @param {number} teamId
+   * @returns
+   */
   sheets.getTeamById = async (teamId) => {
     const doc = await getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
 
@@ -63,20 +68,20 @@ module.exports = function (logger) {
    * Spreadsheet.
    * @param {string} messageId Message Id
    * @param {string} username Current user name
-   * @param {date} currentTime JavaScript date object
    * @param {array} usersRequestingSupport Users requesting support
    * @param {string} selectedTeam Selected team
    * @param {string} summaryDescription Summary description
    * @param {string} messageLink Link to support ticket/message
+   * @param {date} currentTime JavaScript date object
    */
   sheets.captureResponses = async (
     messageId,
     username,
-    currentTime,
     usersRequestingSupport,
     selectedTeam,
     summaryDescription,
-    messageLink
+    messageLink,
+    dateTime = new Date()
   ) => {
     const doc = await getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
 
@@ -85,13 +90,13 @@ module.exports = function (logger) {
     const userList = usersRequestingSupport.join(', ');
 
     const dateFormatted = moment
-      .tz(currentTime, 'America/New_York')
+      .tz(dateTime, 'America/New_York')
       .format('LLLL');
 
     const row = await sheet.addRow({
       MessageId: messageId,
       SubmittedBy: username,
-      DateTimeUTC: currentTime,
+      DateTimeUTC: dateTime,
       DateTimeEST: dateFormatted,
       Users: userList,
       Team: selectedTeam,

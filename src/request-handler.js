@@ -205,6 +205,76 @@ module.exports = function (app, logger) {
 
   /* VIEW LISTENERS */
 
+  async function extractFormData(client, body, view) {
+    const { id, username } = body.user;
+    const {
+      users_requesting_support: users,
+      topic,
+      summary,
+    } = view.state.values;
+
+    const selectedTeamId = topic.selected.selected_option.value;
+    const whoNeedsSupportUserIds = users.users.selected_users;
+    const summaryDescription = summary.value.value;
+
+    const whoNeedsSupport = (
+      await util.getSlackUsers(client, whoNeedsSupportUserIds)
+    ).map((user) => {
+      return { id: user.user.id, username: user.user.name };
+    });
+
+    const teamData = await sheets.getTeamById(selectedTeamId);
+
+    const selectedTeam = teamData
+      ? {
+          id: teamData.Title,
+          name: teamData.Display,
+          pagerDutySchedule: teamData.PagerDutySchedule,
+          slackGroup: teamData.SlackGroup,
+        }
+      : {};
+
+    return {
+      submittedBy: {
+        id,
+        username,
+      },
+      whoNeedsSupport,
+      selectedTeam,
+      summaryDescription,
+    };
+  }
+
+  async function postSupportTicket(client, formData) {
+    const postedMessage = await client.chat.postMessage({
+      channel: SUPPORT_CHANNEL_ID,
+      link_names: 1,
+      blocks: responseBuilder.buildSupportResponse(
+        formData.submittedBy.id,
+        formData.selectedTeam.name,
+        formData.summaryDescription
+      ),
+      text: `Hey there <@${formData.submittedBy.id}>, you have a new Platform Support ticket!`,
+      unfurl_links: false, // Remove Link Previews
+    });
+
+    logger.trace(postedMessage);
+
+    if (!postedMessage.ok) {
+      logger.error(`Unable to post message. ${JSON.stringify(postedMessage)}`);
+      return {
+        messageId: null,
+        channel: null,
+        error: 'Error Posting Message',
+      };
+    }
+
+    return {
+      messageId: postedMessage.ts,
+      channel: postedMessage.channel,
+    };
+  }
+
   /**
    * View: support_modal_view
    * Handles the form submission when someone submits the Platform Support
@@ -216,87 +286,37 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      const { id, username: whoSubmitted } = body.user;
-      const {
-        users_requesting_support: users,
-        topic,
-        summary,
-      } = view.state.values;
+      const formData = await extractFormData(client, body, view);
 
-      const whoNeedsSupport = users.users.selected_users;
-      const selectedTeam = topic.selected.selected_option.value;
-      const summaryDescription = summary.value.value;
+      logger.debug(formData);
 
-      logger.trace('whoNeedsSupport', whoNeedsSupport);
-      logger.trace('selectedTeam', selectedTeam);
-      logger.trace('summaryDescription', summaryDescription);
-
-      const teamData = await sheets.getTeamById(selectedTeam);
-
-      const teamAbbr = teamData?.Title ?? 'ERROR: NOT FOUND';
-      const teamName = teamData?.Display ?? 'Unknown';
-      const teamPagerDutySchedule = teamData.PagerDutySchedule;
-      const teamSlackGroup = teamData.SlackGroup;
-
-      logger.info(teamPagerDutySchedule);
-      logger.info(teamSlackGroup);
-
-      if (teamPagerDutySchedule) {
+      if (formData.selectedTeam.pagerDutySchedule) {
         const email = await schedule.getOnCallPersonEmailForSchedule(
-          teamPagerDutySchedule
+          formData.selectedTeam.pagerDutySchedule
         );
         const user = await util.getSlackUserByEmail(client, email);
         logger.info('Slack User');
         logger.info(user);
       }
 
-      const dateTime = new Date(Date.now());
-
-      const postedMessage = await client.chat.postMessage({
-        channel: SUPPORT_CHANNEL_ID,
-        link_names: 1,
-        blocks: responseBuilder.buildSupportResponse(
-          id,
-          teamName,
-          summaryDescription
-        ),
-        text: `Hey there <@${id}>!`,
-        unfurl_links: false, // Remove Link Previews
-      });
-
-      if (!postedMessage.ok) {
-        logger.error(
-          `Unable to post message. ${JSON.stringify(postedMessage)}`
-        );
-        return;
-      }
-
-      const messageId = postedMessage.ts;
+      const messageData = await postSupportTicket(client, formData);
 
       const messageLink = util.createMessageLink(
-        postedMessage.channel,
-        messageId
+        messageData.channel,
+        messageData.messageId
       );
 
-      const hashedMessageId = util.hashMessageId(messageId);
+      const hashedMessageId = util.hashMessageId(messageData.messageId);
 
-      logger.trace(postedMessage);
-      logger.debug(`Posted Message ID: ${messageId}`);
+      logger.debug(`Posted Message ID: ${messageData.messageId}`);
       logger.debug(`Posted Message ID Hashed: ${hashedMessageId}`);
-
-      const slackUsers = await Promise.all(
-        whoNeedsSupport.map(async (id) => await util.getSlackUser(client, id))
-      );
-
-      const usernames = slackUsers.map((user) => user.user.name);
 
       sheets.captureResponses(
         hashedMessageId,
-        whoSubmitted,
-        dateTime,
-        usernames,
-        teamAbbr,
-        summaryDescription,
+        formData.submittedBy.username,
+        formData.whoNeedsSupport.map((u) => u.username),
+        formData.selectedTeam.id,
+        formData.summaryDescription,
         messageLink
       );
     } catch (error) {

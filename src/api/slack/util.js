@@ -44,7 +44,7 @@ module.exports = function (logger) {
   };
 
   /**
-   * Returns Slack Username from Slack User Id
+   * Returns Slack User from Slack User Id
    * @param {object} client Slack Client Object
    * @param {string} userId Slack User Id
    * @returns Slack userName
@@ -60,6 +60,25 @@ module.exports = function (logger) {
       logger.error(error);
 
       return userId;
+    }
+  };
+
+  /**
+   * Returns an Array of Slack Users from an Array of Slack User Ids
+   * @param {object} client Slack Client Object
+   * @param {string} userIds Array of Slack User Ids
+   */
+  util.getSlackUsers = async (client, userIds) => {
+    try {
+      return await Promise.all(
+        userIds.map(async (id) => await util.getSlackUser(client, id))
+      );
+    } catch (error) {
+      logger.error(error);
+
+      return userIds.map((id) => {
+        return { id, name: '' };
+      });
     }
   };
 
@@ -105,6 +124,8 @@ module.exports = function (logger) {
    * @returns
    */
   util.createMessageLink = (channel, messageId) => {
+    if (!channel || !messageId) return '';
+
     const updatedId = messageId.replace('.', '');
     return `https://adhoc.slack.com/archives/${channel}/p${updatedId}`;
   };

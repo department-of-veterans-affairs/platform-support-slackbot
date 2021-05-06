@@ -15,7 +15,7 @@ module.exports = function (logger) {
   util.buildSupportModal = async (client, user, trigger_id) => {
     logger.debug('buildSupportModal()');
 
-    const options = await sheets.getOptions();
+    const options = await sheets.getTeams();
 
     const view = modalBuilder.buildSupportModal(user, options);
 
@@ -31,7 +31,7 @@ module.exports = function (logger) {
   util.buildReassignmentModal = async (client, trigger_id) => {
     logger.debug('buildReassignmentModal()');
 
-    const options = await sheets.getOptions();
+    const options = await sheets.getTeams();
 
     const view = modalBuilder.buildReassignmentModal(options);
 

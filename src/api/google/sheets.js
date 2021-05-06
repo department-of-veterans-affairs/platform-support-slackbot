@@ -31,7 +31,7 @@ module.exports = function (logger) {
    * teams and associated values.
    * @returns Array of text/values
    */
-  sheets.getOptions = async () => {
+  sheets.getTeams = async () => {
     const doc = await getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
 
     const sheet = doc.sheetsByIndex[0];
@@ -42,10 +42,20 @@ module.exports = function (logger) {
 
     for (let i = 0; i < sheet.rowCount; i++) {
       if (!rows[i]) break;
-      result.push({ text: rows[i].Title, value: rows[i].Value });
+      result.push({ text: rows[i].Title, value: rows[i].Id });
     }
 
     return result;
+  };
+
+  sheets.getTeamById = async (teamId) => {
+    const doc = await getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
+
+    const sheet = doc.sheetsByIndex[0];
+
+    const rows = await sheet.getRows();
+
+    return rows[teamId - 1];
   };
 
   /**

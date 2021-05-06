@@ -5,6 +5,7 @@ const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 module.exports = function (app, logger) {
   const util = require('./util')(logger);
   const sheets = require('./api/google/sheets')(logger);
+  const schedule = require('./api/pagerduty/schedule')(logger);
 
   /* EVENT LISTENERS */
 
@@ -230,6 +231,25 @@ module.exports = function (app, logger) {
       logger.trace('selectedTeam', selectedTeam);
       logger.trace('summaryDescription', summaryDescription);
 
+      const teamData = await sheets.getTeamById(selectedTeam);
+
+      const teamAbbr = teamData?.Title ?? 'ERROR: NOT FOUND';
+      const teamName = teamData?.Display ?? 'Unknown';
+      const teamPagerDutySchedule = teamData.PagerDutySchedule;
+      const teamSlackGroup = teamData.SlackGroup;
+
+      logger.info(teamPagerDutySchedule);
+      logger.info(teamSlackGroup);
+
+      if (teamPagerDutySchedule) {
+        const email = await schedule.getOnCallPersonEmailForSchedule(
+          teamPagerDutySchedule
+        );
+        const user = await util.getSlackUserByEmail(client, email);
+        logger.info('Slack User');
+        logger.info(user);
+      }
+
       const dateTime = new Date(Date.now());
 
       const postedMessage = await client.chat.postMessage({
@@ -237,7 +257,7 @@ module.exports = function (app, logger) {
         link_names: 1,
         blocks: responseBuilder.buildSupportResponse(
           id,
-          selectedTeam,
+          teamName,
           summaryDescription
         ),
         text: `Hey there <@${id}>!`,
@@ -275,7 +295,7 @@ module.exports = function (app, logger) {
         whoSubmitted,
         dateTime,
         usernames,
-        selectedTeam,
+        teamAbbr,
         summaryDescription,
         messageLink
       );

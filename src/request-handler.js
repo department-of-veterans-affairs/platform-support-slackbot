@@ -1,4 +1,5 @@
 const responseBuilder = require('./api/slack/block-kit/response-builder');
+const { nanoid } = require('nanoid');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
@@ -309,6 +310,8 @@ module.exports = function (app, logger) {
 
       await ack();
 
+      const ticketId = nanoid();
+
       const formData = await extractFormData(client, body, view);
 
       logger.debug(formData);
@@ -328,6 +331,7 @@ module.exports = function (app, logger) {
       logger.debug(`Posted Message ID Hashed: ${hashedMessageId}`);
 
       sheets.captureResponses(
+        ticketId,
         hashedMessageId,
         formData.submittedBy.username,
         formData.whoNeedsSupport.map((u) => u.username),

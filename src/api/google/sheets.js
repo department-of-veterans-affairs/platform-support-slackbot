@@ -66,6 +66,7 @@ module.exports = function (logger) {
   /**
    * Capture form responses and saves them to the Support Responses
    * Spreadsheet.
+   * @param {string} ticketId Ticket Id
    * @param {string} messageId Message Id
    * @param {string} username Current user name
    * @param {array} usersRequestingSupport Users requesting support
@@ -75,6 +76,7 @@ module.exports = function (logger) {
    * @param {date} currentTime JavaScript date object
    */
   sheets.captureResponses = async (
+    ticketId,
     messageId,
     username,
     usersRequestingSupport,
@@ -94,6 +96,7 @@ module.exports = function (logger) {
       .format('LLLL');
 
     const row = await sheet.addRow({
+      TicketId: ticketId,
       MessageId: messageId,
       SubmittedBy: username,
       DateTimeUTC: dateTime,

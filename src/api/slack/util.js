@@ -113,8 +113,9 @@ module.exports = function (logger) {
    * @returns hashed string
    */
   util.hashMessageId = (messageId) => {
-    const hash = createHash('md5');
-    return hash.update(messageId).digest('hex');
+    // const hash = createHash('md5');
+    // return hash.update(messageId).digest('hex');
+    return `msgId:${messageId}`;
   };
 
   /**

@@ -1,4 +1,5 @@
 const buildSupportResponse = (
+  ticketId,
   userId,
   selectedTeam,
   summaryDescription,
@@ -19,6 +20,7 @@ const buildSupportResponse = (
           text: 'Reassign Ticket',
         },
         action_id: 'reassign_ticket',
+        value: ticketId,
       },
     },
     {

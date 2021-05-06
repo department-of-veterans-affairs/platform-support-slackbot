@@ -132,9 +132,12 @@ module.exports = function (app, logger) {
    * This function gets called when the "Reassign Ticket" button
    * is clicked on.  It brings up a reassign ticket modal.
    */
-  app.action('reassign_ticket', async ({ ack, body, client }) => {
+  app.action('reassign_ticket', async (obj) => {
     try {
       logger.info('ACTION: reassign_ticket');
+      // logger.info(obj);
+      const { ack, body, client, payload } = obj;
+      logger.info(payload.value);
 
       await ack();
 
@@ -246,11 +249,12 @@ module.exports = function (app, logger) {
     };
   }
 
-  async function postSupportTicket(client, formData, routeData) {
+  async function postSupportTicket(client, ticketId, formData, routeData) {
     const postedMessage = await client.chat.postMessage({
       channel: SUPPORT_CHANNEL_ID,
       link_names: 1,
       blocks: responseBuilder.buildSupportResponse(
+        ticketId,
         formData.submittedBy.id,
         formData.selectedTeam.name,
         formData.summaryDescription,
@@ -318,7 +322,12 @@ module.exports = function (app, logger) {
 
       const routeData = await routeSupport(client, formData);
 
-      const messageData = await postSupportTicket(client, formData, routeData);
+      const messageData = await postSupportTicket(
+        client,
+        ticketId,
+        formData,
+        routeData
+      );
 
       const messageLink = util.createMessageLink(
         messageData.channel,

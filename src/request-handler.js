@@ -3,7 +3,7 @@ const responseBuilder = require('./api/slack/block-kit/response-builder');
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (app, logger) {
-  const util = require('./util')(logger);
+  const util = require('./api/slack/util')(logger);
   const sheets = require('./api/google/sheets')(logger);
   const schedule = require('./api/pagerduty/schedule')(logger);
 

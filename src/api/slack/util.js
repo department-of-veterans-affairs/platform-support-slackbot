@@ -1,8 +1,8 @@
-const modalBuilder = require('./api/slack/block-kit/modal-builder');
+const modalBuilder = require('./block-kit/modal-builder');
 const { createHash } = require('crypto');
 
 module.exports = function (logger) {
-  const sheets = require('./api/google/sheets')(logger);
+  const sheets = require('../google/sheets')(logger);
 
   let util = {};
 

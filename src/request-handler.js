@@ -79,9 +79,7 @@ module.exports = function (app, logger) {
       logger.info('MESSAGE: hello');
       logger.debug(message.user);
 
-      const data = formSupport.parseChannelTopic(
-        await slack.getChannelTopic(client)
-      );
+      const data = util.parseChannelTopic(await slack.getChannelTopic(client));
 
       logger.info(data);
 

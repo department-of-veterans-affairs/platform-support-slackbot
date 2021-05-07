@@ -10,29 +10,6 @@ module.exports = function (logger) {
 
   let formSupport = {};
 
-  formSupport.parseChannelTopic = async (topic) => {
-    logger.info(topic);
-    const supportList = topic
-      .split(/\r?\n/)
-      .filter((line) => line.includes(':'))
-      .map((line) => line.split(':'))
-      .map((ar) => {
-        return [ar[0], ar[1].trim()];
-      });
-
-    const onCall = Object.fromEntries(supportList);
-
-    logger.info(onCall);
-
-    logger.info(onCall['BE']);
-    logger.info(onCall['FE']);
-    logger.info(onCall['OPS']);
-    logger.info(onCall['Analytics']);
-    logger.info(onCall['Collab Cycle']);
-
-    return onCall;
-  };
-
   /**
    * Takes a form submission and extracts the data into a form
    * object.

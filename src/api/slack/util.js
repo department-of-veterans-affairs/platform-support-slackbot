@@ -69,5 +69,33 @@ module.exports = function (logger) {
     return `https://adhoc.slack.com/archives/${channel}/p${updatedId}`;
   };
 
+  /**
+   * Parses Channel Topic
+   * @param {string} topic
+   * @returns Channel Oncall User Mapping
+   */
+  util.parseChannelTopic = async (topic) => {
+    logger.info(topic);
+    const supportList = topic
+      .split(/\r?\n/)
+      .filter((line) => line.includes(':'))
+      .map((line) => line.split(':'))
+      .map((ar) => {
+        return [ar[0], ar[1].trim()];
+      });
+
+    const onCall = Object.fromEntries(supportList);
+
+    logger.info(onCall);
+
+    logger.info(onCall['BE']);
+    logger.info(onCall['FE']);
+    logger.info(onCall['OPS']);
+    logger.info(onCall['Analytics']);
+    logger.info(onCall['Collab Cycle']);
+
+    return onCall;
+  };
+
   return util;
 };

@@ -1,5 +1,8 @@
 const responseBuilder = require('./api/slack/block-kit/response-builder');
 const { nanoid } = require('nanoid');
+const P = require('pino');
+
+const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (app, logger) {
   const util = require('./api/slack/util')(logger);
@@ -259,6 +262,29 @@ module.exports = function (app, logger) {
     }
   });
 
+  async function extractFormData(view) {
+    const { topic } = view.state.values;
+
+    const selectedValue = topic.selected.selected_option.value;
+
+    const team = await sheets.getTeamById(selectedValue);
+
+    return {
+      title: team.Title,
+      display: team.Display,
+    };
+  }
+
+  async function getMessageById(client, messageId) {
+    const messages = await client.conversations.history({
+      channel: SUPPORT_CHANNEL_ID,
+      latest: parseFloat(messageId) + 1,
+      oldest: parseFloat(messageId) - 1,
+    });
+
+    return messages.messages.find((msg) => msg.ts === messageId);
+  }
+
   /**
    * View: reassign_modal_view
    * Handles the form submission when someone submits the reassigns
@@ -267,17 +293,53 @@ module.exports = function (app, logger) {
   app.view('reassign_modal_view', async (obj) => {
     try {
       logger.info('VIEW: reassign_modal_view (FORM SUBMISSION)');
-      //logger.info(obj);
 
-      const { ack, payload } = obj;
+      const { ack, payload, client, view } = obj;
+
+      await ack();
 
       const ticketId = payload.private_metadata;
 
       logger.info(ticketId);
 
-      await ack();
+      const team = await extractFormData(view);
+
+      logger.info(team);
+
+      sheets.updateAssignedTeamForMessage(ticketId, team.title);
+
+      const messageId = await sheets.getMessageByTicketId(ticketId);
+
+      logger.info(messageId);
+
+      const message = getMessageById(messageId);
+
+      // client.chat.updateMessage();
+
+      const blocks = [
+        ...message.blocks,
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'Assigned to: Alex Yip',
+            verbatim: false,
+          },
+        },
+      ];
+
+      // logger.info(message);
+
+      client.chat.update({
+        channel: SUPPORT_CHANNEL_ID,
+        ts: messageId,
+        blocks,
+      });
     } catch (error) {
       logger.error(error);
     }
   });
 };
+
+//1620400802.025100
+//1620400802.025100

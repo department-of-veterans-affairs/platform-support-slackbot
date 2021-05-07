@@ -141,10 +141,33 @@ module.exports = function (logger) {
       row.FirstReplyTimeUTC = new Date(Date.now()).toISOString();
       await row.save();
     } else {
-      logger.debug('Row not found...');
+      logger.info(`Row not found for messageId: ${messageId}`);
     }
   };
 
+  /**
+   * Update assigned team for the given ticket Id.
+   * @param {string} ticketId Ticket Id
+   * @param {string} team updated team
+   */
+  sheets.updateAssignedTeamForMessage = async (ticketId, team) => {
+    const rows = await sheets.getResponseSheetRows();
+
+    const row = rows.find((row) => row.TicketId === ticketId);
+
+    if (row) {
+      row.Team = team;
+      await row.save();
+    } else {
+      logger.info(`Row not found for ticketId: ${ticketId}`);
+    }
+  };
+
+  /**
+   * Get Google Sheet Row associated with Ticket Id
+   * @param {string} ticketId Message Ticket Id
+   * @returns Google Sheet row assocated with Ticket Id
+   */
   sheets.getMessageByTicketId = async (ticketId) => {
     const rows = await sheets.getResponseSheetRows();
 

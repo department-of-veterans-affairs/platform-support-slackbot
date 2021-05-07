@@ -74,10 +74,12 @@ module.exports = function (app, logger) {
    * MESSAGE: Hello
    * Just responds to the message "hello"
    */
-  app.message('hello', async ({ message, say }) => {
+  app.message('hello', async ({ message, say, client }) => {
     try {
       logger.info('MESSAGE: hello');
       logger.debug(message.user);
+
+      formSupport.getChannelTopic(client);
 
       await say(`Hey there <@${message.user}>!`);
     } catch (error) {

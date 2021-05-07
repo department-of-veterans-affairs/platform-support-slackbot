@@ -9,6 +9,34 @@ module.exports = function (logger) {
 
   let formSupport = {};
 
+  formSupport.getChannelTopic = async (client) => {
+    const info = await client.conversations.info({
+      channel: SUPPORT_CHANNEL_ID,
+    });
+
+    // logger.info(info.channel.topic.value);
+
+    const topic = info.channel.topic.value;
+
+    const supportList = topic
+      .split(/\r?\n/)
+      .filter((line) => line.includes(':'))
+      .map((line) => line.split(':'))
+      .map((ar) => {
+        return [ar[0], ar[1].trim()];
+      });
+
+    const onCall = Object.fromEntries(supportList);
+
+    logger.info(onCall);
+
+    logger.info(onCall['BE']);
+    logger.info(onCall['FE']);
+    logger.info(onCall['OPS']);
+    logger.info(onCall['Analytics']);
+    logger.info(onCall['Collab Cycle']);
+  };
+
   /**
    * Takes a form submission and extracts the data into a form
    * object.

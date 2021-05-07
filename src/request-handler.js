@@ -5,7 +5,7 @@ const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (app, logger) {
   const util = require('./api/slack/util')(logger);
-  const sheets = require('./api/google/sheets')(logger);
+  const sheets = require('./api/google')(logger);
   const formSupport = require('./api/slack/form-support')(logger);
 
   /* EVENT LISTENERS */
@@ -321,7 +321,9 @@ module.exports = function (app, logger) {
 
       logger.info(messageId);
 
-      const message = getMessageById(messageId);
+      const message = await getMessageById(client, messageId);
+
+      logger.info(message);
 
       const blocks = [
         ...message.blocks,

@@ -1,7 +1,7 @@
 const modalBuilder = require('./block-kit/modal-builder');
 
 module.exports = function (logger) {
-  const sheets = require('../google/sheets')(logger);
+  const sheets = require('../google')(logger);
 
   let util = {};
 

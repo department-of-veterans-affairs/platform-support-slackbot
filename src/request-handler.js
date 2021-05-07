@@ -1,10 +1,10 @@
-const responseBuilder = require('./ui/messages');
 const { nanoid } = require('nanoid');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (app, logger) {
   const slack = require('./api/slack')(logger);
+  const logic = require('./logic')(logger);
   const util = require('./api/slack/util')(logger);
   const sheets = require('./api/google')(logger);
   const formSupport = require('./api/slack/form-support')(logger);
@@ -20,11 +20,11 @@ module.exports = function (app, logger) {
     try {
       logger.info('EVENT: app_mention');
 
-      await client.chat.postEphemeral({
-        channel: payload.channel,
-        user: payload.user,
-        blocks: responseBuilder.buildHelpResponse(payload.user),
-      });
+      await logic.postHelpMessageToUserOnly(
+        client,
+        payload.channel,
+        payload.user
+      );
     } catch (error) {
       logger.error(error);
     }
@@ -58,11 +58,7 @@ module.exports = function (app, logger) {
     try {
       logger.info('EVENT: member_joined_channel');
 
-      client.chat.postEphemeral({
-        channel: event.channel,
-        user: event.user,
-        blocks: responseBuilder.buildHelpResponse(event.user),
-      });
+      await logic.postHelpMessageToUserOnly(client, event.channel, event.user);
     } catch (error) {
       logger.error(error);
     }
@@ -165,11 +161,11 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      await client.chat.postEphemeral({
-        channel: body.channel_id,
-        user: body.user_id,
-        blocks: responseBuilder.buildHelpResponse(body.user_id),
-      });
+      await logic.postHelpMessageToUserOnly(
+        client,
+        body.channel_id,
+        body.user_id
+      );
     } catch (error) {
       logger.error(error);
     }

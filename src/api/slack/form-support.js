@@ -3,23 +3,12 @@ const responseBuilder = require('./block-kit/response-builder');
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (logger) {
+  const slack = require('../slack')(logger);
   const schedule = require('../pagerduty')(logger);
   const util = require('./util')(logger);
   const sheets = require('../google')(logger);
 
   let formSupport = {};
-
-  formSupport.getChannelTopic = async (client) => {
-    logger.trace('getChannelTopic()');
-
-    const info = await client.conversations.info({
-      channel: SUPPORT_CHANNEL_ID,
-    });
-
-    logger.debug(info.channel.topic.value);
-
-    return info.channel.topic.value;
-  };
 
   formSupport.parseChannelTopic = async (topic) => {
     logger.info(topic);
@@ -65,7 +54,7 @@ module.exports = function (logger) {
     const summaryDescription = summary.value.value;
 
     const whoNeedsSupport = (
-      await util.getSlackUsers(client, whoNeedsSupportUserIds)
+      await slack.getSlackUsers(client, whoNeedsSupportUserIds)
     ).map((user) => {
       return { id: user.user.id, username: user.user.name };
     });
@@ -156,7 +145,7 @@ module.exports = function (logger) {
       );
       logger.info('Oncall Email');
       logger.info(email);
-      oncallUser = await util.getSlackUserByEmail(client, email);
+      oncallUser = await slack.getSlackUserByEmail(client, email);
       logger.info('Route To User');
       logger.info(oncallUser);
     }

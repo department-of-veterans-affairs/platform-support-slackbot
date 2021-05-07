@@ -4,6 +4,7 @@ const { nanoid } = require('nanoid');
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (app, logger) {
+  const slack = require('./api/slack')(logger);
   const util = require('./api/slack/util')(logger);
   const sheets = require('./api/google')(logger);
   const formSupport = require('./api/slack/form-support')(logger);
@@ -79,7 +80,7 @@ module.exports = function (app, logger) {
       logger.debug(message.user);
 
       const data = formSupport.parseChannelTopic(
-        await formSupport.getChannelTopic(client)
+        await slack.getChannelTopic(client)
       );
 
       logger.info(data);
@@ -337,8 +338,6 @@ module.exports = function (app, logger) {
         },
       ];
 
-      // logger.info(message);
-
       client.chat.update({
         channel: SUPPORT_CHANNEL_ID,
         ts: messageId,
@@ -349,6 +348,3 @@ module.exports = function (app, logger) {
     }
   });
 };
-
-//1620400802.025100
-//1620400802.025100

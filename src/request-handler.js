@@ -39,12 +39,8 @@ module.exports = function (app, logger) {
     try {
       logger.info('EVENT: reaction_added');
 
-      if (payload.item.ts) {
-        logger.debug(payload);
-        const messageIdString = util.stringifyMessageId(payload.item.ts);
-        logger.debug(messageIdString);
-        sheets.updateReplyTimeStampForMessage(messageIdString);
-      }
+      // payload.item.ts is the associated message id of the emoji reaction
+      logic.updateTimeStampOfSupportResponse(payload.item.ts);
     } catch (error) {
       logger.error(error);
     }
@@ -95,15 +91,8 @@ module.exports = function (app, logger) {
     try {
       logger.info('MESSAGE: *');
 
-      // If message is a reply
-      if (message.thread_ts) {
-        const messageIdString = util.stringifyMessageId(message.thread_ts);
-
-        logger.debug(message.thread_ts);
-        logger.debug(messageIdString);
-
-        sheets.updateReplyTimeStampForMessage(messageIdString);
-      }
+      // message.thread_ts only exists for replies
+      logic.updateTimeStampOfSupportResponse(message.thread_ts);
     } catch (error) {
       logger.error(error);
     }

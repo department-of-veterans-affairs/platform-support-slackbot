@@ -1,10 +1,11 @@
 const { WorkflowStep } = require('@slack/bolt');
-const responseBuilder = require('./ui/messages');
 
 const WORKFLOW_CALLBACK_ID = 'platform_support_request';
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (app, logger) {
+  const logic = require('./logic')(logger);
+
   const ws = new WorkflowStep(WORKFLOW_CALLBACK_ID, {
     /**
      * edit() gets called when a workflow administrator adds/edits
@@ -95,11 +96,11 @@ module.exports = function (app, logger) {
         logger.info(inputs);
         logger.info(`WORKFLOW STEP: execute - ${WORKFLOW_CALLBACK_ID}`);
 
-        client.chat.postEphemeral({
-          channel: SUPPORT_CHANNEL_ID,
-          user: inputs.username.value,
-          blocks: responseBuilder.buildHelpResponse(inputs.username.value),
-        });
+        logic.postHelpMessageToUserOnly(
+          client,
+          SUPPORT_CHANNEL_ID,
+          inputs.username.value
+        );
       } catch (error) {
         logger.error(error);
       }

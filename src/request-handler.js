@@ -1,12 +1,10 @@
 const responseBuilder = require('./api/slack/block-kit/response-builder');
 const { nanoid } = require('nanoid');
 
-const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
-
 module.exports = function (app, logger) {
   const util = require('./api/slack/util')(logger);
   const sheets = require('./api/google/sheets')(logger);
-  const schedule = require('./api/pagerduty/schedule')(logger);
+  const formSupport = require('./api/slack/form-support')(logger);
 
   /* EVENT LISTENERS */
 
@@ -209,105 +207,6 @@ module.exports = function (app, logger) {
 
   /* VIEW LISTENERS */
 
-  async function extractFormData(client, body, view) {
-    const { id, username } = body.user;
-    const {
-      users_requesting_support: users,
-      topic,
-      summary,
-    } = view.state.values;
-
-    const selectedTeamId = topic.selected.selected_option.value;
-    const whoNeedsSupportUserIds = users.users.selected_users;
-    const summaryDescription = summary.value.value;
-
-    const whoNeedsSupport = (
-      await util.getSlackUsers(client, whoNeedsSupportUserIds)
-    ).map((user) => {
-      return { id: user.user.id, username: user.user.name };
-    });
-
-    const teamData = await sheets.getTeamById(selectedTeamId);
-
-    const selectedTeam = teamData
-      ? {
-          id: teamData.Title,
-          name: teamData.Display,
-          pagerDutySchedule: teamData.PagerDutySchedule,
-          slackGroup: teamData.SlackGroup,
-        }
-      : {};
-
-    return {
-      submittedBy: {
-        id,
-        username,
-      },
-      whoNeedsSupport,
-      selectedTeam,
-      summaryDescription,
-    };
-  }
-
-  async function postSupportTicketMessage(
-    client,
-    ticketId,
-    formData,
-    routeData
-  ) {
-    const postedMessage = await client.chat.postMessage({
-      channel: SUPPORT_CHANNEL_ID,
-      link_names: 1,
-      blocks: responseBuilder.buildSupportResponse(
-        ticketId,
-        formData.submittedBy.id,
-        formData.selectedTeam.name,
-        formData.summaryDescription,
-        routeData.oncallUser ?? routeData.slackGroup,
-        formData.selectedTeam.name
-      ),
-      text: `Hey there <@${formData.submittedBy.id}>, you have a new Platform Support ticket!`,
-      unfurl_links: false, // Remove Link Previews
-    });
-
-    logger.trace(postedMessage);
-
-    if (!postedMessage.ok) {
-      logger.error(`Unable to post message. ${JSON.stringify(postedMessage)}`);
-      return {
-        messageId: null,
-        channel: null,
-        error: 'Error Posting Message',
-      };
-    }
-
-    return {
-      messageId: postedMessage.ts,
-      channel: postedMessage.channel,
-    };
-  }
-
-  async function buildSupportRoute(client, formData) {
-    let oncallUser = null;
-
-    // Attempt to check PagerDuty API
-    if (formData.selectedTeam.pagerDutySchedule) {
-      const email = await schedule.getOnCallPersonEmailForSchedule(
-        formData.selectedTeam.pagerDutySchedule
-      );
-      logger.info('Oncall Email');
-      logger.info(email);
-      oncallUser = await util.getSlackUserByEmail(client, email);
-      logger.info('Route To User');
-      logger.info(oncallUser);
-    }
-
-    return {
-      oncallUser: oncallUser?.userId,
-      slackGroup: formData.selectedTeam.slackGroup,
-    };
-  }
-
   /**
    * View: support_modal_view
    * Handles the form submission when someone submits the Platform Support
@@ -323,13 +222,13 @@ module.exports = function (app, logger) {
       // the slack message
       const ticketId = nanoid();
 
-      const formData = await extractFormData(client, body, view);
+      const formData = await formSupport.extractFormData(client, body, view);
 
       logger.debug(formData);
 
-      const routeData = await buildSupportRoute(client, formData);
+      const routeData = await formSupport.buildSupportRoute(client, formData);
 
-      const messageData = await postSupportTicketMessage(
+      const messageData = await formSupport.postSupportTicketMessage(
         client,
         ticketId,
         formData,

@@ -133,13 +133,13 @@ module.exports = function (app, logger) {
   app.action('reassign_ticket', async (obj) => {
     try {
       logger.info('ACTION: reassign_ticket');
-      // logger.info(obj);
+
       const { ack, body, client, payload } = obj;
       logger.info(payload.value);
 
       await ack();
 
-      util.buildReassignmentModal(client, body.trigger_id);
+      util.buildReassignmentModal(client, body.trigger_id, payload.value);
     } catch (error) {
       logger.error(error);
     }
@@ -267,9 +267,13 @@ module.exports = function (app, logger) {
   app.view('reassign_modal_view', async (obj) => {
     try {
       logger.info('VIEW: reassign_modal_view (FORM SUBMISSION)');
-      logger.info(obj);
+      //logger.info(obj);
 
-      const { ack } = obj;
+      const { ack, payload } = obj;
+
+      const ticketId = payload.private_metadata;
+
+      logger.info(ticketId);
 
       await ack();
     } catch (error) {

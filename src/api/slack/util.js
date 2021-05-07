@@ -27,12 +27,12 @@ module.exports = function (logger) {
     logger.trace(result);
   };
 
-  util.buildReassignmentModal = async (client, trigger_id) => {
+  util.buildReassignmentModal = async (client, trigger_id, ticketId) => {
     logger.debug('buildReassignmentModal()');
 
     const options = await sheets.getTeams();
 
-    const view = modalBuilder.buildReassignmentModal(options);
+    const view = modalBuilder.buildReassignmentModal(options, ticketId);
 
     const result = await client.views.open({
       trigger_id,

@@ -99,7 +99,7 @@ const buildSupportModal = (user, options) => {
   };
 };
 
-const buildReassignmentModal = (options) => {
+const buildReassignmentModal = (options, ticketId) => {
   return {
     type: 'modal',
     callback_id: 'reassign_modal_view',
@@ -151,6 +151,7 @@ const buildReassignmentModal = (options) => {
         },
       },
     ],
+    private_metadata: ticketId,
   };
 };
 

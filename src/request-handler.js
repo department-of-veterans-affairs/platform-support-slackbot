@@ -1,6 +1,5 @@
 const responseBuilder = require('./api/slack/block-kit/response-builder');
 const { nanoid } = require('nanoid');
-const P = require('pino');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 

@@ -7,9 +7,9 @@ module.exports = function (logger) {
 
   /**
    * Build Support Modal
-   * @param {*} client Slack Client Object
-   * @param {*} user Current User Id
-   * @param {*} trigger_id Trigger Id to generate modal
+   * @param {object} client Slack Client Object
+   * @param {string} user Current User Id
+   * @param {string} trigger_id Trigger Id to generate modal
    */
   util.buildSupportModal = async (client, user, trigger_id) => {
     logger.debug('buildSupportModal()');
@@ -39,6 +39,7 @@ module.exports = function (logger) {
       view,
     });
 
+    logger.debug(`ticketId: ${ticketId}`);
     logger.trace(result);
   };
 
@@ -55,9 +56,9 @@ module.exports = function (logger) {
         user: userId,
       });
     } catch (error) {
-      // If it fails to retreive the username, just return the user Id
       logger.error(error);
 
+      // If it fails to retreive the username, just return the user Id
       return userId;
     }
   };
@@ -75,6 +76,8 @@ module.exports = function (logger) {
     } catch (error) {
       logger.error(error);
 
+      // If it fails, just return an array of user objects with no
+      // usernames.
       return userIds.map((id) => {
         return { id, name: '' };
       });
@@ -103,7 +106,7 @@ module.exports = function (logger) {
   };
 
   /**
-   * Hash a message id to store in Google Sheet.
+   * Converts a Slack message id to store in Google Sheet.
    *
    * Note: Message Id is double and causes issues
    * when referencing the Id.  Convert it to a string

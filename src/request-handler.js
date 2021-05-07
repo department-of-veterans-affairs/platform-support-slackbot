@@ -78,7 +78,11 @@ module.exports = function (app, logger) {
       logger.info('MESSAGE: hello');
       logger.debug(message.user);
 
-      formSupport.getChannelTopic(client);
+      const data = formSupport.parseChannelTopic(
+        await formSupport.getChannelTopic(client)
+      );
+
+      logger.info(data);
 
       await say(`Hey there <@${message.user}>!`);
     } catch (error) {
@@ -226,7 +230,11 @@ module.exports = function (app, logger) {
       // the slack message
       const ticketId = nanoid();
 
-      const formData = await formSupport.extractFormData(client, body, view);
+      const formData = await formSupport.extractSupportFormData(
+        client,
+        body,
+        view
+      );
 
       logger.debug(formData);
 
@@ -263,7 +271,7 @@ module.exports = function (app, logger) {
     }
   });
 
-  async function extractFormData(view) {
+  async function extractReassignFormData(view) {
     const { topic } = view.state.values;
 
     const selectedValue = topic.selected.selected_option.value;
@@ -303,7 +311,7 @@ module.exports = function (app, logger) {
 
       logger.info(ticketId);
 
-      const team = await extractFormData(view);
+      const team = await extractReassignFormData(view);
 
       logger.info(team);
 
@@ -314,8 +322,6 @@ module.exports = function (app, logger) {
       logger.info(messageId);
 
       const message = getMessageById(messageId);
-
-      // client.chat.updateMessage();
 
       const blocks = [
         ...message.blocks,

@@ -10,14 +10,19 @@ module.exports = function (logger) {
   let formSupport = {};
 
   formSupport.getChannelTopic = async (client) => {
+    logger.trace('getChannelTopic()');
+
     const info = await client.conversations.info({
       channel: SUPPORT_CHANNEL_ID,
     });
 
-    // logger.info(info.channel.topic.value);
+    logger.debug(info.channel.topic.value);
 
-    const topic = info.channel.topic.value;
+    return info.channel.topic.value;
+  };
 
+  formSupport.parseChannelTopic = async (topic) => {
+    logger.info(topic);
     const supportList = topic
       .split(/\r?\n/)
       .filter((line) => line.includes(':'))
@@ -35,6 +40,8 @@ module.exports = function (logger) {
     logger.info(onCall['OPS']);
     logger.info(onCall['Analytics']);
     logger.info(onCall['Collab Cycle']);
+
+    return onCall;
   };
 
   /**
@@ -45,7 +52,7 @@ module.exports = function (logger) {
    * @param {object} view Slack View
    * @returns Form Data Object
    */
-  formSupport.extractFormData = async (client, body, view) => {
+  formSupport.extractSupportFormData = async (client, body, view) => {
     const { id, username } = body.user;
     const {
       users_requesting_support: users,

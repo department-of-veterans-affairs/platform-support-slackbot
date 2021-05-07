@@ -16,10 +16,15 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
+// Handles Slack Requests
 requestHandler(app, logger);
+
+// Add Slack Workflow Middleware
 workflowHandler(app, logger);
 
-// Start Platform Support Slack Bot
+/**
+ * App Entry Point
+ */
 (async () => {
   await app.start(process.env.PORT || 3000);
 

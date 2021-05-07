@@ -40,9 +40,9 @@ module.exports = function (app, logger) {
 
       if (payload.item.ts) {
         logger.debug(payload);
-        const hashedMessageId = util.hashMessageId(payload.item.ts);
-        logger.debug(hashedMessageId);
-        sheets.updateReplyTimeStampForMessage(hashedMessageId);
+        const messageIdString = util.stringifyMessageId(payload.item.ts);
+        logger.debug(messageIdString);
+        sheets.updateReplyTimeStampForMessage(messageIdString);
       }
     } catch (error) {
       logger.error(error);
@@ -96,12 +96,12 @@ module.exports = function (app, logger) {
 
       // If message is a reply
       if (message.thread_ts) {
-        const hashedMessageId = util.hashMessageId(message.thread_ts);
+        const messageIdString = util.stringifyMessageId(message.thread_ts);
 
         logger.debug(message.thread_ts);
-        logger.debug(hashedMessageId);
+        logger.debug(messageIdString);
 
-        sheets.updateReplyTimeStampForMessage(hashedMessageId);
+        sheets.updateReplyTimeStampForMessage(messageIdString);
       }
     } catch (error) {
       logger.error(error);
@@ -249,7 +249,12 @@ module.exports = function (app, logger) {
     };
   }
 
-  async function postSupportTicket(client, ticketId, formData, routeData) {
+  async function postSupportTicketMessage(
+    client,
+    ticketId,
+    formData,
+    routeData
+  ) {
     const postedMessage = await client.chat.postMessage({
       channel: SUPPORT_CHANNEL_ID,
       link_names: 1,
@@ -282,7 +287,7 @@ module.exports = function (app, logger) {
     };
   }
 
-  async function routeSupport(client, formData) {
+  async function buildSupportRoute(client, formData) {
     let oncallUser = null;
 
     // Attempt to check PagerDuty API
@@ -314,15 +319,17 @@ module.exports = function (app, logger) {
 
       await ack();
 
+      // Ticket ID is used for reassignment button to reference
+      // the slack message
       const ticketId = nanoid();
 
       const formData = await extractFormData(client, body, view);
 
       logger.debug(formData);
 
-      const routeData = await routeSupport(client, formData);
+      const routeData = await buildSupportRoute(client, formData);
 
-      const messageData = await postSupportTicket(
+      const messageData = await postSupportTicketMessage(
         client,
         ticketId,
         formData,
@@ -334,14 +341,14 @@ module.exports = function (app, logger) {
         messageData.messageId
       );
 
-      const hashedMessageId = util.hashMessageId(messageData.messageId);
+      const messageIdString = util.stringifyMessageId(messageData.messageId);
 
       logger.debug(`Posted Message ID: ${messageData.messageId}`);
-      logger.debug(`Posted Message ID Hashed: ${hashedMessageId}`);
+      logger.debug(`Posted Message ID Hashed: ${messageIdString}`);
 
       sheets.captureResponses(
         ticketId,
-        hashedMessageId,
+        messageIdString,
         formData.submittedBy.username,
         formData.whoNeedsSupport.map((u) => u.username),
         formData.selectedTeam.id,

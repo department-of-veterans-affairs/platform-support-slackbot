@@ -1,5 +1,4 @@
 const modalBuilder = require('./block-kit/modal-builder');
-const { createHash } = require('crypto');
 
 module.exports = function (logger) {
   const sheets = require('../google/sheets')(logger);
@@ -110,11 +109,9 @@ module.exports = function (logger) {
    * when referencing the Id.  Convert it to a string
    * for better comparison.
    * @param {string} messageId Message Id
-   * @returns hashed string
+   * @returns string Message Id String
    */
-  util.hashMessageId = (messageId) => {
-    // const hash = createHash('md5');
-    // return hash.update(messageId).digest('hex');
+  util.stringifyMessageId = (messageId) => {
     return `msgId:${messageId}`;
   };
 

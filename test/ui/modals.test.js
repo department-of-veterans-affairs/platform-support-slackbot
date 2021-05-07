@@ -1,6 +1,6 @@
 const chai = require('chai');
 const assertArrays = require('chai-arrays');
-const modalBuilder = require('../../../../src/api/slack/block-kit/modal-builder');
+const modalBuilder = require('../../src/ui/modals');
 
 // Chai Setup
 chai.use(assertArrays);

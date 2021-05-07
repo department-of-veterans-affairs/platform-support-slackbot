@@ -1,4 +1,4 @@
-const responseBuilder = require('./api/slack/block-kit/response-builder');
+const responseBuilder = require('./ui/messages');
 const { nanoid } = require('nanoid');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;

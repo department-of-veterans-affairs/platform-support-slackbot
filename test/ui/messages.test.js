@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const responseBuilder = require('../../../../src/api/slack/block-kit/response-builder');
+const responseBuilder = require('../../src/ui/messages');
 
 describe('Response Builder', () => {
   it('should populate a response message correctly', () => {

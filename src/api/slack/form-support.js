@@ -1,4 +1,4 @@
-const responseBuilder = require('./block-kit/response-builder');
+const responseBuilder = require('../../ui/messages');
 
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 

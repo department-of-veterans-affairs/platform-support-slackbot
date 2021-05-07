@@ -1,4 +1,4 @@
-const modalBuilder = require('./block-kit/modal-builder');
+const modalBuilder = require('../../ui/modals');
 
 module.exports = function (logger) {
   const sheets = require('../google')(logger);

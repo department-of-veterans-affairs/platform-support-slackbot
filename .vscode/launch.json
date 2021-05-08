@@ -23,6 +23,8 @@
             "runtimeArgs": [
               "${workspaceRoot}/node_modules/.bin/mocha",
               "--inspect-brk",
+              "--recursive",
+              "${workspaceFolder}/test/**/*.test.js"
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

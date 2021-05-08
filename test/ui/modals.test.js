@@ -6,7 +6,7 @@ const modalBuilder = require('../../src/ui/modals');
 chai.use(assertArrays);
 const expect = chai.expect;
 
-describe('Modal Builder', () => {
+describe('Modals', () => {
   it('should set initial users array with passed in user id', () => {
     const modal = modalBuilder.buildSupportModal('U01T9CL8PEK', []);
 

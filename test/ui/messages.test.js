@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const responseBuilder = require('../../src/ui/messages');
 
-describe('Response Builder', () => {
+describe('Messages', () => {
   it('should populate a response message correctly', () => {
     const ticketId = 'abc123';
     const userId = 'alex.yip';

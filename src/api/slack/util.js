@@ -74,14 +74,14 @@ module.exports = function (logger) {
    * @param {string} topic
    * @returns Channel Oncall User Mapping
    */
-  util.parseChannelTopic = async (topic) => {
+  util.parseChannelTopic = (topic) => {
     logger.info(topic);
     const supportList = topic
       .split(/\r?\n/)
       .filter((line) => line.includes(':'))
       .map((line) => line.split(':'))
       .map((ar) => {
-        return [ar[0], ar[1].trim()];
+        return [ar[0].trim(), ar[1].trim()];
       });
 
     const onCall = Object.fromEntries(supportList);

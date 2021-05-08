@@ -62,12 +62,92 @@ describe('Util', () => {
 
       const result = util.parseChannelTopic(channelTopic);
 
-      expect(result['BE']).to.equal('@Riley Anderson');
-      expect(result['FE']).to.equal('@eugene_doan');
-      expect(result['OPS']).to.equal('@Jeremy Britt');
-      expect(result['DS']).to.equal('@brooks');
-      expect(result['Analytics']).to.equal('@Jon Wehausen');
-      expect(result['Collab Cycle']).to.equal('@vsp-product-support-members');
+      expect(Object.keys(result).length).to.equal(6);
+      expect(result['be']).to.equal('@Riley Anderson');
+      expect(result['fe']).to.equal('@eugene_doan');
+      expect(result['ops']).to.equal('@Jeremy Britt');
+      expect(result['ds']).to.equal('@brooks');
+      expect(result['analytics']).to.equal('@Jon Wehausen');
+      expect(result['collab cycle']).to.equal('@vsp-product-support-members');
+    });
+
+    it('should parse a mixed case channel topic', () => {
+      const channelTopic = `Need help from Platform? Ask here!
+      Off-hours emergency? Ping #oncall!
+      
+      Be: @Riley Anderson
+      fE: @eugene_doan
+      OpS: @Jeremy Britt
+      Ds: @brooks
+      AnAlYTiCs: @Jon Wehausen
+      ColLaB CYclE: @vsp-product-support-members`;
+
+      const result = util.parseChannelTopic(channelTopic);
+
+      expect(result['be']).to.equal('@Riley Anderson');
+      expect(result['fe']).to.equal('@eugene_doan');
+      expect(result['ops']).to.equal('@Jeremy Britt');
+      expect(result['ds']).to.equal('@brooks');
+      expect(result['analytics']).to.equal('@Jon Wehausen');
+      expect(result['collab cycle']).to.equal('@vsp-product-support-members');
+    });
+
+    it('should ignore random @-mentions', () => {
+      const channelTopic = `Need help from Platform? Ask here!
+      Off-hours emergency? Ping @chris!! @alex
+      
+      BE: @Riley Anderson
+      FE: @eugene_doan`;
+
+      const result = util.parseChannelTopic(channelTopic);
+
+      expect(Object.keys(result).length).to.equal(2);
+      expect(result['be']).to.equal('@Riley Anderson');
+      expect(result['fe']).to.equal('@eugene_doan');
+    });
+
+    it('should allow for no spacing between colon and @-mention', () => {
+      const channelTopic = `Need help from Platform? Ask here!
+      Off-hours emergency? Ping #oncall!
+      
+      Be:@Riley Anderson
+      fE:@eugene_doan`;
+
+      const result = util.parseChannelTopic(channelTopic);
+
+      expect(Object.keys(result).length).to.equal(2);
+      expect(result['be']).to.equal('@Riley Anderson');
+      expect(result['fe']).to.equal('@eugene_doan');
+    });
+
+    it('should not crash on invalid on call specification', () => {
+      const channelTopic = `Need help from Platform? Ask here!
+      Off-hours emergency? Ping #oncall!
+      
+      :@ 
+      Be:@Riley Anderson
+      fE:@eugene_doan`;
+
+      const result = util.parseChannelTopic(channelTopic);
+
+      expect(Object.keys(result).length).to.equal(2);
+      expect(result['be']).to.equal('@Riley Anderson');
+      expect(result['fe']).to.equal('@eugene_doan');
+    });
+
+    it('should not crash on split character', () => {
+      const channelTopic = `Need help from Platform? Ask here!
+      Off-hours emergency? Ping #oncall!
+      
+      : 
+      Be:@Riley Anderson
+      fE:@eugene_doan`;
+
+      const result = util.parseChannelTopic(channelTopic);
+
+      expect(Object.keys(result).length).to.equal(2);
+      expect(result['be']).to.equal('@Riley Anderson');
+      expect(result['fe']).to.equal('@eugene_doan');
     });
   });
 });

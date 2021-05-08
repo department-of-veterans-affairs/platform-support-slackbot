@@ -78,21 +78,16 @@ module.exports = function (logger) {
     logger.info(topic);
     const supportList = topic
       .split(/\r?\n/)
-      .filter((line) => line.includes(':'))
+      .filter((line) => line.match(/^.+:\s*@.+$/))
       .map((line) => line.split(':'))
       .map((ar) => {
-        return [ar[0].trim(), ar[1].trim()];
-      });
+        return [ar[0].toLowerCase().trim(), ar[1].trim()];
+      })
+      .filter((ar) => ar[0].length > 0 && ar[1].length > 0);
 
     const onCall = Object.fromEntries(supportList);
 
     logger.info(onCall);
-
-    logger.info(onCall['BE']);
-    logger.info(onCall['FE']);
-    logger.info(onCall['OPS']);
-    logger.info(onCall['Analytics']);
-    logger.info(onCall['Collab Cycle']);
 
     return onCall;
   };

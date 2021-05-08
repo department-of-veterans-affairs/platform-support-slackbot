@@ -15,11 +15,11 @@ module.exports = function (logger) {
   };
 
   logic.updateTimeStampOfSupportResponse = async (slackMessageId) => {
-    if (slackMessageId) {
-      const messageIdString = util.stringifyMessageId(slackMessageId);
-      logger.debug(messageIdString);
-      sheets.updateReplyTimeStampForMessage(messageIdString);
-    }
+    if (!slackMessageId) return;
+
+    const messageIdString = util.stringifyMessageId(slackMessageId);
+    logger.debug(messageIdString);
+    sheets.updateReplyTimeStampForMessage(messageIdString);
   };
 
   return logic;

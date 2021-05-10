@@ -27,13 +27,35 @@ module.exports = function (logger) {
   };
 
   /**
+   * Returns the Google Sheet containing the list of teams and mappings
+   * @returns Teams Sheet
+   */
+  sheets.getTeamsSheet = async () => {
+    const doc = await sheets.getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
+
+    // Return first tab
+    return doc.sheetsByIndex[0];
+  };
+
+  /**
+   * Returns the Google Sheet collecting all form responses
+   * @returns Responses Sheet
+   */
+  sheets.getResponsesSheet = async () => {
+    const doc = await sheets.getGoogleSheet(
+      process.env.RESPONSES_SPREADSHEET_ID
+    );
+
+    // Return first tab
+    return doc.sheetsByIndex[0];
+  };
+
+  /**
    * Gets all rows for the Google Teams Sheet
    * @returns Google Sheet Rows
    */
   sheets.getTeamsSheetRows = async () => {
-    const doc = await sheets.getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
-
-    const sheet = doc.sheetsByIndex[0];
+    const sheet = await sheets.getTeamsSheet();
 
     return await sheet.getRows();
   };
@@ -43,11 +65,7 @@ module.exports = function (logger) {
    * @returns Google Sheet Rows
    */
   sheets.getResponseSheetRows = async () => {
-    const doc = await sheets.getGoogleSheet(
-      process.env.RESPONSES_SPREADSHEET_ID
-    );
-
-    const sheet = doc.sheetsByIndex[0];
+    const sheet = await sheets.getResponsesSheet();
 
     return await sheet.getRows();
   };
@@ -76,6 +94,8 @@ module.exports = function (logger) {
   sheets.getTeamById = async (teamId) => {
     const rows = await sheets.getTeamsSheetRows();
 
+    if (rows.length < teamId) return null;
+
     return rows[teamId - 1];
   };
 
@@ -101,11 +121,7 @@ module.exports = function (logger) {
     messageLink,
     dateTime = new Date()
   ) => {
-    const doc = await sheets.getGoogleSheet(
-      process.env.RESPONSES_SPREADSHEET_ID
-    );
-
-    const sheet = doc.sheetsByIndex[0];
+    const sheet = await sheets.getResponsesSheet();
 
     const userList = usersRequestingSupport.join(', ');
 

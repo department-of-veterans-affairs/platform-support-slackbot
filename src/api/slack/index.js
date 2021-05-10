@@ -62,6 +62,7 @@ module.exports = function (logger) {
       };
     } catch (error) {
       logger.error(error);
+      return null;
     }
   };
 

@@ -6,6 +6,7 @@ module.exports = function (logger) {
   const sheets = require('../api/google')(logger);
   const util = require('../api/slack/util')(logger);
   const formSupport = require('./form-support')(logger);
+  const routing = require('./routing')(logger);
 
   let logic = {};
 
@@ -98,13 +99,16 @@ module.exports = function (logger) {
 
     logger.debug(formData);
 
-    const routeData = await formSupport.buildSupportRoute(client, formData);
+    const oncalluser = await routing.getOnCallUser(
+      client,
+      formData.selectedTeam.id
+    );
 
     const messageData = await formSupport.postSupportTicketMessage(
       client,
       ticketId,
       formData,
-      routeData
+      oncalluser
     );
 
     const messageLink = util.createMessageLink(
@@ -126,7 +130,7 @@ module.exports = function (logger) {
       messageIdString,
       formData.submittedBy.username,
       formData.whoNeedsSupport.map((u) => u.username),
-      formData.selectedTeam.id,
+      formData.selectedTeam.title,
       formData.summaryDescription,
       messageLink
     );

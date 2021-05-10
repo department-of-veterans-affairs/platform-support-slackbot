@@ -40,7 +40,8 @@ module.exports = function (logger) {
 
     const selectedTeam = teamData
       ? {
-          id: teamData.Title,
+          id: selectedTeamId,
+          title: teamData.Title,
           name: teamData.Display,
           pagerDutySchedule: teamData.PagerDutySchedule,
           slackGroup: teamData.SlackGroup,
@@ -63,14 +64,14 @@ module.exports = function (logger) {
    * @param {object} client Slack Client
    * @param {string} ticketId Ticket Id (for Reassignment)
    * @param {object} formData Form Data Object
-   * @param {object} routeData Route Data Object
+   * @param {object} oncallUser On Call Slack User Id
    * @returns Posted Message Id and Channel
    */
   formSupport.postSupportTicketMessage = async (
     client,
     ticketId,
     formData,
-    routeData
+    oncallUser
   ) => {
     const postedMessage = await client.chat.postMessage({
       channel: SUPPORT_CHANNEL_ID,
@@ -80,7 +81,7 @@ module.exports = function (logger) {
         formData.submittedBy.id,
         formData.selectedTeam.name,
         formData.summaryDescription,
-        routeData.oncallUser ?? routeData.slackGroup,
+        oncallUser,
         formData.selectedTeam.name
       ),
       text: `Hey there <@${formData.submittedBy.id}>, you have a new Platform Support ticket!`,
@@ -101,47 +102,6 @@ module.exports = function (logger) {
     return {
       messageId: postedMessage.ts,
       channel: postedMessage.channel,
-    };
-  };
-
-  /**
-   * Build a support route based on:
-   * 1. PagerDuty (if available)
-   * 2. Slack group
-   * @param {object} client Slack Client
-   * @param {object} formData Form Data Object
-   * @returns Route Data Object
-   */
-  formSupport.buildSupportRoute = async (client, formData) => {
-    let oncallUser = null;
-
-    const routeData = util.parseChannelTopic(
-      await slack.getChannelTopic(client)
-    );
-
-    const slackUser = routeData[formData.selectedTeam.id.toLowerCase()];
-
-    if (slackUser) {
-      oncallUser = { userId: slackUser };
-    } else if (formData.selectedTeam.pagerDutySchedule) {
-      // Attempt to check PagerDuty API
-      const email = await schedule.getOnCallPersonEmailForSchedule(
-        formData.selectedTeam.pagerDutySchedule
-      );
-      logger.info('Oncall Email');
-      logger.info(email);
-      oncallUser = await slack.getSlackUserByEmail(client, email);
-      logger.info('Route To User');
-      logger.info(oncallUser);
-    }
-
-    if (!oncallUser) {
-      oncallUser = formData.selectedTeam.slackGroup;
-    }
-
-    return {
-      oncallUser: oncallUser?.userId,
-      slackGroup: formData.selectedTeam.slackGroup,
     };
   };
 

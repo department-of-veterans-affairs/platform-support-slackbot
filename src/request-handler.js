@@ -6,6 +6,7 @@ module.exports = function (app, logger) {
   const util = require('./api/slack/util')(logger);
   const sheets = require('./api/google')(logger);
   const formSupport = require('./logic/form-support')(logger);
+  const routing = require('./logic/routing')(logger);
 
   /* EVENT LISTENERS */
 
@@ -69,7 +70,9 @@ module.exports = function (app, logger) {
       logger.info('MESSAGE: hello');
       logger.debug(message.user);
 
-      const data = util.parseChannelTopic(await slack.getChannelTopic(client));
+      // const data = util.parseChannelTopic(await slack.getChannelTopic(client));
+
+      const data = await routing.getOnCallUser(client, 1);
 
       logger.info(data);
 

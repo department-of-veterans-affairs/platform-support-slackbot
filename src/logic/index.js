@@ -46,7 +46,7 @@ module.exports = function (logger) {
    * @param {string} trigger_id Trigger Id to generate modal
    */
   logic.displaySupportModal = async (client, user, trigger_id) => {
-    logger.debug('buildSupportModal()');
+    logger.debug('displaySupportModal()');
 
     const options = await sheets.getTeams();
 
@@ -68,7 +68,7 @@ module.exports = function (logger) {
    * @param {string} trigger_id Trigger Id to generate modal
    */
   logic.displayReassignmentModal = async (client, ticketId, trigger_id) => {
-    logger.debug('buildReassignmentModal()');
+    logger.debug('displayReassignmentModal()');
 
     const options = await sheets.getTeams();
 

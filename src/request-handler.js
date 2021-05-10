@@ -111,7 +111,7 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      util.buildSupportModal(client, body.user.id, body.trigger_id);
+      await logic.displaySupportModal(client, body.user.id, body.trigger_id);
     } catch (error) {
       logger.error(error);
     }
@@ -122,16 +122,17 @@ module.exports = function (app, logger) {
    * This function gets called when the "Reassign Ticket" button
    * is clicked on.  It brings up a reassign ticket modal.
    */
-  app.action('reassign_ticket', async (obj) => {
+  app.action('reassign_ticket', async ({ ack, body, client, payload }) => {
     try {
       logger.info('ACTION: reassign_ticket');
 
-      const { ack, body, client, payload } = obj;
-      logger.info(payload.value);
-
       await ack();
 
-      util.buildReassignmentModal(client, body.trigger_id, payload.value);
+      await logic.displayReassignmentModal(
+        client,
+        payload.value,
+        body.trigger_id
+      );
     } catch (error) {
       logger.error(error);
     }
@@ -171,7 +172,7 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      util.buildSupportModal(client, body.user_id, body.trigger_id);
+      await logic.displaySupportModal(client, body.user_id, body.trigger_id);
     } catch (error) {
       logger.error(error);
     }
@@ -191,7 +192,11 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      util.buildSupportModal(client, shortcut.user.id, shortcut.trigger_id);
+      await logic.displaySupportModal(
+        client,
+        shortcut.user.id,
+        shortcut.trigger_id
+      );
     } catch (error) {
       logger.error(error);
     }

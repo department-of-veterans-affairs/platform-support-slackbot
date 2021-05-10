@@ -7,6 +7,12 @@ module.exports = function (logger) {
 
   let logic = {};
 
+  /**
+   * Displays help (emphemeral) message to user. (Only visible to the user)
+   * @param {object} client Slack Client Object
+   * @param {string} channel Slack Channel Id
+   * @param {string} user Slack User Id
+   */
   logic.postHelpMessageToUserOnly = async (client, channel, user) => {
     await client.chat.postEphemeral({
       channel: channel,
@@ -15,6 +21,10 @@ module.exports = function (logger) {
     });
   };
 
+  /**
+   * Updates the timestamp of first reaction from user to a support ticket
+   * @param {string} slackMessageId Slack Message Id
+   */
   logic.updateTimeStampOfSupportResponse = async (slackMessageId) => {
     if (!slackMessageId) return;
 

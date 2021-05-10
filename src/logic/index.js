@@ -7,6 +7,7 @@ const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 module.exports = function (logger) {
   const sheets = require('../api/google')(logger);
   const util = require('../api/slack/util')(logger);
+  const slack = require('../api/slack')(logger);
   const formSupport = require('./form-support')(logger);
   const routing = require('./routing')(logger);
 
@@ -146,19 +147,54 @@ module.exports = function (logger) {
     const team = await sheets.getTeamById(selectedValue);
 
     return {
+      id: selectedValue,
       title: team.Title,
       display: team.Display,
     };
   };
 
-  logic.getMessageById = async (client, messageId) => {
-    const messages = await client.conversations.history({
-      channel: SUPPORT_CHANNEL_ID,
-      latest: parseFloat(messageId) + 1,
-      oldest: parseFloat(messageId) - 1,
-    });
+  logic.handleReassignmentFormSubmission = async (client, payload, view) => {
+    const ticketId = payload.private_metadata;
 
-    return messages.messages.find((msg) => msg.ts === messageId);
+    logger.info(ticketId);
+
+    const team = await logic.extractReassignFormData(view);
+
+    logger.info(team);
+
+    sheets.updateAssignedTeamForMessage(ticketId, team.title);
+
+    const messageId = await sheets.getMessageByTicketId(ticketId);
+
+    logger.info(messageId);
+
+    const message = await slack.getMessageById(
+      client,
+      messageId,
+      SUPPORT_CHANNEL_ID
+    );
+
+    const onCallUser = await routing.getOnCallUser(client, team.id);
+
+    logger.info(message);
+
+    const blocks = [
+      ...message.blocks,
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Assigned to: <@${onCallUser}>`,
+          verbatim: false,
+        },
+      },
+    ];
+
+    client.chat.update({
+      channel: SUPPORT_CHANNEL_ID,
+      ts: messageId,
+      blocks,
+    });
   };
 
   return logic;

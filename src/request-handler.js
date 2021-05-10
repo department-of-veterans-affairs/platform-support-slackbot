@@ -218,49 +218,13 @@ module.exports = function (app, logger) {
    * Handles the form submission when someone submits the reassigns
    * a ticket
    */
-  app.view('reassign_modal_view', async (obj) => {
+  app.view('reassign_modal_view', async ({ ack, payload, client, view }) => {
     try {
       logger.info('VIEW: reassign_modal_view (FORM SUBMISSION)');
 
-      const { ack, payload, client, view } = obj;
-
       await ack();
 
-      const ticketId = payload.private_metadata;
-
-      logger.info(ticketId);
-
-      const team = await logic.extractReassignFormData(view);
-
-      logger.info(team);
-
-      sheets.updateAssignedTeamForMessage(ticketId, team.title);
-
-      const messageId = await sheets.getMessageByTicketId(ticketId);
-
-      logger.info(messageId);
-
-      const message = await logic.getMessageById(client, messageId);
-
-      logger.info(message);
-
-      const blocks = [
-        ...message.blocks,
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: 'Assigned to: Alex Yip',
-            verbatim: false,
-          },
-        },
-      ];
-
-      client.chat.update({
-        channel: SUPPORT_CHANNEL_ID,
-        ts: messageId,
-        blocks,
-      });
+      logic.handleReassignmentFormSubmission(client, payload, view);
     } catch (error) {
       logger.error(error);
     }

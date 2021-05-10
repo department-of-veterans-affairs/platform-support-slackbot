@@ -83,5 +83,22 @@ module.exports = function (logger) {
     return info.channel.topic.value;
   };
 
+  /**
+   * Returns a Slack Message Object by the Slack Message Id (Timestamp)
+   * @param {*} client Slack Client Object
+   * @param {*} messageId Slack Message Id (timestamp)
+   * @returns Slack Message Object
+   */
+  slackApi.getMessageById = async (client, messageId, channelId) => {
+    // Search Conversation History
+    const messages = await client.conversations.history({
+      channel: channelId,
+      latest: parseFloat(messageId) + 1,
+      oldest: parseFloat(messageId) - 1,
+    });
+
+    return messages.messages.find((msg) => msg.ts === messageId);
+  };
+
   return slackApi;
 };

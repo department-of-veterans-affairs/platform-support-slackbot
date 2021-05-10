@@ -139,26 +139,18 @@ module.exports = function (logger) {
     );
   };
 
-  logic.extractReassignFormData = async (view) => {
-    const { topic } = view.state.values;
-
-    const selectedValue = topic.selected.selected_option.value;
-
-    const team = await sheets.getTeamById(selectedValue);
-
-    return {
-      id: selectedValue,
-      title: team.Title,
-      display: team.Display,
-    };
-  };
-
+  /**
+   * Handles Support Ticket Reassignment Form
+   * @param {object} client Slack Client Object
+   * @param {object} payload Slack Payload Object
+   * @param {object} view Slack View Object
+   */
   logic.handleReassignmentFormSubmission = async (client, payload, view) => {
     const ticketId = payload.private_metadata;
 
     logger.info(ticketId);
 
-    const team = await logic.extractReassignFormData(view);
+    const team = await formSupport.extractReassignFormData(view);
 
     logger.info(team);
 

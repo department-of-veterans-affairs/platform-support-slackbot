@@ -58,6 +58,25 @@ module.exports = function (logger) {
   };
 
   /**
+   * Extracts selected team from the Support Ticket Reassignment form
+   * @param {object} view Slack View Object
+   * @returns Selected Team Object
+   */
+  formSupport.extractReassignFormData = async (view) => {
+    const { topic } = view.state.values;
+
+    const selectedValue = topic.selected.selected_option.value;
+
+    const team = await sheets.getTeamById(selectedValue);
+
+    return {
+      id: selectedValue,
+      title: team.Title,
+      display: team.Display,
+    };
+  };
+
+  /**
    * Post a Support Ticket to the Platform Support Channel
    * @param {object} client Slack Client
    * @param {string} ticketId Ticket Id (for Reassignment)

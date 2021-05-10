@@ -6,6 +6,7 @@ module.exports = function (logger) {
   const slack = require('../api/slack')(logger);
   const schedule = require('../api/pagerduty')(logger);
   const sheets = require('../api/google')(logger);
+  const util = require('../api/slack/util')(logger);
 
   let formSupport = {};
 
@@ -114,8 +115,16 @@ module.exports = function (logger) {
   formSupport.buildSupportRoute = async (client, formData) => {
     let oncallUser = null;
 
-    // Attempt to check PagerDuty API
-    if (formData.selectedTeam.pagerDutySchedule) {
+    const routeData = util.parseChannelTopic(
+      await slack.getChannelTopic(client)
+    );
+
+    const slackUser = routeData[formData.selectedTeam.id.toLowerCase()];
+
+    if (slackUser) {
+      oncallUser = { userId: slackUser };
+    } else if (formData.selectedTeam.pagerDutySchedule) {
+      // Attempt to check PagerDuty API
       const email = await schedule.getOnCallPersonEmailForSchedule(
         formData.selectedTeam.pagerDutySchedule
       );

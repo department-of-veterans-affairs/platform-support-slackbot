@@ -1,9 +1,5 @@
-const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
-
 module.exports = function (app, logger) {
   const logic = require('./logic')(logger);
-  const sheets = require('./api/google')(logger);
-  const routing = require('./logic/routing')(logger);
 
   /* EVENT LISTENERS */
 

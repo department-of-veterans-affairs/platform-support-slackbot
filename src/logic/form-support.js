@@ -4,9 +4,7 @@ const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (logger) {
   const slack = require('../api/slack')(logger);
-  const schedule = require('../api/pagerduty')(logger);
   const sheets = require('../api/google')(logger);
-  const util = require('../api/slack/util')(logger);
 
   let formSupport = {};
 

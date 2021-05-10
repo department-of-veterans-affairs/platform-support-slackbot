@@ -2,6 +2,8 @@ const modalBuilder = require('../ui/modals');
 const responseBuilder = require('../ui/messages');
 const { nanoid } = require('nanoid');
 
+const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
+
 module.exports = function (logger) {
   const sheets = require('../api/google')(logger);
   const util = require('../api/slack/util')(logger);
@@ -134,6 +136,29 @@ module.exports = function (logger) {
       formData.summaryDescription,
       messageLink
     );
+  };
+
+  logic.extractReassignFormData = async (view) => {
+    const { topic } = view.state.values;
+
+    const selectedValue = topic.selected.selected_option.value;
+
+    const team = await sheets.getTeamById(selectedValue);
+
+    return {
+      title: team.Title,
+      display: team.Display,
+    };
+  };
+
+  logic.getMessageById = async (client, messageId) => {
+    const messages = await client.conversations.history({
+      channel: SUPPORT_CHANNEL_ID,
+      latest: parseFloat(messageId) + 1,
+      oldest: parseFloat(messageId) - 1,
+    });
+
+    return messages.messages.find((msg) => msg.ts === messageId);
   };
 
   return logic;

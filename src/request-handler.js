@@ -1,11 +1,8 @@
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (app, logger) {
-  const slack = require('./api/slack')(logger);
   const logic = require('./logic')(logger);
-  const util = require('./api/slack/util')(logger);
   const sheets = require('./api/google')(logger);
-  const formSupport = require('./logic/form-support')(logger);
   const routing = require('./logic/routing')(logger);
 
   /* EVENT LISTENERS */
@@ -69,12 +66,6 @@ module.exports = function (app, logger) {
     try {
       logger.info('MESSAGE: hello');
       logger.debug(message.user);
-
-      // const data = util.parseChannelTopic(await slack.getChannelTopic(client));
-
-      const data = await routing.getOnCallUser(client, 1);
-
-      logger.info(data);
 
       await say(`Hey there <@${message.user}>!`);
     } catch (error) {
@@ -222,29 +213,6 @@ module.exports = function (app, logger) {
     }
   });
 
-  async function extractReassignFormData(view) {
-    const { topic } = view.state.values;
-
-    const selectedValue = topic.selected.selected_option.value;
-
-    const team = await sheets.getTeamById(selectedValue);
-
-    return {
-      title: team.Title,
-      display: team.Display,
-    };
-  }
-
-  async function getMessageById(client, messageId) {
-    const messages = await client.conversations.history({
-      channel: SUPPORT_CHANNEL_ID,
-      latest: parseFloat(messageId) + 1,
-      oldest: parseFloat(messageId) - 1,
-    });
-
-    return messages.messages.find((msg) => msg.ts === messageId);
-  }
-
   /**
    * View: reassign_modal_view
    * Handles the form submission when someone submits the reassigns
@@ -262,7 +230,7 @@ module.exports = function (app, logger) {
 
       logger.info(ticketId);
 
-      const team = await extractReassignFormData(view);
+      const team = await logic.extractReassignFormData(view);
 
       logger.info(team);
 
@@ -272,7 +240,7 @@ module.exports = function (app, logger) {
 
       logger.info(messageId);
 
-      const message = await getMessageById(client, messageId);
+      const message = await logic.getMessageById(client, messageId);
 
       logger.info(message);
 

@@ -170,17 +170,24 @@ module.exports = function (logger) {
 
     logger.info(message);
 
-    const blocks = [
-      ...message.blocks,
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `Assigned to: <@${onCallUser}>`,
-          verbatim: false,
-        },
+    let blocks = message.blocks;
+
+    blocks[1] = {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Need help from*\n${team.display}`,
       },
-    ];
+    };
+
+    blocks[3] = {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Assigned to: <@${onCallUser}>`,
+        verbatim: false,
+      },
+    };
 
     client.chat.update({
       channel: SUPPORT_CHANNEL_ID,

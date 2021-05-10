@@ -1,9 +1,11 @@
 const modalBuilder = require('../ui/modals');
 const responseBuilder = require('../ui/messages');
+const { nanoid } = require('nanoid');
 
 module.exports = function (logger) {
   const sheets = require('../api/google')(logger);
   const util = require('../api/slack/util')(logger);
+  const formSupport = require('./form-support')(logger);
 
   let logic = {};
 
@@ -58,7 +60,7 @@ module.exports = function (logger) {
   /**
    * Displays reassignment modal to the user.
    * @param {object} client Slack Client Object
-   * @param {*} ticketId Nanoid generated ticket Id to be used to reference Google Sheet
+   * @param {string} ticketId Nanoid generated ticket Id to be used to reference Google Sheet
    * @param {string} trigger_id Trigger Id to generate modal
    */
   logic.displayReassignmentModal = async (client, ticketId, trigger_id) => {
@@ -75,6 +77,59 @@ module.exports = function (logger) {
 
     logger.debug(`ticketId: ${ticketId}`);
     logger.trace(result);
+  };
+
+  /**
+   * Handles support form submission.
+   * @param {object} client Slack Client Object
+   * @param {object} body Slack Message Body
+   * @param {object} view Slack View
+   */
+  logic.handleSupportFormSubmission = async (client, body, view) => {
+    // Ticket ID is used for reassignment button to reference
+    // the slack message
+    const ticketId = nanoid();
+
+    const formData = await formSupport.extractSupportFormData(
+      client,
+      body,
+      view
+    );
+
+    logger.debug(formData);
+
+    const routeData = await formSupport.buildSupportRoute(client, formData);
+
+    const messageData = await formSupport.postSupportTicketMessage(
+      client,
+      ticketId,
+      formData,
+      routeData
+    );
+
+    const messageLink = util.createMessageLink(
+      messageData.channel,
+      messageData.messageId
+    );
+
+    // Slack uses a numeric timestamp (double) for a message id. Saving the value
+    // into Google Sheets is problematic as it tries to truncate values. Converting
+    // the message id to a string value prevents Google Sheets from modifying the
+    // message id.
+    const messageIdString = util.stringifyMessageId(messageData.messageId);
+
+    logger.debug(`Posted Message ID: ${messageData.messageId}`);
+    logger.debug(`Posted Message ID Hashed: ${messageIdString}`);
+
+    await sheets.captureResponses(
+      ticketId,
+      messageIdString,
+      formData.submittedBy.username,
+      formData.whoNeedsSupport.map((u) => u.username),
+      formData.selectedTeam.id,
+      formData.summaryDescription,
+      messageLink
+    );
   };
 
   return logic;

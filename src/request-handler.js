@@ -1,5 +1,3 @@
-const { nanoid } = require('nanoid');
-
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (app, logger) {
@@ -215,46 +213,7 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      // Ticket ID is used for reassignment button to reference
-      // the slack message
-      const ticketId = nanoid();
-
-      const formData = await formSupport.extractSupportFormData(
-        client,
-        body,
-        view
-      );
-
-      logger.debug(formData);
-
-      const routeData = await formSupport.buildSupportRoute(client, formData);
-
-      const messageData = await formSupport.postSupportTicketMessage(
-        client,
-        ticketId,
-        formData,
-        routeData
-      );
-
-      const messageLink = util.createMessageLink(
-        messageData.channel,
-        messageData.messageId
-      );
-
-      const messageIdString = util.stringifyMessageId(messageData.messageId);
-
-      logger.debug(`Posted Message ID: ${messageData.messageId}`);
-      logger.debug(`Posted Message ID Hashed: ${messageIdString}`);
-
-      sheets.captureResponses(
-        ticketId,
-        messageIdString,
-        formData.submittedBy.username,
-        formData.whoNeedsSupport.map((u) => u.username),
-        formData.selectedTeam.id,
-        formData.summaryDescription,
-        messageLink
-      );
+      logic.handleSupportFormSubmission(client, body, view);
     } catch (error) {
       logger.error(error);
     }

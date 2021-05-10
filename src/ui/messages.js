@@ -41,7 +41,7 @@ const buildSupportResponse = (
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: mention ? `Assigned to: <@${mention}>` : `Assigned to: ${team}`,
+        text: mention ? `Assigned to: ${mention}` : `Assigned to: ${team}`,
       },
     },
   ];

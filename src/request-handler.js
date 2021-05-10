@@ -1,5 +1,6 @@
 module.exports = function (app, logger) {
   const logic = require('./logic')(logger);
+  const routing = require('./logic/routing')(logger);
 
   /* EVENT LISTENERS */
 

@@ -41,18 +41,17 @@ module.exports = function (logger) {
 
     const formatValue = (value) => {
       const trimmed = value.trim();
-      const slackIdMatch = trimmed.match(/^<@(.+)>$/);
-      return slackIdMatch ? slackIdMatch[1] : trimmed;
+      const slackIdMatch = trimmed.match(/^(<@.+>)|(<!subteam\^.+\|@.+>)$/);
+      return slackIdMatch ? slackIdMatch[0] : null;
     };
 
     const supportList = topic
       .split(/\r?\n/)
-      .filter((line) => line.match(/^.+:\s*<?@.+$/))
+      .filter((line) => line.match(/^.+:\s*<[@!].+>$/))
       .map((line) => line.split(':'))
       .map((ar) => {
         return [formatKey(ar[0]), formatValue(ar[1])];
-      })
-      .filter((ar) => ar[0].length > 0 && ar[1].length > 0);
+      });
 
     const onCall = Object.fromEntries(supportList);
 

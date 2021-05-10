@@ -50,24 +50,23 @@ module.exports = function (logger) {
     const topicRouteData = await routing.getRoutingFromChannelTopic(client);
     if (topicRouteData) {
       logger.debug(topicRouteData);
-      const slackUser = topicRouteData[selectedTeam.Title.toLowerCase()];
-      oncallUser = slackUser ? { userId: slackUser } : null;
-      logger.info(`Selected On-Call User: ${slackUser} from Channel Topic`);
+      oncallUser = topicRouteData[selectedTeam.Title.toLowerCase()];
+      logger.info(`Selected On-Call User: ${oncallUser} from Channel Topic`);
     }
 
     // Check PagerDuty
     if (!oncallUser) {
       logger.info('User not found in Channel Topic.  Trying PagerDuty...');
 
-      oncallUser = await routing.getSlackUserForPagerDutySchedule(
+      const user = await routing.getSlackUserForPagerDutySchedule(
         client,
         selectedTeam
       );
 
+      oncallUser = user ? `<@${user.userId}>` : null;
+
       if (oncallUser) {
-        logger.info(
-          `Selected On-Call User: ${oncallUser.userId} from PagerDuty`
-        );
+        logger.info(`Selected On-Call User: ${oncallUser} from PagerDuty`);
       } else {
         logger.info(`Unable to find slack user from Pager Duty...`);
       }
@@ -76,10 +75,10 @@ module.exports = function (logger) {
     // Get Slack Group
     if (!oncallUser) {
       logger.info('User not found at PagerDuty.  Getting SlackGroup');
-      oncallUser = { userId: selectedTeam.slackGroup };
+      oncallUser = selectedTeam.SlackGroup;
     }
 
-    return oncallUser?.userId;
+    return oncallUser;
   };
 
   return routing;

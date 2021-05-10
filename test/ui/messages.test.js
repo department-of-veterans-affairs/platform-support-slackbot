@@ -7,7 +7,7 @@ describe('Messages', () => {
     const userId = 'alex.yip';
     const selectedTeam = 'FE Tools';
     const summaryDescription = 'I need a PR Reviewed';
-    const mention = 'alex.yip';
+    const mention = '<@alex.yip>';
     const team = null;
 
     let response = responseBuilder.buildSupportResponse(

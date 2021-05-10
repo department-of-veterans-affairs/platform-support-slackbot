@@ -135,6 +135,10 @@ module.exports = function (logger) {
       logger.info(oncallUser);
     }
 
+    if (!oncallUser) {
+      oncallUser = formData.selectedTeam.slackGroup;
+    }
+
     return {
       oncallUser: oncallUser?.userId,
       slackGroup: formData.selectedTeam.slackGroup,

@@ -36,12 +36,21 @@ module.exports = function (logger) {
    */
   util.parseChannelTopic = (topic) => {
     logger.info(topic);
+
+    const formatKey = (key) => key.toLowerCase().trim();
+
+    const formatValue = (value) => {
+      const trimmed = value.trim();
+      const slackIdMatch = trimmed.match(/^<@(.+)>$/);
+      return slackIdMatch ? slackIdMatch[1] : trimmed;
+    };
+
     const supportList = topic
       .split(/\r?\n/)
-      .filter((line) => line.match(/^.+:\s*@.+$/))
+      .filter((line) => line.match(/^.+:\s*<?@.+$/))
       .map((line) => line.split(':'))
       .map((ar) => {
-        return [ar[0].toLowerCase().trim(), ar[1].trim()];
+        return [formatKey(ar[0]), formatValue(ar[1])];
       })
       .filter((ar) => ar[0].length > 0 && ar[1].length > 0);
 

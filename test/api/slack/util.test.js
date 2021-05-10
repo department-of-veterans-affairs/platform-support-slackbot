@@ -55,7 +55,7 @@ describe('api/slack', () => {
         Off-hours emergency? Ping #oncall!
         
         BE: @Riley Anderson
-        FE: @eugene_doan
+        FE: <@U1Q33H0LT>
         OPS: @Jeremy Britt
         DS: @brooks
         Analytics: @Jon Wehausen
@@ -65,7 +65,7 @@ describe('api/slack', () => {
 
         expect(Object.keys(result).length).to.equal(6);
         expect(result['be']).to.equal('@Riley Anderson');
-        expect(result['fe']).to.equal('@eugene_doan');
+        expect(result['fe']).to.equal('U1Q33H0LT');
         expect(result['ops']).to.equal('@Jeremy Britt');
         expect(result['ds']).to.equal('@brooks');
         expect(result['analytics']).to.equal('@Jon Wehausen');

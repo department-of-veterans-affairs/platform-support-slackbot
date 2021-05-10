@@ -7,7 +7,7 @@ module.exports = function (app, logger) {
   const logic = require('./logic')(logger);
   const util = require('./api/slack/util')(logger);
   const sheets = require('./api/google')(logger);
-  const formSupport = require('./api/slack/form-support')(logger);
+  const formSupport = require('./logic/form-support')(logger);
 
   /* EVENT LISTENERS */
 

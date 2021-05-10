@@ -24,6 +24,7 @@ module.exports = function (logger) {
     const email = await schedule.getOnCallPersonEmailForSchedule(
       selectedTeam.PagerDutySchedule
     );
+    if (!email) return null;
     logger.info(`Found PagerDuty user email: ${email}`);
     return await slack.getSlackUserByEmail(client, email);
   };
@@ -68,7 +69,7 @@ module.exports = function (logger) {
           `Selected On-Call User: ${oncallUser.userId} from PagerDuty`
         );
       } else {
-        logger.info(`Unable to find slack user with email: ${email}`);
+        logger.info(`Unable to find slack user from Pager Duty...`);
       }
     }
 

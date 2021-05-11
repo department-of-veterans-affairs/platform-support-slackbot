@@ -189,7 +189,7 @@ module.exports = function (logger) {
 
     const row = rows.find((row) => row.TicketId === ticketId);
 
-    return row.MessageId.replace('msgId:', '');
+    return row ? row.MessageId.replace('msgId:', '') : null;
   };
 
   return sheets;

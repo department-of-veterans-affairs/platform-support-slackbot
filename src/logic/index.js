@@ -167,6 +167,8 @@ module.exports = function (logger) {
 
     const messageId = await sheets.getMessageByTicketId(ticketId);
 
+    // TODO: Handle Message Not Found
+
     logger.info(messageId);
 
     const message = await slack.getMessageById(

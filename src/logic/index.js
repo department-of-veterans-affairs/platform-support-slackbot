@@ -20,6 +20,8 @@ module.exports = function (logger) {
    * @param {string} user Slack User Id
    */
   logic.postHelpMessageToUserOnly = async (client, channel, user) => {
+    logger.debug('postHelpMessageToUserOnly()');
+
     await client.chat.postEphemeral({
       channel: channel,
       user: user,
@@ -32,10 +34,13 @@ module.exports = function (logger) {
    * @param {string} slackMessageId Slack Message Id
    */
   logic.updateTimeStampOfSupportResponse = async (slackMessageId) => {
+    logger.debug('updateTimeStampOfSupportResponse()');
+
     if (!slackMessageId) return;
 
     const messageIdString = util.stringifyMessageId(slackMessageId);
-    logger.debug(messageIdString);
+    logger.debug(`messageIdString: ${messageIdString}`);
+
     sheets.updateReplyTimeStampForMessage(messageIdString);
   };
 
@@ -90,6 +95,8 @@ module.exports = function (logger) {
    * @param {object} view Slack View
    */
   logic.handleSupportFormSubmission = async (client, body, view) => {
+    logger.debug('handleSupportFormSubmission()');
+
     // Ticket ID is used for reassignment button to reference
     // the slack message
     const ticketId = nanoid();
@@ -146,6 +153,8 @@ module.exports = function (logger) {
    * @param {object} view Slack View Object
    */
   logic.handleReassignmentFormSubmission = async (client, payload, view) => {
+    logger.debug('handleReassignmentFormSubmission()');
+
     const ticketId = payload.private_metadata;
 
     logger.info(ticketId);
@@ -189,11 +198,7 @@ module.exports = function (logger) {
       },
     };
 
-    client.chat.update({
-      channel: SUPPORT_CHANNEL_ID,
-      ts: messageId,
-      blocks,
-    });
+    slack.updateMessageById(client, messageId, SUPPORT_CHANNEL_ID, blocks);
   };
 
   return logic;

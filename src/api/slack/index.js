@@ -85,19 +85,38 @@ module.exports = function (logger) {
 
   /**
    * Returns a Slack Message Object by the Slack Message Id (Timestamp)
-   * @param {*} client Slack Client Object
-   * @param {*} messageId Slack Message Id (timestamp)
+   * @param {object} client Slack Client Object
+   * @param {string} messageId Slack Message Id (timestamp)
    * @returns Slack Message Object
    */
   slackApi.getMessageById = async (client, messageId, channelId) => {
-    // Search Conversation History
+    // Search Conversation History to find a message in the
+    // specified channel with in a 2 second window of the specified
+    // timestamp (messageId).  Note: no way of getting a message
+    // by ID specifically.
     const messages = await client.conversations.history({
       channel: channelId,
       latest: parseFloat(messageId) + 1,
       oldest: parseFloat(messageId) - 1,
     });
 
+    // Find the message Id that matches with the one passed in.
     return messages.messages.find((msg) => msg.ts === messageId);
+  };
+
+  /**
+   *
+   * @param {object} client Slack Client Object
+   * @param {string} messageId Slack Message Id (timestamp)
+   * @param {string} channelId Slack Channel Id
+   * @param {Array} blocks Array of block kit elements
+   */
+  slackApi.updateMessageById = async (client, messageId, channelId, blocks) => {
+    client.chat.update({
+      channel: channelId,
+      ts: messageId,
+      blocks,
+    });
   };
 
   return slackApi;

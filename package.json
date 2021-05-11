@@ -5,7 +5,8 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js | pino-pretty",
-    "test": "mocha --recursive --require test/mocha.opts.js"
+    "test": "mocha --recursive --require test/mocha.opts.js",
+    "test:random": "mocha --require test/mocha.opts.js $(find test | grep .test.js | gshuf)"
   },
   "author": "",
   "license": "ISC",

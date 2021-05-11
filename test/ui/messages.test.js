@@ -2,7 +2,7 @@ const { expect } = require('chai');
 
 const responseBuilder = require('../../src/ui/messages');
 
-describe('Messages', () => {
+describe('ui/messages', () => {
   it('should populate a response message correctly', () => {
     const ticketId = 'abc123';
     const userId = 'alex.yip';

@@ -1,10 +1,6 @@
-const chai = require('chai');
-const assertArrays = require('chai-arrays');
-const modalBuilder = require('../../src/ui/modals');
+const { expect } = require('chai');
 
-// Chai Setup
-chai.use(assertArrays);
-const expect = chai.expect;
+const modalBuilder = require('../../src/ui/modals');
 
 describe('Modals', () => {
   it('should set initial users array with passed in user id', () => {

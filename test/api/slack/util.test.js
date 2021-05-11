@@ -1,8 +1,4 @@
-const expect = require('chai').expect;
-
-const logger = require('pino')({
-  enabled: false,
-});
+const { expect } = require('chai');
 
 describe('api/slack', () => {
   describe('Util', () => {

@@ -17,12 +17,14 @@
             ]
         },
         {
-            "name": "Run Mocha Tests (Debug)",
+            "name": "Debug Mocha Tests",
             "type": "node",
             "request": "launch",
             "runtimeArgs": [
               "${workspaceRoot}/node_modules/.bin/mocha",
               "--inspect-brk",
+              "--require",
+              "${workspaceFolder}/test/mocha.opts.js",
               "--recursive",
               "${workspaceFolder}/test/**/*.test.js"
             ],

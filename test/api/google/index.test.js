@@ -1,14 +1,4 @@
-const sinon = require('sinon');
-const chai = require('chai');
-const assertArrays = require('chai-arrays');
-
-// Chai Setup
-chai.use(assertArrays);
-const expect = chai.expect;
-
-const logger = require('pino')({
-  enabled: false,
-});
+const { expect } = require('chai');
 
 describe('api/google', () => {
   describe('Google Sheets', () => {

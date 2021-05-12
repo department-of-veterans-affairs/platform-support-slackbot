@@ -215,15 +215,18 @@ module.exports = function (app, logger) {
    * Handles the form submission when someone submits the reassigns
    * a ticket
    */
-  app.view('reassign_modal_view', async ({ ack, payload, client, view }) => {
-    try {
-      logger.info('VIEW: reassign_modal_view (FORM SUBMISSION)');
+  app.view(
+    'reassign_modal_view',
+    async ({ ack, payload, client, view, body }) => {
+      try {
+        logger.info('VIEW: reassign_modal_view (FORM SUBMISSION)');
 
-      await ack();
+        await ack();
 
-      logic.handleReassignmentFormSubmission(client, payload, view);
-    } catch (error) {
-      logger.error(error);
+        logic.handleReassignmentFormSubmission(client, payload, view, body);
+      } catch (error) {
+        logger.error(error);
+      }
     }
-  });
+  );
 };

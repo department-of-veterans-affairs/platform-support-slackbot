@@ -152,7 +152,12 @@ module.exports = function (logger) {
    * @param {object} payload Slack Payload Object
    * @param {object} view Slack View Object
    */
-  logic.handleReassignmentFormSubmission = async (client, payload, view) => {
+  logic.handleReassignmentFormSubmission = async (
+    client,
+    payload,
+    view,
+    body
+  ) => {
     logger.debug('handleReassignmentFormSubmission()');
 
     const ticketId = payload.private_metadata;
@@ -170,7 +175,9 @@ module.exports = function (logger) {
     if (!messageId) {
       logic.handleError(
         client,
-        "Hey there!  I'm sorry!  I'm having some difficulties reassigning your ticket.  Please contact support."
+        "Hey there!  Sorry, I'm having some difficulties reassigning your ticket.  Please contact support.",
+        SUPPORT_CHANNEL_ID,
+        body.user.id
       );
       return;
     }
@@ -209,7 +216,7 @@ module.exports = function (logger) {
     slack.updateMessageById(client, messageId, SUPPORT_CHANNEL_ID, blocks);
   };
 
-  logic.handleError = async (client, friendlyErrorMessage) => {
+  logic.handleError = async (client, friendlyErrorMessage, channel, user) => {
     await client.chat.postEphemeral({
       channel: channel,
       user: user,

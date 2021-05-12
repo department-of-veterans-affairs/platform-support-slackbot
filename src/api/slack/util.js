@@ -13,7 +13,7 @@ module.exports = function (logger) {
    * @returns string Message Id String
    */
   util.stringifyMessageId = (messageId) => {
-    return `msgId:${messageId}`;
+    return `msgId:${messageId ?? ''}`;
   };
 
   /**

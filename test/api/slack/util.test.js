@@ -11,6 +11,23 @@ describe('api/slack/util', () => {
     util = null;
   });
 
+  describe('stringifyMessageId()', () => {
+    it('should stringify a timestamp', () => {
+      let timestamp = 1620757447.050401;
+
+      let result = util.stringifyMessageId(timestamp);
+
+      expect(result).to.equal('msgId:1620757447.050401');
+    });
+    it('should fail gracefully with a null', () => {
+      let timestamp = null;
+
+      let result = util.stringifyMessageId(timestamp);
+
+      expect(result).to.equal('msgId:');
+    });
+  });
+
   describe('createMessageLink()', () => {
     it('build a message link correctly', () => {
       // Example Link:

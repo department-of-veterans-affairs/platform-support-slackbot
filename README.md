@@ -123,3 +123,17 @@ platform-support-bot@platform-support-bot-312013.iam.gserviceaccount.com
 ```
 
 This is the service account created for the Platform Service Bot. Google Sheets will ask you if you want to give write permissions to this spreadsheet outside of the organization. Click Yes.
+
+# Docker
+
+Building a docker image
+
+```
+$ docker build -t plaform_support_slackbot:1.0 .
+```
+
+Running the docker image
+
+```
+docker run --env-file=.env plaform_support_slackbot:1.0
+```

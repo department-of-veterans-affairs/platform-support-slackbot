@@ -14,6 +14,8 @@ const workflowHandler = require('./workflow-handler');
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
+  socketMode: true,
+  appToken: process.env.SLACK_WEB_SOCKET_APP_TOKEN,
 });
 
 // Handles Slack Requests

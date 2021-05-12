@@ -2,9 +2,16 @@ const { expect } = require('chai');
 
 describe('api/slack', () => {
   let slack;
+  let client;
 
   beforeEach(() => {
     slack = require('../../../src/api/slack')(logger);
+    client = {
+      users: {
+        info: async function (obj) {},
+        lookupByEmail: async function (obj) {},
+      },
+    };
   });
 
   afterEach(() => {
@@ -13,11 +20,7 @@ describe('api/slack', () => {
 
   describe('getSlackUser()', () => {
     it('should call users.info() to get slack user', () => {
-      let client = {
-        users: {
-          info: sinon.spy(),
-        },
-      };
+      client.users.info = sinon.spy();
 
       slack.getSlackUser(client, 'abc123');
 
@@ -28,12 +31,6 @@ describe('api/slack', () => {
     });
 
     it('should return user id when user.info() throws an error', async () => {
-      let client = {
-        users: {
-          info: function (obj) {},
-        },
-      };
-
       let error = new Error('Error');
       sinon.stub(client.users, 'info').throws(error);
 
@@ -45,15 +42,11 @@ describe('api/slack', () => {
 
   describe('getSlackUsers()', () => {
     it('should return a list of slack users', async () => {
-      let client = {
-        users: {
-          info: async function (obj) {
-            return {
-              id: obj.user,
-              name: obj.user,
-            };
-          },
-        },
+      client.users.info = async function (obj) {
+        return {
+          id: obj.user,
+          name: obj.user,
+        };
       };
 
       let users = await slack.getSlackUsers(client, ['abc123', 'def456']);
@@ -65,12 +58,6 @@ describe('api/slack', () => {
     });
 
     it('should return a list of user ids if it gets an exception', async () => {
-      let client = {
-        users: {
-          info: function (obj) {},
-        },
-      };
-
       let error = new Error('Error');
       sinon.stub(client.users, 'info').throws(error);
 
@@ -82,12 +69,6 @@ describe('api/slack', () => {
 
   describe('getSlackUserByEmail()', () => {
     it('should return a Slack User by Email', async () => {
-      let client = {
-        users: {
-          lookupByEmail: async (obj) => {},
-        },
-      };
-
       sinon
         .stub(client.users, 'lookupByEmail')
         .withArgs(sinon.match.any)

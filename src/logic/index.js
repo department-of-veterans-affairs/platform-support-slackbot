@@ -208,7 +208,7 @@ module.exports = function (logger) {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `Assigned to: <@${onCallUser}>`,
+        text: `Assigned to: ${onCallUser}`,
         verbatim: false,
       },
     };

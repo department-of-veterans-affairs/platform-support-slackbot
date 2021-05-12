@@ -167,7 +167,10 @@ module.exports = function (logger) {
 
     const messageId = await sheets.getMessageByTicketId(ticketId);
 
-    // TODO: Handle Message Not Found
+    if (!messageId) {
+      logic.handleError(client, "Hey there!  I'm sorry!  I'm having some difficulties reassigning your ticket.  Please contact support.");
+      return;
+    }
 
     logger.info(messageId);
 
@@ -201,6 +204,14 @@ module.exports = function (logger) {
     };
 
     slack.updateMessageById(client, messageId, SUPPORT_CHANNEL_ID, blocks);
+  };
+
+  logic.handleError = (client, friendlyErrorMessage) => {
+    await client.chat.postEphemeral({
+      channel: channel,
+      user: user,
+      text: friendlyErrorMessage,
+    });
   };
 
   return logic;

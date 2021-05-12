@@ -168,7 +168,10 @@ module.exports = function (logger) {
     const messageId = await sheets.getMessageByTicketId(ticketId);
 
     if (!messageId) {
-      logic.handleError(client, "Hey there!  I'm sorry!  I'm having some difficulties reassigning your ticket.  Please contact support.");
+      logic.handleError(
+        client,
+        "Hey there!  I'm sorry!  I'm having some difficulties reassigning your ticket.  Please contact support."
+      );
       return;
     }
 
@@ -206,7 +209,7 @@ module.exports = function (logger) {
     slack.updateMessageById(client, messageId, SUPPORT_CHANNEL_ID, blocks);
   };
 
-  logic.handleError = (client, friendlyErrorMessage) => {
+  logic.handleError = async (client, friendlyErrorMessage) => {
     await client.chat.postEphemeral({
       channel: channel,
       user: user,

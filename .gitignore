@@ -115,4 +115,3 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-client_secret.json

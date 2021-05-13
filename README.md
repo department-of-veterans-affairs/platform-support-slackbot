@@ -135,5 +135,5 @@ $ docker build -t plaform_support_slackbot:1.0 .
 Running the docker image
 
 ```
-docker run --env-file=.env plaform_support_slackbot:1.0
+docker run --env-file=.env --read-only -v "$PWD:$PWD" -w "$PWD" plaform_support_slackbot:1.0
 ```

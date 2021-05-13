@@ -6,17 +6,9 @@ Install dependencies:
 
 `$ yarn install`
 
-or
-
-`$ npm install`
-
 To start the slack bot locally:
 
 `$ yarn start`
-
-or
-
-`$ npm run start`
 
 Note: In order for Slack to communicate with the slack bot, you must either deploy it or use a tunneling tool like ngrok.
 
@@ -25,10 +17,6 @@ Note: In order for Slack to communicate with the slack bot, you must either depl
 To run unit tests:
 
 `$ yarn test`
-
-or
-
-`$ npm run test`
 
 ### Randomizing Unit Tests
 
@@ -39,10 +27,6 @@ To run tests in random order, install `coreutils`.
 Then run the unit tests in random order:
 
 `$ yarn test:random`
-
-or
-
-`$ npm run test:random`
 
 # Logging
 
@@ -95,8 +79,26 @@ Building a docker image
 $ docker build -t plaform_support_slackbot:1.0 .
 ```
 
-Running the docker image
+Then run the docker image by using this command:
 
 ```
-docker run --env-file=.env --read-only -v "$PWD:$PWD" -w "$PWD" plaform_support_slackbot:1.0
+docker run --env-file=.env plaform_support_slackbot:1.0
+```
+
+If you want to run it in the background:
+
+```
+docker run -d --env-file=.env.docker plaform_support_slackbot:1.0
+```
+
+Check for Docker background processes:
+
+```
+docker ps
+```
+
+Stop Docker container by passing in the Container Id from `docker ps`.
+
+```
+docker stop [CONTAINER ID]
 ```

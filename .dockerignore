@@ -1,8 +1,16 @@
-.git
+# Visual Studio Code
 .vscode
+
+# git 
+.git
+
+# Node modules
 node_modules
+
+# dotenv files
 .env
 .env.prod
 .env.test
-client_secret.json
-ngrok.sh
+
+# Heroku Procfile
+Procfile

@@ -85,11 +85,19 @@ Then run the docker image by using this command:
 docker run --env-file=.env plaform_support_slackbot:1.0
 ```
 
-If you want to run it in the background:
+If you want to run it in the background (local only):
+
+```
+docker run -d --read-only -v "$PWD:$PWD" -w "$PWD" plaform_support_slackbot:1.0
+```
+
+Note: Using the `.env` file with docker run does not work since multiline environment variables doesn't seem to work passed this way.
 
 ```
 docker run -d --env-file=.env.docker plaform_support_slackbot:1.0
 ```
+
+! Does Not Work! Future: look at using Docker Compose.
 
 Check for Docker background processes:
 

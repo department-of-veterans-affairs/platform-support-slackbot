@@ -2,5 +2,7 @@
 .vscode
 node_modules
 .env
+.env.prod
+.env.test
 client_secret.json
 ngrok.sh

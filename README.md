@@ -85,6 +85,10 @@ This is the service account created for the Platform Service Bot. Google Sheets 
 
 # Docker
 
+A Docker image is built to containerize the application. Download and install Docker from [here](https://www.docker.com/get-started).
+
+First build the Docker image and run it using the following commands:
+
 Building a docker image
 
 ```

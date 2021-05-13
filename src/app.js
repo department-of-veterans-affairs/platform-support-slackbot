@@ -28,7 +28,7 @@ workflowHandler(app, logger);
  * App Entry Point
  */
 (async () => {
-  await app.start(process.env.PORT || 3000);
+  await app.start();
 
   logger.info('⚡️Platform Support Bot is running! ⚡️');
 })();

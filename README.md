@@ -46,7 +46,7 @@ The following is a high level overview of application code:
 - **logic/index.js** - Entry point for business logic
 - **logic/form-support.js** - Business logic related to form submissions. (Support Request and Reassignment modals)
 - **routing.js** - Business logic related to determining the oncall user.
-- **ui/messages.js** - Build message responses to the user using Slack’s Block Kit.
+- **ui/messages.js** - Build message responses to the user using Slack’s Block Kit. Find our more about Block Kit by clicking [here](https://api.slack.com/block-kit).
 - **ui/modals.js** - Build modal responses to the user using Slack’s Block Kit.
 
 ## Launching Platform Support Slack Bot
@@ -69,7 +69,7 @@ To run unit tests:
 
 ### Randomizing Unit Tests
 
-To run tests in random order, install `coreutils`.
+To run tests in random order, install `coreutils`. (Instructions for MacOS)
 
 `$ brew install coreutils`
 
@@ -151,6 +151,14 @@ platform-support-bot@platform-support-bot-312013.iam.gserviceaccount.com
 ```
 
 This is the service account created for the Platform Service Bot. Google Sheets will ask you if you want to give write permissions to this spreadsheet outside of the organization. Click Yes.
+
+**Google Authentication**
+
+_google_client.json_
+
+A file client_secret.json for credential information was downloaded from the Google Cloud console. However, due to the sensitive nature of the content, the sensitive information was extracted into environment variables and renamed from client_secret.json to google_client.json. The environment variables **GOOGLE_CLIENT_ID**, **GOOGLE_PRIVATE_KEY** and **GOOGLE_PRIVATE_KEY_ID** have been extracted from client_secret.json.
+
+If a new key needs to be generated, click on the service account link above and generate a new key. You will need to download client_secret.json and extract the sensitive variables as necessary.
 
 ## Docker
 

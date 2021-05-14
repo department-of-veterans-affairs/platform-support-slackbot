@@ -1,6 +1,4 @@
 module.exports = function (logger) {
-  const sheets = require('../google')(logger);
-
   let util = {};
 
   /**

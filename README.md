@@ -59,8 +59,6 @@ To start the slack bot locally:
 
 `$ yarn start`
 
-Note: In order for Slack to communicate with the slack bot, you must either deploy it or use a tunneling tool like ngrok.
-
 ## Running Unit Tests
 
 To run unit tests:

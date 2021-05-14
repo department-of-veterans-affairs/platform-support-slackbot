@@ -158,6 +158,15 @@ module.exports = function (logger) {
     view,
     body
   ) => {
+    function sendErrorMessageToUser() {
+      logic.handleError(
+        client,
+        "Hey there!  Sorry, I'm having some difficulties reassigning your ticket.  Please contact support.",
+        SUPPORT_CHANNEL_ID,
+        body.user.id
+      );
+    }
+
     logger.debug('handleReassignmentFormSubmission()');
 
     const ticketId = payload.private_metadata;
@@ -172,15 +181,7 @@ module.exports = function (logger) {
 
     const messageId = await sheets.getMessageByTicketId(ticketId);
 
-    if (!messageId) {
-      logic.handleError(
-        client,
-        "Hey there!  Sorry, I'm having some difficulties reassigning your ticket.  Please contact support.",
-        SUPPORT_CHANNEL_ID,
-        body.user.id
-      );
-      return;
-    }
+    if (!messageId) return sendErrorMessageToUser();
 
     logger.info(messageId);
 
@@ -189,6 +190,8 @@ module.exports = function (logger) {
       messageId,
       SUPPORT_CHANNEL_ID
     );
+
+    if (!message) return sendErrorMessageToUser();
 
     const onCallUser = await routing.getOnCallUser(client, team.id);
 

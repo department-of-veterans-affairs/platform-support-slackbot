@@ -7,7 +7,7 @@ module.exports = function (logger) {
    * Get PagerDuty API Instance
    * @returns PagerDuty API Instance
    */
-  schedule.getApiInstance = function () {
+  schedule._getApiInstance = function () {
     return api({ token: process.env.PAGER_DUTY_API_KEY });
   };
 
@@ -18,7 +18,7 @@ module.exports = function (logger) {
    * @param {date} date Schedule date
    * @returns PagerDuty schedule instance
    */
-  schedule.getScheduleForDate = async function (pd, scheduleId, date) {
+  schedule._getScheduleForDate = async function (pd, scheduleId, date) {
     logger.trace('getScheduleForDate()');
 
     const encodedDate = encodeURI(date.toISOString());
@@ -34,7 +34,7 @@ module.exports = function (logger) {
    * @param {string} userId PagerDuty User Id
    * @returns PagerDuty user instance
    */
-  schedule.getUserById = async function (pd, userId) {
+  schedule._getUserById = async function (pd, userId) {
     logger.trace('getUserById()');
 
     return await pd.get(`/users/${userId}`);
@@ -48,11 +48,11 @@ module.exports = function (logger) {
   schedule.getOnCallPersonEmailForSchedule = async function (scheduleId) {
     logger.trace('getOnCallPersonEmailForSchedule()');
 
-    const api = this.getApiInstance();
+    const api = this._getApiInstance();
 
     const currentDate = new Date();
 
-    const currentScheduleResponse = await this.getScheduleForDate(
+    const currentScheduleResponse = await this._getScheduleForDate(
       api,
       scheduleId,
       currentDate
@@ -66,7 +66,7 @@ module.exports = function (logger) {
 
     const oncallUser = entries[0].user;
 
-    const userResponse = await this.getUserById(api, oncallUser.id);
+    const userResponse = await this._getUserById(api, oncallUser.id);
 
     return userResponse?.data?.user?.email;
   };

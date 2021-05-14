@@ -93,7 +93,8 @@ module.exports = function (logger) {
     // Search Conversation History to find a message in the
     // specified channel with in a 2 second window of the specified
     // timestamp (messageId).  Note: no way of getting a message
-    // by ID specifically.
+    // by ID specifically and anything less than a 2 second window
+    // seems to cause rounding errors with the comparison. ???
     const messages = await client.conversations.history({
       channel: channelId,
       latest: parseFloat(messageId) + 1,
@@ -101,11 +102,11 @@ module.exports = function (logger) {
     });
 
     // Find the message Id that matches with the one passed in.
-    return messages.messages.find((msg) => msg.ts === messageId);
+    return messages.messages.find((msg) => msg.ts === messageId) || null;
   };
 
   /**
-   *
+   * Update a Message by Slack Message Id (ts - timestamp)
    * @param {object} client Slack Client Object
    * @param {string} messageId Slack Message Id (timestamp)
    * @param {string} channelId Slack Channel Id

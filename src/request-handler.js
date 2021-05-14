@@ -64,6 +64,13 @@ module.exports = function (app, logger) {
       logger.info('MESSAGE: hello');
       logger.debug(message.user);
 
+      const slack = require('./api/slack')(logger);
+      const result = await slack.getSlackUserByEmail(
+        client,
+        'a.yip@adhocteam.us'
+      );
+      console.log(result);
+
       await say(`Hey there <@${message.user}>!`);
     } catch (error) {
       logger.error(error);

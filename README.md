@@ -1,7 +1,5 @@
 # Platform Support Slack Bot
 
----
-
 ## Launching Platform Support Slack Bot
 
 Install dependencies:
@@ -30,8 +28,6 @@ Then run the unit tests in random order:
 
 `$ yarn test:random`
 
----
-
 ## Environment Variables
 
 To configure the Slackbot, the following environment variables are used:
@@ -47,8 +43,6 @@ To configure the Slackbot, the following environment variables are used:
 - **GOOGLE_CLIENT_ID** - Google Client Id used for accessing Google Sheets
 - **GOOGLE_PRIVATE_KEY** - Certificate used for accessing Google Sheets
 - **GOOGLE_PRIVATE_KEY_ID** - Certificate Id used for accessing Google Sheets
-
----
 
 ## Logging
 
@@ -79,8 +73,6 @@ $ node src/app.js | pino-pretty
 
 Running `npm start` does the same.
 
----
-
 # Google Sheets
 
 TODO:
@@ -98,8 +90,6 @@ platform-support-bot@platform-support-bot-312013.iam.gserviceaccount.com
 ```
 
 This is the service account created for the Platform Service Bot. Google Sheets will ask you if you want to give write permissions to this spreadsheet outside of the organization. Click Yes.
-
----
 
 # Docker
 

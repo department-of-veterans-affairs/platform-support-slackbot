@@ -11,6 +11,10 @@ describe('api/slack', () => {
         info: async function (obj) {},
         lookupByEmail: async function (obj) {},
       },
+      conversations: {
+        info: async function (obj) {},
+        history: async function (obj) {},
+      },
     };
   });
 
@@ -58,8 +62,7 @@ describe('api/slack', () => {
     });
 
     it('should return a list of user ids if it gets an exception', async () => {
-      let error = new Error('Error');
-      sinon.stub(client.users, 'info').throws(error);
+      sinon.stub(client.users, 'info').throws(new Error('Error'));
 
       let users = await slack.getSlackUsers(client, ['abc123', 'def456']);
 
@@ -88,6 +91,84 @@ describe('api/slack', () => {
         userId: 'jsmith1234',
         userName: 'john.smith',
       });
+    });
+
+    it('should return null if the users email is not found', async () => {
+      sinon.stub(client.users, 'lookupByEmail').throws(new Error('Error'));
+
+      let result = await slack.getSlackUserByEmail('john.smith@adhocteam.us');
+
+      expect(result).to.be.null;
+    });
+  });
+
+  describe('getChannelTopic()', async () => {
+    it('should return the channel topic', async () => {
+      sinon
+        .stub(client.conversations, 'info')
+        .withArgs(sinon.match.any)
+        .resolves({
+          channel: {
+            topic: {
+              value: 'This is the channel topic',
+            },
+          },
+        });
+
+      let result = await slack.getChannelTopic(client);
+
+      expect(result).to.equal('This is the channel topic');
+    });
+  });
+
+  describe('getMessageById()', async () => {
+    it('should get a message by timestamp', async () => {
+      const messages = [
+        {
+          type: 'message',
+          user: 'U012AB3CDE',
+          text: 'I find you punny and would like to smell your nose letter',
+          ts: '1512085950.000216',
+        },
+        {
+          type: 'message',
+          user: 'U061F7AUR',
+          text: 'What, you want to smell my shoes better?',
+          ts: '1512104434.000490',
+        },
+      ];
+
+      sinon
+        .stub(client.conversations, 'history')
+        .withArgs(sinon.match.any)
+        .resolves({
+          messages,
+        });
+
+      let result = await slack.getMessageById(
+        client,
+        '1512104434.000490',
+        'C12DS3DX'
+      );
+
+      expect(result).to.eql(messages[1]);
+    });
+
+    it('should return null when a message is not found', async () => {
+      sinon
+        .stub(client.conversations, 'history')
+        .withArgs(sinon.match.any)
+        .resolves({
+          messages: [],
+        });
+
+      let result = await slack.getMessageById(
+        client,
+        '1512104434.000490',
+        'C12DS3DX'
+      );
+
+      expect(result).to.be.null;
     });
   });
 

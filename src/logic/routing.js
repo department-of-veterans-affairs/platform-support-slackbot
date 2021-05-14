@@ -36,7 +36,7 @@ module.exports = function (logger) {
    * 3. Slack Group
    * 4. If all else fails, return null.
    * @param {object} client Slack Client
-   * @param {*} selectedTeamId Selected Team Id
+   * @param {string} selectedTeamId Selected Team Id
    * @returns On Call Slack User, null if unavailable.
    */
   routing.getOnCallUser = async (client, selectedTeamId) => {

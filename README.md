@@ -1,5 +1,54 @@
 # Platform Support Slack Bot
 
+The Slackbot is written with JavaScript using the bolt.js framework. Bolt.js is a framework created by Slack to make it easier to build Slack applications.
+
+- Bolt.js Documentation
+  https://slack.dev/bolt-js/tutorial/getting-started
+
+- Bolt.js GitHub Page
+  https://github.com/slackapi/bolt-js
+
+Bolt.js is entirely a backend framework. There are no frontend components in the Slack bot application.
+
+## Software Requirements
+
+The Slack bot was written specifically with these tools:
+
+- **Node.js**
+  Version: 14.15.0
+- **Yarn**
+  Version: 1.21.1
+
+## Dependencies
+
+These are the dependencies that are used in the Slack bot and a description of where it is used.
+
+- **@pagerduty/pdjs** - PagerDuty client to access on-call schedules
+- **@slack/bolt** - Bolt.js - Slack SDK for Slack App Development
+- **dotenv** - Handling of environment variables
+- **googleapis / google-spreadsheet** - Google Sheets library for accessing and updating Google Sheets (Teams and Support Forms).
+- **moment / moment-timezone** - Timezone conversion used for saving date time to EST.
+- **nanoid** - Used for generating ticket id for the reassignment feature to reference a support ticket in the Google Sheet.
+- **pino** - Logging library for node. Displays in JSON format by default. Log level is specified as an environment variable.
+- **pino-pretty** - Used for prettifying pino logs output.
+
+## Project Structure
+
+The following is a high level overview of application code:
+
+- **app.js** - Application Entry Point and Configuration
+- **request-handler.js** - Handles all events from Slack
+- **workflow-handler.js** - Setup the Workflow middleware. Only used to display a help message.
+- **api/google** - Google Sheets Client
+- **api/pagerduty** - PagerDuty API Client
+- **api/slack** - Slack API
+- **api/slack/util** - Misc. utilities related to Slack
+- **logic/index.js** - Entry point for business logic
+- **logic/form-support.js** - Business logic related to form submissions. (Support Request and Reassignment modals)
+- **routing.js** - Business logic related to determining the oncall user.
+- **ui/messages.js** - Build message responses to the user using Slack’s Block Kit.
+- **ui/modals.js** - Build modal responses to the user using Slack’s Block Kit.
+
 ## Launching Platform Support Slack Bot
 
 Install dependencies:
@@ -76,11 +125,22 @@ Running `npm start` does the same.
 
 ## Google Sheets
 
-TODO:
+The two spreadsheets can be found here:
 
-- Setting up a Service Account with Google Developer Console
-- Getting the Spreadsheet ID and setting it up as an environment variable
-- Top row is the header row, ideally don't use spaces since they become JavaScript properties
+- [Platform Teams Google Sheet](https://docs.google.com/spreadsheets/d/1k9P921Hdo654631HmX9WovGaYRIFAhO3QRg3EN3F9gI)
+- [Platform Support Responses Sheet](https://docs.google.com/spreadsheets/d/1TItdfPMH_TiXEhgMKEqxIW2e5EaMKy4cHaBhaeQ7drU)
+
+Please contact James Chasia to get access to these sheets.
+
+** Service Account **
+
+There is a service account set up to write to the Google Sheet.
+
+Login to the [Google Cloud Console](https://console.cloud.google.com/).
+
+Select the project "Platform Support Bot" under the "ADHOCTEAM.US" organization. Click on APIs and Services > Credentials. Here's a direct [link](https://console.cloud.google.com/apis/credentials?project=platform-support-bot-312013).
+
+Here's a direct link to the [service account](https://console.cloud.google.com/iam-admin/serviceaccounts?project=platform-support-bot-312013).
 
 **Granting Sheet Permissions To Slack Bot**
 

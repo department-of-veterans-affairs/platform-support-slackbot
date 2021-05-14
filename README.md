@@ -23,14 +23,14 @@ The Slack bot was written specifically with these tools:
 
 These are the dependencies that are used in the Slack bot and a description of where it is used.
 
-- **@pagerduty/pdjs** - PagerDuty client to access on-call schedules
-- **@slack/bolt** - Bolt.js - Slack SDK for Slack App Development
-- **dotenv** - Handling of environment variables
-- **googleapis / google-spreadsheet** - Google Sheets library for accessing and updating Google Sheets (Teams and Support Forms).
-- **moment / moment-timezone** - Timezone conversion used for saving date time to EST.
-- **nanoid** - Used for generating ticket id for the reassignment feature to reference a support ticket in the Google Sheet.
-- **pino** - Logging library for node. Displays in JSON format by default. Log level is specified as an environment variable.
-- **pino-pretty** - Used for prettifying pino logs output.
+- **@pagerduty/pdjs** - PagerDuty client to access on-call schedules - [Repo](https://github.com/PagerDuty/pdjs)
+- **@slack/bolt** - Bolt.js - Slack SDK for Slack App Development. - [Docs](https://slack.dev/bolt-js/tutorial/getting-started) - [Repo](https://github.com/SlackAPI/bolt-js)
+- **dotenv** - Handling of environment variables - [Repo](https://github.com/motdotla/dotenv#readme)
+- **googleapis / google-spreadsheet** - Google Sheets library for accessing and updating Google Sheets (Teams and Support Forms). [Docs](https://theoephraim.github.io/node-google-spreadsheet/#/).
+- **moment / moment-timezone** - Timezone conversion used for saving date time to EST. Library link - [Docs](https://momentjs.com/)
+- **nanoid** - Used for generating ticket id for the reassignment feature to reference a support ticket in the Google Sheet. - [Repo](https://github.com/ai/nanoid)
+- **pino** - Logging library for node. Displays in JSON format by default. Log level is specified as an environment variable. - [Repo](https://github.com/pinojs/pino)
+- **pino-pretty** - Used for prettifying pino logs output. - [Repo](https://github.com/pinojs/pino-pretty)
 
 ## Project Structure
 
@@ -132,13 +132,13 @@ The two spreadsheets can be found here:
 
 Please contact James Chasia to get access to these sheets.
 
-** Service Account **
+**Service Account**
 
 There is a service account set up to write to the Google Sheet.
 
 Login to the [Google Cloud Console](https://console.cloud.google.com/).
 
-Select the project "Platform Support Bot" under the "ADHOCTEAM.US" organization. Click on APIs and Services > Credentials. Here's a direct [link](https://console.cloud.google.com/apis/credentials?project=platform-support-bot-312013).
+Select the project "Platform Support Bot" under the "ADHOCTEAM.US" organization. Click on APIs and Services > Credentials. Here's a direct [link](https://console.cloud.google.com/apis/credentials?project=platform-support-bot-312013) to the Credentials page.
 
 Here's a direct link to the [service account](https://console.cloud.google.com/iam-admin/serviceaccounts?project=platform-support-bot-312013).
 

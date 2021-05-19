@@ -1,4 +1,4 @@
-name: grafana
+name: support-bot
 on:
   push:
     branches:

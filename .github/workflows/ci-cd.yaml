@@ -1,0 +1,58 @@
+name: support-bot
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-push:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: kciter/aws-ecr-action@v2
+      with:
+        access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        account_id: '008577686731'
+        repo: dsva/platform-support-slackbot
+        region: us-gov-west-1
+        tags: latest,${{ github.sha }}
+        dockerfile: Dockerfile
+  update-manifest:
+    needs: build-and-push
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-gov-west-1"
+      - name: Obtain GitHub Token
+        uses: marvinpinto/action-inject-ssm-secrets@latest
+        with:
+          ssm_parameter: /devops/VA_VSP_BOT_GITHUB_TOKEN
+          env_variable_name: VA_VSP_BOT_GITHUB_TOKEN
+      - name: Install yq
+        run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64.tar.gz -O - |\
+          tar xz && sudo mv yq_linux_amd64 /usr/bin/yq
+      - name: Check out Manifest Repo
+        uses: actions/checkout@v2
+        with:
+          repository: department-of-veterans-affairs/vsp-infra-application-manifests
+          token: ${{ env.VA_VSP_BOT_GITHUB_TOKEN }}
+          fetch-depth: 1
+          path: vsp-infra-application-manifests
+      - name: Update Manifest
+        run: |
+          cd vsp-infra-application-manifests/apps/vsp-tools-frontend/support-slackbot
+          yq e -i '.spec.template.spec.containers.[].image = "008577686731.dkr.ecr.us-gov-west-1.amazonaws.com/dsva/platform-support-slackbot:${{ github.sha }}"' deployment.yaml
+      - name: Add and Commit change(s)
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: va-vsp-bot
+          author_email: devops@va.gov
+          branch: main
+          cwd: vsp-infra-application-manifests/apps/vsp-tools-frontend
+          add: support-slackbot/*.yaml
+          message: 'auto update slackbot manifests'

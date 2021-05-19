@@ -56,21 +56,6 @@ module.exports = function (app, logger) {
   /* MESSAGE LISTENERS */
 
   /**
-   * MESSAGE: Hello
-   * Just responds to the message "hello"
-   */
-  app.message('hello', async ({ message, say, client }) => {
-    try {
-      logger.info('MESSAGE: hello');
-      logger.debug(message.user);
-
-      await say(`Hey there <@${message.user}>!`);
-    } catch (error) {
-      logger.error(error);
-    }
-  });
-
-  /**
    * MESSAGE: any
    * Listens to any messages on the channel to determine if
    * the message is a reply to a support ticket.  If the reply

@@ -35,8 +35,7 @@ const buildSupportModal = (user, options) => {
         type: 'section',
         text: {
           type: 'plain_text',
-          text:
-            ":wave: Hey there!\n\nPlease fill out the form below and we'll route your support request to the right team.",
+          text: ":wave: Hey there!\n\nPlease fill out the form below and we'll route your support request to the right team.",
           emoji: true,
         },
       },
@@ -76,25 +75,27 @@ const buildSupportModal = (user, options) => {
           action_id: 'value',
         },
       },
-      {
-        type: 'input',
-        block_id: 'users_requesting_support',
-        element: {
-          type: 'multi_users_select',
-          placeholder: {
-            type: 'plain_text',
-            text: 'Select users',
-            emoji: true,
-          },
-          action_id: 'users',
-          initial_users: [user],
-        },
-        label: {
-          type: 'plain_text',
-          text: 'User(s) requesting support',
-          emoji: true,
-        },
-      },
+      // TODO: Enable in the future.  Commented out on 5/18 since
+      // this is not used.
+      // {
+      //   type: 'input',
+      //   block_id: 'users_requesting_support',
+      //   element: {
+      //     type: 'multi_users_select',
+      //     placeholder: {
+      //       type: 'plain_text',
+      //       text: 'Select users',
+      //       emoji: true,
+      //     },
+      //     action_id: 'users',
+      //     initial_users: [user],
+      //   },
+      //   label: {
+      //     type: 'plain_text',
+      //     text: 'User(s) requesting support',
+      //     emoji: true,
+      //   },
+      // },
     ],
   };
 };
@@ -123,8 +124,7 @@ const buildReassignmentModal = (options, ticketId) => {
         type: 'section',
         text: {
           type: 'plain_text',
-          text:
-            ':wave: Hey there!\n\nPlease route your support request to the correct team.',
+          text: ':wave: Hey there!\n\nPlease route your support request to the correct team.',
           emoji: true,
         },
       },

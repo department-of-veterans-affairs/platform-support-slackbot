@@ -25,7 +25,7 @@ module.exports = function (logger) {
     } = view.state.values;
 
     const selectedTeamId = topic.selected.selected_option.value;
-    const whoNeedsSupportUserIds = users.users.selected_users;
+    const whoNeedsSupportUserIds = users?.users?.selected_users ?? [];
     const summaryDescription = summary.value.value;
 
     const whoNeedsSupport = (

@@ -3,14 +3,15 @@ const { expect } = require('chai');
 const modalBuilder = require('../../src/ui/modals');
 
 describe('ui/modals', () => {
-  it('should set initial users array with passed in user id', () => {
-    const modal = modalBuilder.buildSupportModal('U01T9CL8PEK', []);
+  // TODO: Commented out on 5/18 since this users field is not currently used.
+  // it('should set initial users array with passed in user id', () => {
+  //   const modal = modalBuilder.buildSupportModal('U01T9CL8PEK', []);
 
-    const initial_users = modal.blocks[4].element.initial_users;
+  //   const initial_users = modal.blocks[4].element.initial_users;
 
-    expect(initial_users).to.have.lengthOf(1);
-    expect(initial_users).to.be.eql(['U01T9CL8PEK']);
-  });
+  //   expect(initial_users).to.have.lengthOf(1);
+  //   expect(initial_users).to.be.eql(['U01T9CL8PEK']);
+  // });
 
   it('should generate correct team drop down menu', () => {
     const modal = modalBuilder.buildSupportModal('U01T9CL8PEK', [

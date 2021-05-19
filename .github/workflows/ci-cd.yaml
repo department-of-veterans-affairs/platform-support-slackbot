@@ -2,7 +2,7 @@ name: support-bot
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   build-and-push:
     runs-on: ubuntu-20.04

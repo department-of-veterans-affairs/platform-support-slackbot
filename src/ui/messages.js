@@ -11,7 +11,7 @@ const buildSupportResponse = (
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `Hey there <@${userId}>! We've recieved your Platform support request.`,
+        text: `Hey there <@${userId}>! We've received your Platform support request.`,
       },
       accessory: {
         type: 'button',

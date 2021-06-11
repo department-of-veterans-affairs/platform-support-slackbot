@@ -31,31 +31,44 @@ describe('api/slack/util', () => {
   describe('createMessageLink()', () => {
     it('build a message link correctly', () => {
       // Example Link:
-      // https://adhoc.slack.com/archives/C01UZ7SULTX/p1620056853018500
+      // https://example.slack.com/archives/C01UZ7SULTX/p1620056853018500
       const channel = 'C01UZ7SULTX';
+      const host = 'example.slack.com';
       const messageId = '1620055651.018100';
 
-      const link = util.createMessageLink(channel, messageId);
+      const link = util.createMessageLink(host, channel, messageId);
 
       expect(link).to.equal(
-        'https://adhoc.slack.com/archives/C01UZ7SULTX/p1620055651018100'
+        'https://example.slack.com/archives/C01UZ7SULTX/p1620055651018100'
       );
     });
 
     it('should return an empty string with a null channel', () => {
       const channel = null;
+      const host = 'example.slack.com';
       const messageId = 'abc';
 
-      const link = util.createMessageLink(channel, messageId);
+      const link = util.createMessageLink(host, channel, messageId);
+
+      expect(link).to.equal('');
+    });
+
+    it('should return an empty string with a null message host', () => {
+      const channel = 'abc';
+      const host = null;
+      const messageId = 'abc';
+
+      const link = util.createMessageLink(host, channel, messageId);
 
       expect(link).to.equal('');
     });
 
     it('should return an empty string with a null message id', () => {
       const channel = 'abc';
+      const host = 'example.slack.com';
       const messageId = null;
 
-      const link = util.createMessageLink(channel, messageId);
+      const link = util.createMessageLink(host, channel, messageId);
 
       expect(link).to.equal('');
     });
@@ -65,7 +78,7 @@ describe('api/slack/util', () => {
     it('should parse a correctly written channel topic', () => {
       const channelTopic = `Need help from Platform? Ask here!
         Off-hours emergency? Ping #oncall!
-        
+
         BE: <@U01T9CL8PEK>
         FE: <@U1Q33H0LT>
         OPS: <@U01T9CL8PEK>

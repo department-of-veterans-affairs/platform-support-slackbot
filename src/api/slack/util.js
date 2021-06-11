@@ -20,11 +20,11 @@ module.exports = function (logger) {
    * @param {string} messageId
    * @returns
    */
-  util.createMessageLink = (channel, messageId) => {
-    if (!channel || !messageId) return '';
+  util.createMessageLink = (host, channel, messageId) => {
+    if (!channel || !host || !messageId) return '';
 
     const updatedId = messageId.replace('.', '');
-    return `https://adhoc.slack.com/archives/${channel}/p${updatedId}`;
+    return `https://${host}/archives/${channel}/p${updatedId}`;
   };
 
   /**

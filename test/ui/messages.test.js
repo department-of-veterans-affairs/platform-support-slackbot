@@ -21,7 +21,7 @@ describe('ui/messages', () => {
     );
 
     expect(response[0].text.text).to.equal(
-      "Hey there <@alex.yip>! We've recieved your Platform support request."
+      "Hey there <@alex.yip>! We've received your Platform support request."
     );
     expect(response[1].text.text).to.equal('*Need help from*\nFE Tools');
     expect(response[2].text.text).to.equal('*Summary*\nI need a PR Reviewed');

@@ -2,6 +2,7 @@ const modalBuilder = require('../ui/modals');
 const responseBuilder = require('../ui/messages');
 const { nanoid } = require('nanoid');
 
+const SUPPORT_HOST = process.env.SLACK_SUPPORT_HOSTNAME;
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
 module.exports = function (logger) {
@@ -122,6 +123,7 @@ module.exports = function (logger) {
     );
 
     const messageLink = util.createMessageLink(
+      SUPPORT_HOST,
       messageData.channel,
       messageData.messageId
     );

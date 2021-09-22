@@ -21,8 +21,10 @@ describe('ui/messages', () => {
     );
 
     expect(response[0].text.text).to.equal(
-      'From *<@alex.yip>:* I need a PR Reviewed'
+      "Hey there <@alex.yip>! We've received your Platform support request."
     );
-    expect(response[1].text.text).to.equal('*Assigned to <@alex.yip>* (FE Tools)');
+    expect(response[1].text.text).to.equal('*Need help from*\nFE Tools');
+    expect(response[2].text.text).to.equal('*Summary*\nI need a PR Reviewed');
+    expect(response[3].text.text).to.equal('Assigned to: <@alex.yip>');
   });
 });

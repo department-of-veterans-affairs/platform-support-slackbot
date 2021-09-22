@@ -12,14 +12,14 @@ const buildSupportResponse = (
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: summaryDescription,
+        text: `From *<@${userId}>:* ${summaryDescription}`,
       },
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `Request from *<@${userId}>*\nNeeds help from *${selectedTeam}*\nAssigned to *${assignee}*`,
+        text: `*Assigned to ${assignee}* (${selectedTeam})`,
       },
       accessory: {
         type: 'button',

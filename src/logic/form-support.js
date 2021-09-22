@@ -101,7 +101,6 @@ module.exports = function (logger) {
         oncallUser,
         formData.selectedTeam.name
       ),
-      text: `Hey there <@${formData.submittedBy.id}>, you have a new Platform Support ticket!`,
       unfurl_links: false, // Remove Link Previews
     });
 

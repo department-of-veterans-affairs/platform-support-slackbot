@@ -18,7 +18,7 @@ const buildSupportResponse = (
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: mention ? `*Assigned to: ${mention}* (${team})` : `*Assigned to: ${team}*`,
+        text: mention ? `*Assigned to: ${mention}* (${selectedTeam})\n` : `*Assigned to: ${team}*\n`,
       },
       accessory: {
         type: 'button',

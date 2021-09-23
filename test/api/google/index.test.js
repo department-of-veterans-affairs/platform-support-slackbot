@@ -16,8 +16,8 @@ describe('api/google', () => {
     sinon.stub(sheets, 'getResponsesSheet').resolves(obj);
 
     sinon.stub(sheets, 'getTeamsSheetRows').resolves([
-      { Title: 'Frontend Tools', Id: 'FE' },
-      { Title: 'Backend Tools', Id: 'BE' },
+      { Display: 'Frontend Tools', Id: 'FE' },
+      { Display: 'Backend Tools', Id: 'BE' },
     ]);
 
     sheets.getGoogleSheet.callThrough();
@@ -44,7 +44,7 @@ describe('api/google', () => {
       const result = await sheets.getTeamById(2);
 
       expect(result).to.eql({
-        Title: 'Backend Tools',
+        Display: 'Backend Tools',
         Id: 'BE',
       });
     });

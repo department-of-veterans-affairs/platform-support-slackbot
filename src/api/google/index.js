@@ -90,7 +90,7 @@ module.exports = function (logger) {
 
     return rows.map((row) => {
       return {
-        text: row.Title,
+        text: row.Display,
         value: row.Id,
       };
     });

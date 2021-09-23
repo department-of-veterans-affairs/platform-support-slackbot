@@ -205,16 +205,17 @@ module.exports = function (logger) {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*Need help from*\n${team.display}`,
-      },
-    };
-
-    blocks[3] = {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `Assigned to: ${onCallUser}`,
+        text: `*Assigned to: ${onCallUser}* (${team.display})`,
         verbatim: false,
+      },
+      accessory: {
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'Reassign Ticket',
+        },
+        action_id: 'reassign_ticket',
+        value: ticketId,
       },
     };
 

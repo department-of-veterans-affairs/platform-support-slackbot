@@ -11,7 +11,14 @@ const buildSupportResponse = (
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `Hey there <@${userId}>! We've received your Platform support request.`,
+        text: `From *<@${userId}>*: ${summaryDescription}`,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: mention ? `*Assigned to: ${mention}* (${selectedTeam})\n` : `*Assigned to: ${team}*\n`,
       },
       accessory: {
         type: 'button',
@@ -21,27 +28,6 @@ const buildSupportResponse = (
         },
         action_id: 'reassign_ticket',
         value: ticketId,
-      },
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `*Need help from*\n${selectedTeam}`,
-      },
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `*Summary*\n${summaryDescription}`,
-      },
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: mention ? `Assigned to: ${mention}` : `Assigned to: ${team}`,
       },
     },
   ];

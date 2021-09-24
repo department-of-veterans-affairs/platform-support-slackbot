@@ -163,8 +163,12 @@ module.exports = function (logger) {
 
     const row = rows.find((row) => row.MessageId === messageId);
 
-    if (row && row.FirstReplyTimeUTC === '') {
-      row.FirstReplyTimeUTC = new Date(Date.now()).toISOString();
+    if (row && !row.FirstReplyTimeUTC) {
+      const dateTime = new Date(Date.now())
+      row.FirstReplyTimeUTC = dateTime.toISOString();
+      row.FirstReplyTimeEST = moment
+        .tz(dateTime, 'America/New_York')
+        .format('LLLL');
       await row.save();
     } else {
       logger.info(`Row not found for messageId: ${messageId}`);

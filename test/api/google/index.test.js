@@ -98,9 +98,9 @@ describe('api/google', () => {
 
     beforeEach(() => {
       responsesSheetRows = [
-        { MessageId: 'msg:1000.0', FirstReplyTimeUTC: '', save: sinon.spy() },
-        { MessageId: 'msg:1001.0', FirstReplyTimeUTC: '', save: sinon.spy() },
-        { MessageId: 'msg:1002.0', FirstReplyTimeUTC: '', save: sinon.spy() },
+        { MessageId: 'msg:1000.0', FirstReplyTimeUTC: '', FirstReplyTimeEST: '', save: sinon.spy() },
+        { MessageId: 'msg:1001.0', FirstReplyTimeUTC: '', FirstReplyTimeEST: '', save: sinon.spy() },
+        { MessageId: 'msg:1002.0', FirstReplyTimeUTC: '', FirstReplyTimeEST: '', save: sinon.spy() },
       ];
 
       sinon.stub(sheets, 'getResponseSheetRows').resolves(responsesSheetRows);
@@ -115,6 +115,7 @@ describe('api/google', () => {
 
       expect(responsesSheetRows[1].save.calledOnce).to.be.true;
       expect(responsesSheetRows[1].FirstReplyTimeUTC).to.be.not.empty;
+      expect(responsesSheetRows[1].FirstReplyTimeEST).to.not.be.empty;
     });
 
     it('should not update any rows for an invalid Message Id', async () => {

@@ -165,7 +165,7 @@ module.exports = function (logger) {
 
     if (row && row.FirstReplyTimeUTC === '') {
       const dateTime = new Date();
-      row.FirstReplyTimeUTC = dateTime;
+      row.FirstReplyTimeUTC = dateTime.toISOString();
       row.FirstReplyTimeEST = moment
         .tz(dateTime, 'America/New_York')
         .format('LLLL');

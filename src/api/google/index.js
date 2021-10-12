@@ -164,7 +164,7 @@ module.exports = function (logger) {
     const row = rows.find((row) => row.MessageId === messageId);
 
     if (row && row.FirstReplyTimeUTC === '') {
-      const dateTime = new Date();
+      const dateTime = new Date(Date.now());
       row.FirstReplyTimeUTC = dateTime.toISOString();
       row.FirstReplyTimeEST = moment
         .tz(dateTime, 'America/New_York')

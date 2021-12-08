@@ -3,6 +3,7 @@
 The Slackbot is written with JavaScript using the bolt.js framework. Bolt.js is a framework created by Slack to make it easier to build Slack applications.
 
 [General Documentation](https://vfs.atlassian.net/wiki/spaces/FTT/pages/1883406342/Platform+Support+Bot)
+
 [Toubleshooting Documentation](https://vfs.atlassian.net/wiki/spaces/FTT/pages/1912569969/Troubleshooting+Support+Bot)
 
 - Bolt.js Documentation

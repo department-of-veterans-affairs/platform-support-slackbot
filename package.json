@@ -18,7 +18,7 @@
     "googleapis": "^72.0.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
-    "nanoid": "^3.1.22",
+    "nanoid": "^3.1.31",
     "pino": "^6.11.3",
     "pino-pretty": "^4.7.1",
     "ws": "^7.4.6"

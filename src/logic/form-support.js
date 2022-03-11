@@ -21,10 +21,12 @@ module.exports = function (logger) {
     const {
       users_requesting_support: users,
       topic,
+      category,
       summary,
     } = view.state.values;
 
     const selectedTeamId = topic.selected.selected_option.value;
+    const selectedCategoryId = category.selected.selected_option.value;
     const whoNeedsSupportUserIds = users?.users?.selected_users ?? [];
     const summaryDescription = summary.value.value;
 
@@ -46,6 +48,15 @@ module.exports = function (logger) {
         }
       : {};
 
+    const categoryData = await sheets.getCategoryById(selectedCategoryId);
+
+    const selectedCategory = categoryData
+      ? {
+          id: selectedCategoryId,
+          name: categoryData.Name
+        }
+      : {};
+
     return {
       submittedBy: {
         id,
@@ -53,6 +64,7 @@ module.exports = function (logger) {
       },
       whoNeedsSupport,
       selectedTeam,
+      selectedCategory,
       summaryDescription,
     };
   };
@@ -97,6 +109,7 @@ module.exports = function (logger) {
         ticketId,
         formData.submittedBy.id,
         formData.selectedTeam.name,
+        formData.selectedCategory.name,
         formData.summaryDescription,
         oncallUser,
         formData.selectedTeam.name

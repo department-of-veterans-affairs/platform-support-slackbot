@@ -7,6 +7,7 @@ describe('ui/messages', () => {
     const ticketId = 'abc123';
     const userId = 'alex.yip';
     const selectedTeam = 'FE Tools';
+    const selectedCategory = 'Pull Request';
     const summaryDescription = 'I need a PR Reviewed';
     const mention = '<@alex.yip>';
     const team = null;
@@ -15,6 +16,7 @@ describe('ui/messages', () => {
       ticketId,
       userId,
       selectedTeam,
+      selectedCategory,
       summaryDescription,
       mention,
       team
@@ -23,6 +25,6 @@ describe('ui/messages', () => {
     expect(response[0].text.text).to.equal(
       "From *<@alex.yip>*: I need a PR Reviewed"
     );
-    expect(response[1].text.text).to.equal('*Assigned to: <@alex.yip>* (FE Tools)\n');
+    expect(response[2].text.text).to.equal('*Assigned to: <@alex.yip>* (FE Tools)\n');
   });
 });

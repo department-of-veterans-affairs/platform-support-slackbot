@@ -11,7 +11,7 @@ const buildDropDown = (options) => {
   });
 };
 
-const buildSupportModal = (user, options) => {
+const buildSupportModal = (user, topicOptions, categoryOptions) => {
   return {
     type: 'modal',
     callback_id: 'support_modal_view',
@@ -52,12 +52,31 @@ const buildSupportModal = (user, options) => {
             text: 'Select an item',
             emoji: true,
           },
-          options: buildDropDown(options),
+          options: buildDropDown(topicOptions),
           action_id: 'selected',
         },
         label: {
           type: 'plain_text',
           text: 'I need help from',
+          emoji: true,
+        },
+      },
+      {
+        type: 'input',
+        block_id: 'category',
+        element: {
+          type: 'static_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select an item',
+            emoji: true,
+          },
+          options: buildDropDown(categoryOptions),
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'What is the nature of the request?',
           emoji: true,
         },
       },

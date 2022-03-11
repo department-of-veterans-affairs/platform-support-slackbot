@@ -54,9 +54,10 @@ module.exports = function (logger) {
   logic.displaySupportModal = async (client, user, trigger_id) => {
     logger.debug('displaySupportModal()');
 
-    const options = await sheets.getTeams();
+    const topicOptions = await sheets.getTeams();
+    const categoryOptions = await sheets.getCategories();
 
-    const view = modalBuilder.buildSupportModal(user, options);
+    const view = modalBuilder.buildSupportModal(user, topicOptions, categoryOptions);
 
     const result = await client.views.open({
       trigger_id,
@@ -143,6 +144,7 @@ module.exports = function (logger) {
       formData.submittedBy.username,
       formData.whoNeedsSupport.map((u) => u.username),
       formData.selectedTeam.title,
+      formData.selectedCategory.name,
       formData.summaryDescription,
       messageLink
     );
@@ -201,7 +203,7 @@ module.exports = function (logger) {
 
     let blocks = message.blocks;
 
-    blocks[1] = {
+    blocks[2] = {
       type: 'section',
       text: {
         type: 'mrkdwn',

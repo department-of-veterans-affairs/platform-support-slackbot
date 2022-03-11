@@ -48,6 +48,17 @@ module.exports = function (logger) {
   };
 
   /**
+   * Returns the Google Sheet containing the list of categories and mappings
+   * @returns Categories Sheet
+   */
+   sheets.getCategoriesSheet = async () => {
+    const doc = await sheets.getGoogleSheet(process.env.CATEGORIES_SPREADSHEET_ID);
+
+    // Return first tab
+    return doc.sheetsByIndex[0];
+  };
+
+  /**
    * Returns the Google Sheet collecting all form responses
    * @returns Responses Sheet
    */
@@ -69,6 +80,16 @@ module.exports = function (logger) {
 
     return await sheet.getRows();
   };
+
+   /**
+   * Gets all rows for the Google Categories Sheet
+   * @returns Google Sheet Rows
+   */
+    sheets.getCategoriesSheetRows = async () => {
+      const sheet = await sheets.getCategoriesSheet();
+  
+      return await sheet.getRows();
+    };
 
   /**
    * Gets all rows for the Google Responses Sheet
@@ -96,6 +117,22 @@ module.exports = function (logger) {
     });
   };
 
+   /**
+   * Reads the category Google Spreadsheet and returns an array of
+   * categories and associated values.
+   * @returns Array of text/values
+   */
+    sheets.getCategories = async () => {
+      const rows = await sheets.getCategoriesSheetRows();
+  
+      return rows.map((row) => {
+        return {
+          text: row.Name,
+          value: row.Id,
+        };
+      });
+    };
+
   /**
    * Get team based on teamId (1-based index)
    * @param {number} teamId
@@ -110,6 +147,19 @@ module.exports = function (logger) {
   };
 
   /**
+   * Get category based on categoryId (1-based index)
+   * @param {number} categoryId
+   * @returns
+   */
+   sheets.getCategoryById = async (categoryId) => {
+    const rows = await sheets.getCategoriesSheetRows();
+
+    if (rows.length < categoryId) return null;
+
+    return rows[categoryId - 1];
+  };
+
+  /**
    * Capture form responses and saves them to the Support Responses
    * Spreadsheet.
    * @param {string} ticketId Ticket Id
@@ -117,6 +167,7 @@ module.exports = function (logger) {
    * @param {string} username Current user name
    * @param {array} usersRequestingSupport Users requesting support
    * @param {string} selectedTeam Selected team
+   * @param {string} selectedCategory Selected Category
    * @param {string} summaryDescription Summary description
    * @param {string} messageLink Link to support ticket/message
    * @param {date} currentTime JavaScript date object
@@ -127,6 +178,7 @@ module.exports = function (logger) {
     username,
     usersRequestingSupport,
     selectedTeam,
+    selectedCategory,
     summaryDescription,
     messageLink,
     dateTime = new Date()
@@ -147,6 +199,7 @@ module.exports = function (logger) {
       DateTimeEST: dateFormatted,
       Users: userList,
       Team: selectedTeam,
+      Category: selectedCategory,
       Summary: summaryDescription,
       MessageLink: messageLink,
     });

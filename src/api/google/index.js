@@ -20,7 +20,7 @@ module.exports = function (logger) {
     // Authentication using Google Service Account
     const creds = {
       "private_key_id": process.env.GOOGLE_PRIVATE_KEY_ID,
-      "private_key": process.env.GOOGLE_PRIVATE_KEY,
+      "private_key": process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       "client_id": process.env.GOOGLE_CLIENT_ID
     };
     const auth = {
@@ -48,11 +48,11 @@ module.exports = function (logger) {
   };
 
   /**
-   * Returns the Google Sheet containing the list of categories and mappings
-   * @returns Categories Sheet
+   * Returns the Google Sheet containing the list of topics and mappings
+   * @returns Topics Sheet
    */
-   sheets.getCategoriesSheet = async () => {
-    const doc = await sheets.getGoogleSheet(process.env.CATEGORIES_SPREADSHEET_ID);
+   sheets.getTopicsSheet = async () => {
+    const doc = await sheets.getGoogleSheet(process.env.TOPICS_SPREADSHEET_ID);
 
     // Return first tab
     return doc.sheetsByIndex[0];
@@ -82,11 +82,11 @@ module.exports = function (logger) {
   };
 
    /**
-   * Gets all rows for the Google Categories Sheet
+   * Gets all rows for the Google Topics Sheet
    * @returns Google Sheet Rows
    */
-    sheets.getCategoriesSheetRows = async () => {
-      const sheet = await sheets.getCategoriesSheet();
+    sheets.getTopicsSheetRows = async () => {
+      const sheet = await sheets.getTopicsSheet();
   
       return await sheet.getRows();
     };
@@ -118,12 +118,12 @@ module.exports = function (logger) {
   };
 
    /**
-   * Reads the category Google Spreadsheet and returns an array of
-   * categories and associated values.
+   * Reads the topic Google Spreadsheet and returns an array of
+   * topics and associated values.
    * @returns Array of text/values
    */
-    sheets.getCategories = async () => {
-      const rows = await sheets.getCategoriesSheetRows();
+    sheets.getTopics = async () => {
+      const rows = await sheets.getTopicsSheetRows();
   
       return rows.map((row) => {
         return {
@@ -147,16 +147,16 @@ module.exports = function (logger) {
   };
 
   /**
-   * Get category based on categoryId (1-based index)
-   * @param {number} categoryId
+   * Get topic based on topicId (1-based index)
+   * @param {number} topicId
    * @returns
    */
-   sheets.getCategoryById = async (categoryId) => {
-    const rows = await sheets.getCategoriesSheetRows();
+   sheets.getTopicById = async (topicId) => {
+    const rows = await sheets.getTopicsSheetRows();
 
-    if (rows.length < categoryId) return null;
+    if (rows.length < topicId) return null;
 
-    return rows[categoryId - 1];
+    return rows[topicId - 1];
   };
 
   /**
@@ -167,7 +167,7 @@ module.exports = function (logger) {
    * @param {string} username Current user name
    * @param {array} usersRequestingSupport Users requesting support
    * @param {string} selectedTeam Selected team
-   * @param {string} selectedCategory Selected Category
+   * @param {string} selectedTopic Selected Topic
    * @param {string} summaryDescription Summary description
    * @param {string} messageLink Link to support ticket/message
    * @param {date} currentTime JavaScript date object
@@ -178,7 +178,7 @@ module.exports = function (logger) {
     username,
     usersRequestingSupport,
     selectedTeam,
-    selectedCategory,
+    selectedTopic,
     summaryDescription,
     messageLink,
     dateTime = new Date()
@@ -199,7 +199,8 @@ module.exports = function (logger) {
       DateTimeEST: dateFormatted,
       Users: userList,
       Team: selectedTeam,
-      Category: selectedCategory,
+      SuggestedTopic: selectedTopic,
+      Topic: selectedTopic,
       Summary: summaryDescription,
       MessageLink: messageLink,
     });

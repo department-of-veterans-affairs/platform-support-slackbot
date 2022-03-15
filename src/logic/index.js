@@ -54,10 +54,10 @@ module.exports = function (logger) {
   logic.displaySupportModal = async (client, user, trigger_id) => {
     logger.debug('displaySupportModal()');
 
-    const topicOptions = await sheets.getTeams();
-    const categoryOptions = await sheets.getCategories();
+    const teamOptions = await sheets.getTeams();
+    const topicOptions = await sheets.getTopics();
 
-    const view = modalBuilder.buildSupportModal(user, topicOptions, categoryOptions);
+    const view = modalBuilder.buildSupportModal(user, teamOptions, topicOptions);
 
     const result = await client.views.open({
       trigger_id,
@@ -144,7 +144,7 @@ module.exports = function (logger) {
       formData.submittedBy.username,
       formData.whoNeedsSupport.map((u) => u.username),
       formData.selectedTeam.title,
-      formData.selectedCategory.name,
+      formData.selectedTopic.name,
       formData.summaryDescription,
       messageLink
     );

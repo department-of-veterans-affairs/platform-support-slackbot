@@ -11,7 +11,7 @@ const buildDropDown = (options) => {
   });
 };
 
-const buildSupportModal = (user, topicOptions, categoryOptions) => {
+const buildSupportModal = (user, teamOptions, topicOptions) => {
   return {
     type: 'modal',
     callback_id: 'support_modal_view',
@@ -44,7 +44,7 @@ const buildSupportModal = (user, topicOptions, categoryOptions) => {
       },
       {
         type: 'input',
-        block_id: 'topic',
+        block_id: 'team',
         element: {
           type: 'static_select',
           placeholder: {
@@ -52,7 +52,7 @@ const buildSupportModal = (user, topicOptions, categoryOptions) => {
             text: 'Select an item',
             emoji: true,
           },
-          options: buildDropDown(topicOptions),
+          options: buildDropDown(teamOptions),
           action_id: 'selected',
         },
         label: {
@@ -63,7 +63,7 @@ const buildSupportModal = (user, topicOptions, categoryOptions) => {
       },
       {
         type: 'input',
-        block_id: 'category',
+        block_id: 'topic',
         element: {
           type: 'static_select',
           placeholder: {
@@ -71,7 +71,7 @@ const buildSupportModal = (user, topicOptions, categoryOptions) => {
             text: 'Select an item',
             emoji: true,
           },
-          options: buildDropDown(categoryOptions),
+          options: buildDropDown(topicOptions),
           action_id: 'selected',
         },
         label: {

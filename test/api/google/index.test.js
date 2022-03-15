@@ -20,7 +20,7 @@ describe('api/google', () => {
       { Display: 'Backend Tools', Id: 'BE' },
     ]);
 
-    sinon.stub(sheets, 'getCategoriesSheetRows').resolves([
+    sinon.stub(sheets, 'getTopicsSheetRows').resolves([
       { Name: 'Pull Request', Id: '1' },
       { Name: 'Access Request', Id: '2' },
     ]);
@@ -61,9 +61,9 @@ describe('api/google', () => {
     });
   });
 
-  describe('getCategories()', () => {
-    it('should convert categories to text/value pair', async () => {
-      const result = await sheets.getCategories();
+  describe('getTopics()', () => {
+    it('should convert topics to text/value pair', async () => {
+      const result = await sheets.getTopics();
 
       expect(result).to.eql([
         { text: 'Pull Request', value: '1' },
@@ -72,9 +72,9 @@ describe('api/google', () => {
     });
   });
 
-  describe('getCategoryById()', () => {
-    it('should get category by 1 based index', async () => {
-      const result = await sheets.getCategoryById(2);
+  describe('getTopicById()', () => {
+    it('should get topic by 1 based index', async () => {
+      const result = await sheets.getTopicById(2);
 
       expect(result).to.eql({
         Name: 'Access Request',
@@ -82,8 +82,8 @@ describe('api/google', () => {
       });
     });
 
-    it('should return null if the category is not found', async () => {
-      const result = await sheets.getCategoryById(20);
+    it('should return null if the topic is not found', async () => {
+      const result = await sheets.getTopicById(20);
 
       expect(result).to.be.null;
     });
@@ -97,7 +97,7 @@ describe('api/google', () => {
       const username = 'alex.yip';
       const usersRequestingSupport = ['alex.yip', 'james'];
       const selectedTeam = 'FE';
-      const selectedCategory = 'Pull Request';
+      const selectedTopic = 'Pull Request';
       const summaryDescription = 'I need some support';
       const messageLink = 'http://example.com/abcd1234';
       const dateTime = new Date();
@@ -108,7 +108,7 @@ describe('api/google', () => {
         username,
         usersRequestingSupport,
         selectedTeam,
-        selectedCategory,
+        selectedTopic,
         summaryDescription,
         messageLink,
         dateTime
@@ -124,7 +124,7 @@ describe('api/google', () => {
       expect(firstCallArg.DateTimeUTC).to.equal(dateTime);
       expect(firstCallArg.Users).to.equal('alex.yip, james');
       expect(firstCallArg.Team).to.equal(selectedTeam);
-      expect(firstCallArg.Category).to.equal(selectedCategory);
+      expect(firstCallArg.Topic).to.equal(selectedTopic);
       expect(firstCallArg.Summary).to.equal(summaryDescription);
       expect(firstCallArg.MessageLink).to.equal(messageLink);
     });

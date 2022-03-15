@@ -109,7 +109,7 @@ module.exports = function (logger) {
         ticketId,
         formData.submittedBy.id,
         formData.selectedTeam.name,
-        formData.selectedCategory.name,
+        formData.selectedTopic.name,
         formData.summaryDescription,
         oncallUser,
         formData.selectedTeam.name

@@ -17,6 +17,9 @@ describe('ui/modals', () => {
     const modal = modalBuilder.buildSupportModal('U01T9CL8PEK', [
       { text: 'Team 1', value: 'Value 1' },
       { text: 'Team 2', value: 'Value 2' },
+    ],[
+      { text: 'Category 1', value: 'Value 1'},
+      { text: 'Category 2', value: 'Value 2'}
     ]);
 
     const options = modal.blocks[2].element.options;

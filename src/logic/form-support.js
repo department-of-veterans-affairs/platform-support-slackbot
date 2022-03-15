@@ -22,6 +22,7 @@ module.exports = function (logger) {
       users_requesting_support: users,
       team,
       topic,
+      category,
       summary,
     } = view.state.values;
 

@@ -82,12 +82,11 @@ module.exports = function (logger) {
   };
 
    /**
-   * Gets all rows for the Google Topics Sheet
+* Gets all rows for the Google Topics Sheet
    * @returns Google Sheet Rows
    */
     sheets.getTopicsSheetRows = async () => {
       const sheet = await sheets.getTopicsSheet();
-  
       return await sheet.getRows();
     };
 
@@ -124,7 +123,6 @@ module.exports = function (logger) {
    */
     sheets.getTopics = async () => {
       const rows = await sheets.getTopicsSheetRows();
-  
       return rows.map((row) => {
         return {
           text: row.Name,

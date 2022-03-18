@@ -2,6 +2,7 @@ const buildSupportResponse = (
   ticketId,
   userId,
   selectedTeam,
+  selectedCategory,
   summaryDescription,
   mention,
   team
@@ -12,6 +13,13 @@ const buildSupportResponse = (
       text: {
         type: 'mrkdwn',
         text: `From *<@${userId}>*: ${summaryDescription}`,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Request Type: ${selectedCategory}`,
       },
     },
     {

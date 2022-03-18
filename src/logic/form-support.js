@@ -20,11 +20,14 @@ module.exports = function (logger) {
     const { id, username } = body.user;
     const {
       users_requesting_support: users,
+      team,
       topic,
+      category,
       summary,
     } = view.state.values;
 
-    const selectedTeamId = topic.selected.selected_option.value;
+    const selectedTeamId = team.selected.selected_option.value;
+    const selectedTopicId = topic.selected.selected_option.value;
     const whoNeedsSupportUserIds = users?.users?.selected_users ?? [];
     const summaryDescription = summary.value.value;
 
@@ -46,6 +49,15 @@ module.exports = function (logger) {
         }
       : {};
 
+    const topicData = await sheets.getTopicById(selectedTopicId);
+
+    const selectedTopic = topicData
+      ? {
+          id: selectedTopicId,
+          name: topicData.Name
+        }
+      : {};
+
     return {
       submittedBy: {
         id,
@@ -53,6 +65,7 @@ module.exports = function (logger) {
       },
       whoNeedsSupport,
       selectedTeam,
+      selectedTopic,
       summaryDescription,
     };
   };
@@ -97,6 +110,7 @@ module.exports = function (logger) {
         ticketId,
         formData.submittedBy.id,
         formData.selectedTeam.name,
+        formData.selectedTopic.name,
         formData.summaryDescription,
         oncallUser,
         formData.selectedTeam.name

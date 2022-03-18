@@ -11,7 +11,7 @@ const buildDropDown = (options) => {
   });
 };
 
-const buildSupportModal = (user, options) => {
+const buildSupportModal = (user, teamOptions, topicOptions) => {
   return {
     type: 'modal',
     callback_id: 'support_modal_view',
@@ -44,6 +44,25 @@ const buildSupportModal = (user, options) => {
       },
       {
         type: 'input',
+        block_id: 'team',
+        element: {
+          type: 'static_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select an item',
+            emoji: true,
+          },
+          options: buildDropDown(teamOptions),
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'I need help from',
+          emoji: true,
+        },
+      },
+      {
+        type: 'input',
         block_id: 'topic',
         element: {
           type: 'static_select',
@@ -52,12 +71,12 @@ const buildSupportModal = (user, options) => {
             text: 'Select an item',
             emoji: true,
           },
-          options: buildDropDown(options),
+          options: buildDropDown(topicOptions),
           action_id: 'selected',
         },
         label: {
           type: 'plain_text',
-          text: 'I need help from',
+          text: 'What is the nature of the request?',
           emoji: true,
         },
       },

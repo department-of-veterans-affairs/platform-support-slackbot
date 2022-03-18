@@ -56,7 +56,6 @@ module.exports = function (logger) {
 
     const teamOptions = await sheets.getTeams();
     const topicOptions = await sheets.getTopics();
-
     const view = modalBuilder.buildSupportModal(user, teamOptions, topicOptions);
 
     const result = await client.views.open({
@@ -108,7 +107,6 @@ module.exports = function (logger) {
       body,
       view
     );
-
     logger.debug(formData);
 
     const oncalluser = await routing.getOnCallUser(

@@ -88,7 +88,7 @@ To configure the Slackbot, the following environment variables are used:
 - **SLACK_WEB_SOCKET_APP_TOKEN** - Token used by the Slack bot when connecting to Slack using Socket Mode. This Slack bot is using Socket Mode to communicate with Slack and does not need to expose an external IP.
 - **SLACK_SUPPORT_CHANNEL** - The id of the Platform Support channel used for the default location where the slack bot will post messages. See below regarding how to get the channel id.
 - **TEAMS_SPREADSHEET_ID** - The id of the Google sheet where teams and associated information is stored. This is for the team drop down selection. See below regarding how to get a Google sheet id.
-- **TOPICS_SPREADSHEET_ID** - The id of the Google sheet where topics and associated information is stored. This is for the topic drop down selection. See below regarding how to get a Google sheet id.
+- **TOPICS_SPREADSHEET_ID** - The id of the sheet in the responses doc where topic are stored. This is for the topic drop down selection. This id can be found at the end of the URL when the Topics sheet is active ex. gid=`1990856050`.
 - **RESPONSES_SPREADSHEET_ID** - The id of the Google sheet where the responses are stored and written to. See below regarding how to get a Google sheet id.
 - **LOG_LEVEL** - The level for application logs. See below for more details.
 - **PAGER_DUTY_API_KEY** - The API key to access data in the PagerDuty application.
@@ -131,7 +131,6 @@ Running `npm start` does the same.
 The two spreadsheets can be found here:
 
 - [Platform Teams Google Sheet](https://docs.google.com/spreadsheets/d/1k9P921Hdo654631HmX9WovGaYRIFAhO3QRg3EN3F9gI)
-- [Platform Topics Google Sheet](https://docs.google.com/spreadsheets/d/1ZV0mbjUl4n3tK2i7jPdYmaQ7x1HJ9OOO6kUNJxNk5vI)
 - [Platform Support Responses Sheet](https://docs.google.com/spreadsheets/d/1TItdfPMH_TiXEhgMKEqxIW2e5EaMKy4cHaBhaeQ7drU)
 
 Please contact James Chasia to get access to these sheets.

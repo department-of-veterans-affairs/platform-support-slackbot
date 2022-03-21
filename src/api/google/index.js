@@ -20,7 +20,7 @@ module.exports = function (logger) {
     // Authentication using Google Service Account
     const creds = {
       "private_key_id": process.env.GOOGLE_PRIVATE_KEY_ID,
-      "private_key": process.env.GOOGLE_PRIVATE_KEY,
+      "private_key": process.env.GOOGLE_PRIVATE_KEY/*.replace(/\\n/g, '\n')*/,
       "client_id": process.env.GOOGLE_CLIENT_ID
     };
     const auth = {

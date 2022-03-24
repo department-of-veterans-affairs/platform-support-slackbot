@@ -222,7 +222,7 @@ module.exports = function (logger) {
         .tz(dateTime, 'America/New_York')
         .format('LLLL');
       await row.save();
-    } else {
+    } else if (!row) {
       logger.info(`Row not found for messageId: ${messageId}`);
     }
   };

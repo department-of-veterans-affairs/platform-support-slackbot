@@ -21,8 +21,8 @@ describe('api/google', () => {
     ]);
 
     sinon.stub(sheets, 'getTopicsSheetRows').resolves([
-      { Name: 'Pull Request', Id: '1' },
-      { Name: 'Access Request', Id: '2' },
+      ['Pull Request'],
+      ['Access Request'],
     ]);
 
     sheets.getGoogleSheet.callThrough();
@@ -66,8 +66,8 @@ describe('api/google', () => {
       const result = await sheets.getTopics();
 
       expect(result).to.eql([
-        { text: 'Pull Request', value: '1' },
-        { text: 'Access Request', value: '2' },
+        { text: 'Access Request', value: '1' },
+        { text: 'Pull Request', value: '2' },
       ]);
     });
   });
@@ -76,10 +76,7 @@ describe('api/google', () => {
     it('should get topic by 1 based index', async () => {
       const result = await sheets.getTopicById(2);
 
-      expect(result).to.eql({
-        Name: 'Access Request',
-        Id: '2',
-      });
+      expect(result).to.eql('Pull Request');
     });
 
     it('should return null if the topic is not found', async () => {

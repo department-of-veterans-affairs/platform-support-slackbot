@@ -59,12 +59,11 @@ module.exports = function (logger) {
    */
    sheets.getTopicsSheet = async () => {
     if (!topicsSheet || (new Date() - cacheTime > cacheLength)) {
-      const doc = await sheets.getGoogleSheet(process.env.TOPICS_SPREADSHEET_ID);
-      topicsSheet = doc.sheetsByIndex[0];
-      cacheTime = new Date();
+      const doc = await sheets.getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
+      topicsSheet = doc.sheetsById[process.env.TOPICS_SPREADSHEET_ID];
     }
-    // Return first tab
-    return topicsSheet;
+
+    return topicsSheet
   };
 
   /**
@@ -96,7 +95,7 @@ module.exports = function (logger) {
    */
     sheets.getTopicsSheetRows = async () => {
       const sheet = await sheets.getTopicsSheet();
-      return await sheet.getRows();
+      return await sheet.getCellsInRange('A1:A100');
     };
 
   /**
@@ -132,10 +131,12 @@ module.exports = function (logger) {
    */
     sheets.getTopics = async () => {
       const rows = await sheets.getTopicsSheetRows();
-      return rows.map((row) => {
+      return rows.sort((row1, row2) => {
+        return row1 > row2 ? 1 : row1 < row2 ? -1 : 0;
+      }).map((row, index) => {
         return {
-          text: row.Name,
-          value: row.Id,
+          text: row[0],
+          value: `${index + 1}`,
         };
       });
     };
@@ -160,10 +161,12 @@ module.exports = function (logger) {
    */
    sheets.getTopicById = async (topicId) => {
     const rows = await sheets.getTopicsSheetRows();
+    const sortedRows = rows.sort((row1, row2) => {
+      return row1 > row2 ? 1 : row1 < row2 ? -1 : 0;
+    })
+    if (sortedRows.length < topicId) return null;
 
-    if (rows.length < topicId) return null;
-
-    return rows[topicId - 1];
+    return sortedRows[topicId - 1][0];
   };
 
   /**

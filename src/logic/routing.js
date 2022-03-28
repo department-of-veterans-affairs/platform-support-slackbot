@@ -42,16 +42,12 @@ module.exports = function (logger) {
   routing.getOnCallUser = async (client, selectedTeamId) => {
     let oncallUser = null;
 
-    const selectedTeam = await sheets.getTeamById(selectedTeamId);
-
-    logger.debug(selectedTeam);
-
-    // Check Channel Topic
-    const topicRouteData = await routing.getRoutingFromChannelTopic(client);
+    const selectedTeam = await sheets.getTeamById(selectedTeamId),
+          topicRouteData = await routing.getRoutingFromChannelTopic(client);
+          
     if (topicRouteData) {
-      logger.debug(topicRouteData);
       oncallUser = topicRouteData[selectedTeam.Title.toLowerCase()];
-      logger.info(`Selected On-Call User: ${oncallUser} from Channel Topic`);
+      //logger.info(`Selected On-Call User: ${oncallUser} from Channel Topic`);
     }
 
     // Check PagerDuty
@@ -66,7 +62,7 @@ module.exports = function (logger) {
       oncallUser = user ? `<@${user.userId}>` : null;
 
       if (oncallUser) {
-        logger.info(`Selected On-Call User: ${oncallUser} from PagerDuty`);
+        //logger.info(`Selected On-Call User: ${oncallUser} from PagerDuty`);
       } else {
         logger.info(`Unable to find slack user from Pager Duty...`);
       }

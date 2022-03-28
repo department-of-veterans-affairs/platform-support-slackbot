@@ -48,25 +48,20 @@ module.exports = function (logger) {
   schedule.getOnCallPersonEmailForSchedule = async function (scheduleId) {
     logger.trace('getOnCallPersonEmailForSchedule()');
 
-    const api = this._getApiInstance();
-
-    const currentDate = new Date();
-
-    const currentScheduleResponse = await this._getScheduleForDate(
-      api,
-      scheduleId,
-      currentDate
-    );
-
-    const currentSchedule = currentScheduleResponse?.data?.schedule;
-
-    const entries = currentSchedule?.final_schedule?.rendered_schedule_entries;
+    const api = this._getApiInstance(),
+          currentDate = new Date(),
+          currentScheduleResponse = await this._getScheduleForDate(
+            api,
+            scheduleId,
+            currentDate
+          ),
+          currentSchedule = currentScheduleResponse?.data?.schedule,
+          entries = currentSchedule?.final_schedule?.rendered_schedule_entries;
 
     if (!entries || entries.length == 0) return null;
 
-    const oncallUser = entries[0].user;
-
-    const userResponse = await this._getUserById(api, oncallUser.id);
+    const oncallUser = entries[0].user,
+          userResponse = await this._getUserById(api, oncallUser.id);
 
     return userResponse?.data?.user?.email;
   };

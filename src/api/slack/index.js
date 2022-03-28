@@ -55,7 +55,6 @@ module.exports = function (logger) {
       const { user } = await client.users.lookupByEmail({
         email,
       });
-      logger.debug('getSlackUserByEmail');
       return {
         userId: user.id,
         userName: user.name,
@@ -77,8 +76,6 @@ module.exports = function (logger) {
     const info = await client.conversations.info({
       channel: SUPPORT_CHANNEL_ID,
     });
-
-    logger.debug(info.channel.topic.value);
 
     return info.channel.topic.value;
   };
@@ -113,10 +110,11 @@ module.exports = function (logger) {
    * @param {Array} blocks Array of block kit elements
    */
   slackApi.updateMessageById = async (client, messageId, channelId, blocks) => {
-    client.chat.update({
+    await client.chat.update({
       channel: channelId,
       ts: messageId,
       blocks,
+      text: 'Reassigned'
     });
   };
 

@@ -1,6 +1,11 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const client_config = require('../../../google_client.json');
 const moment = require('moment-timezone');
+const cacheLength = 86400000; // Cache for 1 day
+let teamsSheet,
+    topicsSheet,
+    cacheTime
+    
 
 module.exports = function (logger) {
   let sheets = {};
@@ -20,19 +25,17 @@ module.exports = function (logger) {
     // Authentication using Google Service Account
     const creds = {
       "private_key_id": process.env.GOOGLE_PRIVATE_KEY_ID,
-      "private_key": process.env.GOOGLE_PRIVATE_KEY,
+      "private_key": process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       "client_id": process.env.GOOGLE_CLIENT_ID
     };
     const auth = {
       ... client_config,
       ... creds
     };
-
-    doc.useServiceAccountAuth(auth);
+    await doc.useServiceAccountAuth(auth);
 
     // loads document properties and worksheets
     await doc.loadInfo();
-
     return doc;
   };
 
@@ -41,10 +44,13 @@ module.exports = function (logger) {
    * @returns Teams Sheet
    */
   sheets.getTeamsSheet = async () => {
-    const doc = await sheets.getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
-
+    if (!teamsSheet || (new Date() - cacheTime > cacheLength)) {
+      const doc = await sheets.getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
+      teamsSheet = doc.sheetsByIndex[0];
+      cacheTime = new Date();
+    }
     // Return first tab
-    return doc.sheetsByIndex[0];
+    return teamsSheet
   };
 
   /**
@@ -52,10 +58,13 @@ module.exports = function (logger) {
    * @returns Topics Sheet
    */
    sheets.getTopicsSheet = async () => {
-    const doc = await sheets.getGoogleSheet(process.env.TOPICS_SPREADSHEET_ID);
-
+    if (!topicsSheet || (new Date() - cacheTime > cacheLength)) {
+      const doc = await sheets.getGoogleSheet(process.env.TOPICS_SPREADSHEET_ID);
+      topicsSheet = doc.sheetsByIndex[0];
+      cacheTime = new Date();
+    }
     // Return first tab
-    return doc.sheetsByIndex[0];
+    return topicsSheet;
   };
 
   /**
@@ -137,7 +146,7 @@ module.exports = function (logger) {
    * @returns
    */
   sheets.getTeamById = async (teamId) => {
-    const rows = await sheets.getTeamsSheetRows();
+    let rows = await sheets.getTeamsSheetRows();
 
     if (rows.length < teamId) return null;
 
@@ -233,9 +242,8 @@ module.exports = function (logger) {
    * @param {string} team updated team
    */
   sheets.updateAssignedTeamForMessage = async (ticketId, team) => {
-    const rows = await sheets.getResponseSheetRows();
-
-    const row = rows.find((row) => row.TicketId === ticketId);
+    const rows = await sheets.getResponseSheetRows(),
+          row = rows.find((row) => row.TicketId === ticketId);
 
     if (row) {
       row.Team = team;
@@ -251,9 +259,8 @@ module.exports = function (logger) {
    * @returns Google Sheet row assocated with Ticket Id
    */
   sheets.getMessageByTicketId = async (ticketId) => {
-    const rows = await sheets.getResponseSheetRows();
-
-    const row = rows.find((row) => row.TicketId === ticketId);
+    const rows = await sheets.getResponseSheetRows(),
+          row = rows.find((row) => row.TicketId === ticketId);
 
     return row ? row.MessageId.replace('msgId:', '') : null;
   };

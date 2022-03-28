@@ -33,7 +33,7 @@ module.exports = function (app, logger) {
       logger.info('EVENT: reaction_added');
 
       // payload.item.ts is the associated message id of the emoji reaction
-      logic.updateTimeStampOfSupportResponse(payload.item.ts);
+      await logic.updateTimeStampOfSupportResponse(payload.item.ts);
     } catch (error) {
       logger.error(error);
     }
@@ -66,7 +66,7 @@ module.exports = function (app, logger) {
       logger.info('MESSAGE: *');
 
       // message.thread_ts only exists for replies
-      logic.updateTimeStampOfSupportResponse(message.thread_ts);
+      await logic.updateTimeStampOfSupportResponse(message.thread_ts);
     } catch (error) {
       logger.error(error);
     }
@@ -100,13 +100,12 @@ module.exports = function (app, logger) {
     try {
       logger.info('ACTION: reassign_ticket');
 
-      await ack();
-
       await logic.displayReassignmentModal(
         client,
         payload.value,
         body.trigger_id
       );
+      await ack();
     } catch (error) {
       logger.error(error);
     }
@@ -184,12 +183,12 @@ module.exports = function (app, logger) {
    * form.
    */
   app.view('support_modal_view', async ({ ack, body, view, client }) => {
+    await ack();
     try {
       logger.info('VIEW: support_modal_view (FORM SUBMISSION)');
 
-      await ack();
+      await logic.handleSupportFormSubmission(client, body, view);
 
-      logic.handleSupportFormSubmission(client, body, view);
     } catch (error) {
       logger.error(error);
     }
@@ -200,15 +199,11 @@ module.exports = function (app, logger) {
    * Handles the form submission when someone submits the reassigns
    * a ticket
    */
-  app.view(
-    'reassign_modal_view',
-    async ({ ack, payload, client, view, body }) => {
+  app.view('reassign_modal_view', async ({ ack, body, view, client, payload }) => {
+      await ack();
       try {
         logger.info('VIEW: reassign_modal_view (FORM SUBMISSION)');
-
-        await ack();
-
-        logic.handleReassignmentFormSubmission(client, payload, view, body);
+        await logic.handleReassignmentFormSubmission(body, view, client, payload);
       } catch (error) {
         logger.error(error);
       }

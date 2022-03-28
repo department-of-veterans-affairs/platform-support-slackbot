@@ -13,6 +13,7 @@
   "dependencies": {
     "@pagerduty/pdjs": "^2.2.2",
     "@slack/bolt": "^3.3.0",
+    "axios": "^0.26.1",
     "dotenv": "^8.2.0",
     "google-spreadsheet": "^3.1.15",
     "googleapis": "^72.0.0",
@@ -27,6 +28,7 @@
     "chai": "^4.3.4",
     "chai-arrays": "^2.2.0",
     "mocha": "^8.3.2",
+    "serverless-offline": "^8.5.0",
     "sinon": "^10.0.0"
   },
   "engines": {

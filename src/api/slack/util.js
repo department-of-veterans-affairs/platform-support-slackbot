@@ -33,8 +33,6 @@ module.exports = function (logger) {
    * @returns Channel Oncall User Mapping
    */
   util.parseChannelTopic = (topic) => {
-    logger.info(topic);
-
     const formatKey = (key) => key.toLowerCase().trim();
 
     const formatValue = (value) => {
@@ -52,8 +50,6 @@ module.exports = function (logger) {
       });
 
     const onCall = Object.fromEntries(supportList);
-
-    logger.info(onCall);
 
     return onCall;
   };

@@ -22,7 +22,6 @@ module.exports = function (logger) {
       users_requesting_support: users,
       team,
       topic,
-      category,
       summary,
     } = view.state.values;
 
@@ -54,7 +53,7 @@ module.exports = function (logger) {
     const selectedTopic = topicData
       ? {
           id: selectedTopicId,
-          name: topicData.Name
+          name: topicData
         }
       : {};
 

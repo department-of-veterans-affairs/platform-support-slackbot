@@ -20,7 +20,7 @@ module.exports = function (logger) {
     // Authentication using Google Service Account
     const creds = {
       "private_key_id": process.env.GOOGLE_PRIVATE_KEY_ID,
-      "private_key": process.env.GOOGLE_PRIVATE_KEY,
+      "private_key": process.env.GOOGLE_PRIVATE_KEY/*.replace(/\\n/g, '\n')*/,
       "client_id": process.env.GOOGLE_CLIENT_ID
     };
     const auth = {
@@ -52,10 +52,10 @@ module.exports = function (logger) {
    * @returns Topics Sheet
    */
    sheets.getTopicsSheet = async () => {
-    const doc = await sheets.getGoogleSheet(process.env.TOPICS_SPREADSHEET_ID);
+    const doc = await sheets.getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
 
     // Return first tab
-    return doc.sheetsByIndex[0];
+    return doc.sheetsById[process.env.TOPICS_SPREADSHEET_ID];
   };
 
   /**
@@ -87,7 +87,7 @@ module.exports = function (logger) {
    */
     sheets.getTopicsSheetRows = async () => {
       const sheet = await sheets.getTopicsSheet();
-      return await sheet.getRows();
+      return await sheet.getCellsInRange('A1:A100');
     };
 
   /**
@@ -123,10 +123,12 @@ module.exports = function (logger) {
    */
     sheets.getTopics = async () => {
       const rows = await sheets.getTopicsSheetRows();
-      return rows.map((row) => {
+      return rows.sort((row1, row2) => {
+        return row1 > row2 ? 1 : row1 < row2 ? -1 : 0;
+      }).map((row, index) => {
         return {
-          text: row.Name,
-          value: row.Id,
+          text: row[0],
+          value: `${index + 1}`,
         };
       });
     };
@@ -151,10 +153,12 @@ module.exports = function (logger) {
    */
    sheets.getTopicById = async (topicId) => {
     const rows = await sheets.getTopicsSheetRows();
+    const sortedRows = rows.sort((row1, row2) => {
+      return row1 > row2 ? 1 : row1 < row2 ? -1 : 0;
+    })
+    if (sortedRows.length < topicId) return null;
 
-    if (rows.length < topicId) return null;
-
-    return rows[topicId - 1];
+    return sortedRows[topicId - 1][0];
   };
 
   /**

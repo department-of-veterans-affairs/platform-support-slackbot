@@ -1,7 +1,7 @@
 const modalBuilder = require('../ui/modals');
 const responseBuilder = require('../ui/messages');
 const { nanoid } = require('nanoid');
-
+const fetch = require('node-fetch');
 const SUPPORT_HOST = process.env.SLACK_SUPPORT_HOSTNAME;
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
@@ -56,7 +56,6 @@ module.exports = function (logger) {
 
     const teamOptions = await sheets.getTeams();
     const topicOptions = await sheets.getTopics();
-
     const view = modalBuilder.buildSupportModal(user, teamOptions, topicOptions);
 
     const result = await client.views.open({
@@ -108,7 +107,6 @@ module.exports = function (logger) {
       body,
       view
     );
-
     logger.debug(formData);
 
     const oncalluser = await routing.getOnCallUser(
@@ -148,6 +146,20 @@ module.exports = function (logger) {
       formData.summaryDescription,
       messageLink
     );
+
+    await fetch('https://sreautoanswer01.vercel.app/api/getanswer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ticketId,
+        messageIdString,
+        messageLink,
+        ...formData
+      })
+    })
+
   };
 
   /**

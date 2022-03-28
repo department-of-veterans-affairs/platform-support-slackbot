@@ -217,7 +217,7 @@ describe('api/google', () => {
     it('should return Slack message id (timestamp) as string', async () => {
       const slackMessageId = await sheets.getMessageByTicketId('c3');
 
-      expect(slackMessageId).to.equal('1002.0');
+      expect(slackMessageId.messageId).to.equal('1002.0');
     });
 
     it('should return null if ticket id is not found', async () => {

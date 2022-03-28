@@ -167,12 +167,13 @@ module.exports = (logger) => {
     logger.debug('handleReassignmentFormSubmission()');
 
     const ticketId = payload.private_metadata,
-          team = await formSupport.extractReassignFormData(view),
-          messageId = await sheets.getMessageByTicketId(ticketId);
+          team = await formSupport.extractReassignFormData(view);
+
+    let {messageId, messageRow} = await sheets.getMessageByTicketId(ticketId);
 
     if (!messageId) return sendErrorMessageToUser();
 
-    await sheets.updateAssignedTeamForMessage(ticketId, team.title);
+    await sheets.updateAssignedTeamForMessage(ticketId, team.title, messageRow);
 
     const message = await slack.getMessageById(
       client,

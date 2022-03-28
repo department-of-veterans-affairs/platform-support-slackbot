@@ -241,15 +241,21 @@ module.exports = function (logger) {
    * @param {string} ticketId Ticket Id
    * @param {string} team updated team
    */
-  sheets.updateAssignedTeamForMessage = async (ticketId, team) => {
-    const rows = await sheets.getResponseSheetRows(),
+  sheets.updateAssignedTeamForMessage = async (ticketId, team, messageRow) => {
+    if (messageRow) {
+        messageRow.Team = team;
+        await messageRow.save();
+
+    } else {
+      const rows = await sheets.getResponseSheetRows(),
           row = rows.find((row) => row.TicketId === ticketId);
 
-    if (row) {
-      row.Team = team;
-      await row.save();
-    } else {
-      logger.info(`Row not found for ticketId: ${ticketId}`);
+      if (row) {
+        row.Team = team;
+        await row.save();
+      } else {
+        logger.info(`Row not found for ticketId: ${ticketId}`);
+      }
     }
   };
 
@@ -262,7 +268,7 @@ module.exports = function (logger) {
     const rows = await sheets.getResponseSheetRows(),
           row = rows.find((row) => row.TicketId === ticketId);
 
-    return row ? row.MessageId.replace('msgId:', '') : null;
+    return row ? {messageId: row.MessageId.replace('msgId:', ''), messageRow: row} : null;
   };
 
   return sheets;

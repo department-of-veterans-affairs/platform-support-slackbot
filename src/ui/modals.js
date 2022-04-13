@@ -119,6 +119,77 @@ const buildSupportModal = (user, teamOptions, topicOptions) => {
   };
 };
 
+const buildOnCallModal = (user, teamOptions) => {
+  return {
+    type: 'modal',
+    callback_id: 'oncall_modal_view',
+    submit: {
+      type: 'plain_text',
+      text: 'Submit',
+      emoji: true,
+    },
+    close: {
+      type: 'plain_text',
+      text: 'Cancel',
+      emoji: true,
+    },
+    title: {
+      type: 'plain_text',
+      text: 'Who is on call?',
+      emoji: true,
+    },
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `${teamOptions.map((team) => `${team.text}: ${team.onCallUser ? `<@${team.onCallUser}>` : team.slackGroup} \n`).join('')}`,
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        type: 'input',
+        block_id: 'team',
+        element: {
+          type: 'static_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select an item',
+            emoji: true,
+          },
+          options: buildDropDown(teamOptions),
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'Update on-call user for',
+          emoji: true,
+        },
+      },
+      {
+        type: 'input',
+        block_id: 'user',
+        element: {
+          type: 'users_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select an item',
+            emoji: true,
+          },
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'User',
+          emoji: true,
+        },
+      },
+    ],
+  };
+};
+
 const buildReassignmentModal = (options, ticketId) => {
   return {
     type: 'modal',
@@ -176,5 +247,6 @@ const buildReassignmentModal = (options, ticketId) => {
 
 module.exports = {
   buildSupportModal,
+  buildOnCallModal,
   buildReassignmentModal,
 };

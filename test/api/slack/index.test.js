@@ -102,25 +102,6 @@ describe('api/slack', () => {
     });
   });
 
-  describe('getChannelTopic()', async () => {
-    it('should return the channel topic', async () => {
-      sinon
-        .stub(client.conversations, 'info')
-        .withArgs(sinon.match.any)
-        .resolves({
-          channel: {
-            topic: {
-              value: 'This is the channel topic',
-            },
-          },
-        });
-
-      let result = await slack.getChannelTopic(client);
-
-      expect(result).to.equal('This is the channel topic');
-    });
-  });
-
   describe('getMessageById()', async () => {
     it('should get a message by timestamp', async () => {
       const messages = [

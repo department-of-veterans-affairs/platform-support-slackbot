@@ -40,21 +40,21 @@ module.exports = function (logger) {
 
     const selectedTeam = teamData
       ? {
-          id: selectedTeamId,
-          title: teamData.Title,
-          name: teamData.Display,
-          pagerDutySchedule: teamData.PagerDutySchedule,
-          slackGroup: teamData.SlackGroup,
-        }
+        id: selectedTeamId,
+        title: teamData.Title,
+        name: teamData.Display,
+        pagerDutySchedule: teamData.PagerDutySchedule,
+        slackGroup: teamData.SlackGroup,
+      }
       : {};
 
     const topicData = await sheets.getTopicById(selectedTopicId);
 
     const selectedTopic = topicData
       ? {
-          id: selectedTopicId,
-          name: topicData
-        }
+        id: selectedTopicId,
+        name: topicData
+      }
       : {};
 
     return {
@@ -68,6 +68,43 @@ module.exports = function (logger) {
       summaryDescription,
     };
   };
+
+
+  /**
+     * Takes a form submission and extracts the data into a form
+     * object.
+     * @param {object} client Slack Client
+     * @param {object} body Slack Body
+     * @param {object} view Slack View
+     * @returns Form Data Object
+     */
+  formSupport.extractOnCallFormData = async (client, body, view) => {
+    const { id, username } = body.user;
+    const {
+      team,
+      user
+    } = view.state.values;
+
+    const selectedTeamId = team.selected.selected_option.value;
+    const teamData = await sheets.getTeamById(selectedTeamId);
+
+    const selectedTeam = teamData
+      ? {
+        id: selectedTeamId,
+        title: teamData.Title,
+        name: teamData.Display,
+        pagerDutySchedule: teamData.PagerDutySchedule,
+        slackGroup: teamData.SlackGroup,
+      }
+      : {};
+
+
+    return {
+      selectedTeam,
+      user
+    };
+  };
+
 
   /**
    * Extracts selected team from the Support Ticket Reassignment form
@@ -118,8 +155,6 @@ module.exports = function (logger) {
       unfurl_links: false, // Remove Link Previews
     });
 
-    logger.trace(postedMessage);
-
     if (!postedMessage.ok) {
       logger.error(`Unable to post message. ${JSON.stringify(postedMessage)}`);
       return {
@@ -133,6 +168,49 @@ module.exports = function (logger) {
       messageId: postedMessage.ts,
       channel: postedMessage.channel,
     };
+  };
+
+  formSupport.postOnCallMessage = async (
+    client,
+  ) => {
+    const teams = await sheets.getTeams();
+    const postedMessage = await client.chat.postMessage({
+      channel: SUPPORT_CHANNEL_ID,
+      link_names: 1,
+      blocks: responseBuilder.buildOnCallResponse(
+        teams
+      ),
+      text: `On-call assignments updated!`,
+      unfurl_links: false, // Remove Link Previews
+    });
+
+    if (!postedMessage.ok) {
+      logger.error(`Unable to post message. ${JSON.stringify(postedMessage)}`);
+      return {
+        messageId: null,
+        channel: null,
+        error: 'Error Posting Message',
+      };
+    }
+
+    const pins = await client.pins.list({
+      channel: SUPPORT_CHANNEL_ID
+    })
+    
+    pins.items.forEach((pin) => {
+      if (pin.message.text.indexOf('On-call assignments updated!') !== -1) {
+        client.pins.remove({
+          channel: SUPPORT_CHANNEL_ID,
+          timestamp: pin.message.ts
+        })
+      }
+    });
+
+    client.pins.add({
+      channel: SUPPORT_CHANNEL_ID,
+      timestamp: postedMessage.ts
+    });
+    return postedMessage;
   };
 
   return formSupport;

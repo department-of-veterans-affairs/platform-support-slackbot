@@ -16,8 +16,8 @@ describe('api/google', () => {
     sinon.stub(sheets, 'getResponsesSheet').resolves(obj);
 
     sinon.stub(sheets, 'getTeamsSheetRows').resolves([
-      { Display: 'Frontend Tools', Id: 'FE' },
-      { Display: 'Backend Tools', Id: 'BE' },
+      { Display: 'Frontend Tools', Id: 'FE', SlackGroup: '', OnCallUser: '' },
+      { Display: 'Backend Tools', Id: 'BE', SlackGroup: '', OnCallUser: '' },
     ]);
 
     sinon.stub(sheets, 'getTopicsSheetRows').resolves([
@@ -38,8 +38,8 @@ describe('api/google', () => {
       const result = await sheets.getTeams();
 
       expect(result).to.eql([
-        { text: 'Frontend Tools', value: 'FE' },
-        { text: 'Backend Tools', value: 'BE' },
+        { text: 'Backend Tools', value: 'BE', slackGroup: '', onCallUser: '' },
+        { text: 'Frontend Tools', value: 'FE', slackGroup: '', onCallUser: '' }
       ]);
     });
   });
@@ -51,6 +51,8 @@ describe('api/google', () => {
       expect(result).to.eql({
         Display: 'Backend Tools',
         Id: 'BE',
+        SlackGroup: '', 
+        OnCallUser: ''
       });
     });
 
@@ -212,9 +214,9 @@ describe('api/google', () => {
     });
 
     it('should return Slack message id (timestamp) as string', async () => {
-      const slackMessageId = await sheets.getMessageByTicketId('c3');
+      const { messageId } = await sheets.getMessageByTicketId('c3');
 
-      expect(slackMessageId).to.equal('1002.0');
+      expect(messageId).to.equal('1002.0');
     });
 
     it('should return null if ticket id is not found', async () => {

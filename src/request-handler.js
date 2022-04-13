@@ -33,7 +33,7 @@ module.exports = function (app, logger) {
       logger.info('EVENT: reaction_added');
 
       // payload.item.ts is the associated message id of the emoji reaction
-      logic.updateTimeStampOfSupportResponse(payload.item.ts);
+      await logic.updateTimeStampOfSupportResponse(payload.item.ts);
     } catch (error) {
       logger.error(error);
     }
@@ -66,7 +66,7 @@ module.exports = function (app, logger) {
       logger.info('MESSAGE: *');
 
       // message.thread_ts only exists for replies
-      logic.updateTimeStampOfSupportResponse(message.thread_ts);
+      await logic.updateTimeStampOfSupportResponse(message.thread_ts);
     } catch (error) {
       logger.error(error);
     }
@@ -176,6 +176,52 @@ module.exports = function (app, logger) {
     }
   });
 
+/**
+   * Command: /oncall
+   * Brings up the platform support request modal when someone
+   * types the /oncall command.
+   */
+ app.command('/oncall', async ({ ack, body, client }) => {
+  try {
+    logger.info('COMMAND: /oncall');
+
+    await ack();
+
+    await logic.displayOnCallModal(
+      client,
+      body.user_id,
+      body.trigger_id
+    );
+
+  } catch (error) {
+    logger.error(error);
+  }
+});
+
+
+
+  /**
+   * Shortcut: oncall
+   * Brings up the platform on-call modal when someone
+   * clicks on the Platform On-call bot's shortcut in the app.
+   * (Note: Not the channel specific shortcut, the global one.)
+   */
+   app.shortcut('oncall', async ({ shortcut, ack, client }) => {
+    try {
+      logger.info('SHORTCUT: support');
+
+      await ack();
+
+      await logic.displayOnCallModal(
+        client,
+        shortcut.user.id,
+        shortcut.trigger_id
+      );
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
   /* VIEW LISTENERS */
 
   /**
@@ -189,11 +235,27 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      logic.handleSupportFormSubmission(client, body, view);
+      await logic.handleSupportFormSubmission(client, body, view);
     } catch (error) {
       logger.error(error);
     }
   });
+
+    /**
+   * View: oncall_modal_view
+   * Handles the form submission when someone submits the oncall form.
+   */
+     app.view('oncall_modal_view', async ({ ack, body, view, client }) => {
+      try {
+        logger.info('VIEW: oncall_modal_view (FORM SUBMISSION)');
+  
+        await ack();
+  
+        await logic.handleOnCallFormSubmission(client, body, view);
+      } catch (error) {
+        logger.error(error);
+      }
+    });
 
   /**
    * View: reassign_modal_view
@@ -208,7 +270,7 @@ module.exports = function (app, logger) {
 
         await ack();
 
-        logic.handleReassignmentFormSubmission(client, payload, view, body);
+        await logic.handleReassignmentFormSubmission(client, payload, view, body);
       } catch (error) {
         logger.error(error);
       }

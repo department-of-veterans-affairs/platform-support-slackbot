@@ -135,7 +135,7 @@ const buildOnCallModal = (user, teamOptions) => {
     },
     title: {
       type: 'plain_text',
-      text: 'Who is on call?',
+      text: 'Who is on-call?',
       emoji: true,
     },
     blocks: [
@@ -150,13 +150,20 @@ const buildOnCallModal = (user, teamOptions) => {
         type: 'divider',
       },
       {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*Update a team assignment*`,
+        },
+      },
+      {
         type: 'input',
         block_id: 'team',
         element: {
           type: 'static_select',
           placeholder: {
             type: 'plain_text',
-            text: 'Select an item',
+            text: 'Select an team',
             emoji: true,
           },
           options: buildDropDown(teamOptions),
@@ -164,18 +171,19 @@ const buildOnCallModal = (user, teamOptions) => {
         },
         label: {
           type: 'plain_text',
-          text: 'Update on-call user for',
+          text: 'Team',
           emoji: true,
         },
       },
       {
         type: 'input',
         block_id: 'user',
+        optional: true,
         element: {
           type: 'users_select',
           placeholder: {
             type: 'plain_text',
-            text: 'Select an item',
+            text: 'Select a user',
             emoji: true,
           },
           action_id: 'selected',

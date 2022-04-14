@@ -42,6 +42,7 @@ const buildSupportResponse = (
 };
 
 const buildOnCallResponse = (
+  userId,
   teams
 ) => {
   return [
@@ -49,7 +50,7 @@ const buildOnCallResponse = (
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `On-call assignments have been updated:`,
+        text: `*<@${userId}>* updated an on-call assignment:`,
       },
     },
     {

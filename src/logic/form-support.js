@@ -100,6 +100,10 @@ module.exports = function (logger) {
 
 
     return {
+      submittedBy: {
+        id,
+        username,
+      },
       selectedTeam,
       user
     };
@@ -171,13 +175,15 @@ module.exports = function (logger) {
   };
 
   formSupport.postOnCallMessage = async (
-    client,
+    formData,
+    client
   ) => {
     const teams = await sheets.getTeams();
     const postedMessage = await client.chat.postMessage({
       channel: SUPPORT_CHANNEL_ID,
       link_names: 1,
       blocks: responseBuilder.buildOnCallResponse(
+        formData.submittedBy.id,
         teams
       ),
       text: `On-call assignments updated!`,

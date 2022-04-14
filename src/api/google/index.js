@@ -226,7 +226,7 @@ module.exports = function (logger) {
           row = rows.find((row) => row.Id === teamId);
 
     if (row) {
-      row.OnCallUser = userId;
+      row.OnCallUser = userId || '';
       await row.save();
     } else if (!row) {
       logger.info(`Row not found for teamId: ${teamId}`);

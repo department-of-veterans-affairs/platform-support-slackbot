@@ -7,15 +7,6 @@ module.exports = function (logger) {
   let routing = {};
 
   /**
-   * Parse Channel Topic and return Object Hash
-   * @param {object} client Slack Client
-   * @returns Parsed Routing Data from Channel Topic
-   */
-  routing.getRoutingFromChannelTopic = async (client) => {
-    return util.parseChannelTopic(await slack.getChannelTopic(client));
-  };
-
-  /**
    * Get Slack User from Pager Duty Schedule
    * @param {object} selectedTeam Selected Team Object
    * @returns Slack User from Pager Duty Schedule
@@ -40,19 +31,8 @@ module.exports = function (logger) {
    * @returns On Call Slack User, null if unavailable.
    */
   routing.getOnCallUser = async (client, selectedTeamId) => {
-    let oncallUser = null;
-
     const selectedTeam = await sheets.getTeamById(selectedTeamId);
-
-    logger.debug(selectedTeam);
-
-    // Check Channel Topic
-    const topicRouteData = await routing.getRoutingFromChannelTopic(client);
-    if (topicRouteData) {
-      logger.debug(topicRouteData);
-      oncallUser = topicRouteData[selectedTeam.Title.toLowerCase()];
-      logger.info(`Selected On-Call User: ${oncallUser} from Channel Topic`);
-    }
+    let oncallUser =  selectedTeam.OnCallUser ? `<@${selectedTeam.OnCallUser}>` : null;
 
     // Check PagerDuty
     if (!oncallUser) {

@@ -41,6 +41,28 @@ const buildSupportResponse = (
   ];
 };
 
+const buildOnCallResponse = (
+  userId,
+  teams
+) => {
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*<@${userId}>* updated an on-call assignment:`,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `${teams.map((team) => `${team.text}: ${team.onCallUser ? `<@${team.onCallUser}>` : team.slackGroup} \n`).join('')}`,
+      },
+    },
+  ];
+};
+
 const buildHelpResponse = (userId = null) => {
   const user = userId == null ? '' : ` <@${userId}>`;
   return [
@@ -83,4 +105,5 @@ const buildHelpResponse = (userId = null) => {
 module.exports = {
   buildSupportResponse,
   buildHelpResponse,
+  buildOnCallResponse
 };

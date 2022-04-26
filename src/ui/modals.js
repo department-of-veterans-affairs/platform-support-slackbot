@@ -119,6 +119,85 @@ const buildSupportModal = (user, teamOptions, topicOptions) => {
   };
 };
 
+const buildOnCallModal = (user, teamOptions) => {
+  return {
+    type: 'modal',
+    callback_id: 'oncall_modal_view',
+    submit: {
+      type: 'plain_text',
+      text: 'Submit',
+      emoji: true,
+    },
+    close: {
+      type: 'plain_text',
+      text: 'Cancel',
+      emoji: true,
+    },
+    title: {
+      type: 'plain_text',
+      text: 'Who is on-call?',
+      emoji: true,
+    },
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `${teamOptions.map((team) => `${team.text}: ${team.onCallUser ? `<@${team.onCallUser}>` : team.slackGroup} \n`).join('')}`,
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*Update a team assignment*`,
+        },
+      },
+      {
+        type: 'input',
+        block_id: 'team',
+        element: {
+          type: 'static_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select an team',
+            emoji: true,
+          },
+          options: buildDropDown(teamOptions),
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'Team',
+          emoji: true,
+        },
+      },
+      {
+        type: 'input',
+        block_id: 'user',
+        optional: true,
+        element: {
+          type: 'users_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select a user',
+            emoji: true,
+          },
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'User',
+          emoji: true,
+        },
+      },
+    ],
+  };
+};
+
 const buildReassignmentModal = (options, ticketId) => {
   return {
     type: 'modal',
@@ -176,5 +255,6 @@ const buildReassignmentModal = (options, ticketId) => {
 
 module.exports = {
   buildSupportModal,
+  buildOnCallModal,
   buildReassignmentModal,
 };

@@ -20,7 +20,7 @@ module.exports = function (logger) {
     // Authentication using Google Service Account
     const creds = {
       "private_key_id": process.env.GOOGLE_PRIVATE_KEY_ID,
-      "private_key": process.env.GOOGLE_PRIVATE_KEY/*.replace(/\\n/g, '\n')*/,
+      "private_key": process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       "client_id": process.env.GOOGLE_CLIENT_ID
     };
     const auth = {
@@ -28,7 +28,7 @@ module.exports = function (logger) {
       ... creds
     };
 
-    doc.useServiceAccountAuth(auth);
+    await doc.useServiceAccountAuth(auth);
 
     // loads document properties and worksheets
     await doc.loadInfo();
@@ -108,16 +108,20 @@ module.exports = function (logger) {
   sheets.getTeams = async () => {
     const rows = await sheets.getTeamsSheetRows();
 
-    return rows.map((row) => {
+    return rows.sort((row1, row2) => {
+      return row1.Display > row2.Display ? 1 : row1.Display < row2.Display ? -1 : 0;
+    }).map((row) => {
       return {
         text: row.Display,
         value: row.Id,
+        onCallUser: row.OnCallUser,
+        slackGroup: row.SlackGroup
       };
     });
   };
 
    /**
-   * Reads the topic Google Spreadsheet and returns an array of
+   * Reads the topics from the responses google sheet returns an array of
    * topics and associated values.
    * @returns Array of text/values
    */
@@ -209,6 +213,27 @@ module.exports = function (logger) {
   };
 
   /**
+   * Capture form responses for on-call and saves them to the teams sheet
+   * @param {string} teamId Ticket Id
+   * @param {string} userId Message Id
+   */
+   sheets.captureOnCall = async (
+    teamId,
+    userId
+  ) => {
+    const sheet = await sheets.getTeamsSheet(),
+          rows = await sheet.getRows(),
+          row = rows.find((row) => row.Id === teamId);
+
+    if (row) {
+      row.OnCallUser = userId || '';
+      await row.save();
+    } else if (!row) {
+      logger.info(`Row not found for teamId: ${teamId}`);
+    }
+  };
+
+  /**
    * Updates the Google Sheet with the first reply time stamp.
    * Note: Since Google Sheet is not a database, the code does a "table scan" to find
    *       the right Message ID.
@@ -236,14 +261,15 @@ module.exports = function (logger) {
    * @param {string} ticketId Ticket Id
    * @param {string} team updated team
    */
-  sheets.updateAssignedTeamForMessage = async (ticketId, team) => {
-    const rows = await sheets.getResponseSheetRows();
+  sheets.updateAssignedTeamForMessage = async (ticketId, team, messageRow) => {
+    if (!messageRow) { 
+      const rows = await sheets.getResponseSheetRows();
+      messageRow = rows.find((row) => row.TicketId === ticketId);
+    }
 
-    const row = rows.find((row) => row.TicketId === ticketId);
-
-    if (row) {
-      row.Team = team;
-      await row.save();
+    if (messageRow) {
+      messageRow.Team = team;
+      await messageRow.save();
     } else {
       logger.info(`Row not found for ticketId: ${ticketId}`);
     }
@@ -259,7 +285,7 @@ module.exports = function (logger) {
 
     const row = rows.find((row) => row.TicketId === ticketId);
 
-    return row ? row.MessageId.replace('msgId:', '') : null;
+    return row ? { messageId: row.MessageId.replace('msgId:', ''), messageRow: row } : null;
   };
 
   return sheets;

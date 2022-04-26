@@ -62,9 +62,24 @@ module.exports = function (logger) {
       trigger_id,
       view,
     });
+  };
 
-    logger.debug(`user: ${user}`);
-    logger.trace(result);
+  /**
+   * Displays on-call modal to the user.
+   * @param {object} client Slack Client Object
+   * @param {string} user Current User Id
+   * @param {string} trigger_id Trigger Id to generate modal
+   */
+  logic.displayOnCallModal = async (client, user, trigger_id) => {
+    logger.debug('displayOnCallModal()');
+
+    const teamOptions = await sheets.getTeams();
+    const view = modalBuilder.buildOnCallModal(user, teamOptions);
+
+    const result = await client.views.open({
+      trigger_id,
+      view,
+    });
   };
 
   /**
@@ -84,9 +99,6 @@ module.exports = function (logger) {
       trigger_id,
       view,
     });
-
-    logger.debug(`ticketId: ${ticketId}`);
-    logger.trace(result);
   };
 
   /**
@@ -107,7 +119,6 @@ module.exports = function (logger) {
       body,
       view
     );
-    logger.debug(formData);
 
     const oncalluser = await routing.getOnCallUser(
       client,
@@ -162,6 +173,36 @@ module.exports = function (logger) {
 
   };
 
+
+  /**
+     * Handles on-call form submission.
+     * @param {object} client Slack Client Object
+     * @param {object} body Slack Message Body
+     * @param {object} view Slack View
+     */
+  logic.handleOnCallFormSubmission = async (client, body, view) => {
+    logger.debug('handleOnCallFormSubmission()');
+
+    // Ticket ID is used for reassignment button to reference
+    // the slack message
+    const ticketId = nanoid();
+
+    const formData = await formSupport.extractOnCallFormData(
+      client,
+      body,
+      view
+    );
+    await sheets.captureOnCall(
+      formData.selectedTeam.id,
+      formData.user.selected.selected_user
+    );
+
+    await formSupport.postOnCallMessage(
+      formData,
+      client
+    );
+  };
+
   /**
    * Handles Support Ticket Reassignment Form
    * @param {object} client Slack Client Object
@@ -174,7 +215,7 @@ module.exports = function (logger) {
     view,
     body
   ) => {
-    function sendErrorMessageToUser() {
+    let sendErrorMessageToUser = () => {
       logic.handleError(
         client,
         "Hey there!  Sorry, I'm having some difficulties reassigning your ticket.  Please contact support.",
@@ -185,21 +226,12 @@ module.exports = function (logger) {
 
     logger.debug('handleReassignmentFormSubmission()');
 
-    const ticketId = payload.private_metadata;
+    const ticketId = payload.private_metadata,
+      team = await formSupport.extractReassignFormData(view),
+      { messageId, messageRow } = await sheets.getMessageByTicketId(ticketId);
 
-    logger.info(ticketId);
-
-    const team = await formSupport.extractReassignFormData(view);
-
-    logger.info(team);
-
-    sheets.updateAssignedTeamForMessage(ticketId, team.title);
-
-    const messageId = await sheets.getMessageByTicketId(ticketId);
-
+    await sheets.updateAssignedTeamForMessage(ticketId, team.title, messageRow);
     if (!messageId) return sendErrorMessageToUser();
-
-    logger.info(messageId);
 
     const message = await slack.getMessageById(
       client,
@@ -210,8 +242,6 @@ module.exports = function (logger) {
     if (!message) return sendErrorMessageToUser();
 
     const onCallUser = await routing.getOnCallUser(client, team.id);
-
-    logger.info(message);
 
     let blocks = message.blocks;
 
@@ -233,7 +263,7 @@ module.exports = function (logger) {
       },
     };
 
-    slack.updateMessageById(client, messageId, SUPPORT_CHANNEL_ID, blocks);
+    await slack.updateMessageById(client, messageId, SUPPORT_CHANNEL_ID, blocks);
   };
 
   logic.handleError = async (client, friendlyErrorMessage, channel, user) => {

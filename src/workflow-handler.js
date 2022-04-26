@@ -93,7 +93,6 @@ module.exports = function (app, logger) {
       const outputs = {};
 
       try {
-        logger.info(inputs);
         logger.info(`WORKFLOW STEP: execute - ${WORKFLOW_CALLBACK_ID}`);
 
         logic.postHelpMessageToUserOnly(

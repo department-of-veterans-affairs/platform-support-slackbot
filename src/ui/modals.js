@@ -119,10 +119,10 @@ const buildSupportModal = (user, teamOptions, topicOptions) => {
   };
 };
 
-const buildOnCallModal = (user, teamOptions) => {
+const buildOnSupportModal = (user, teamOptions, teamsText) => {
   return {
     type: 'modal',
-    callback_id: 'oncall_modal_view',
+    callback_id: 'onsupport_modal_view',
     submit: {
       type: 'plain_text',
       text: 'Submit',
@@ -135,7 +135,7 @@ const buildOnCallModal = (user, teamOptions) => {
     },
     title: {
       type: 'plain_text',
-      text: 'Who is on-call?',
+      text: 'Who is on support?',
       emoji: true,
     },
     blocks: [
@@ -143,7 +143,7 @@ const buildOnCallModal = (user, teamOptions) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `${teamOptions.map((team) => `${team.text}: ${team.onCallUser ? `<@${team.onCallUser}>` : team.slackGroup} \n`).join('')}`,
+          text: teamsText,
         },
       },
       {
@@ -180,17 +180,17 @@ const buildOnCallModal = (user, teamOptions) => {
         block_id: 'user',
         optional: true,
         element: {
-          type: 'users_select',
+          type: 'multi_users_select',
           placeholder: {
             type: 'plain_text',
-            text: 'Select a user',
+            text: 'Select user(s)',
             emoji: true,
           },
           action_id: 'selected',
         },
         label: {
           type: 'plain_text',
-          text: 'User',
+          text: 'User(s)',
           emoji: true,
         },
       },
@@ -255,6 +255,6 @@ const buildReassignmentModal = (options, ticketId) => {
 
 module.exports = {
   buildSupportModal,
-  buildOnCallModal,
+  buildOnSupportModal,
   buildReassignmentModal,
 };

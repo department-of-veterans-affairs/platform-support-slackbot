@@ -30,6 +30,22 @@ module.exports = function (logger) {
     });
   };
 
+
+/**
+   * Displays help (emphemeral) message to user. (Only visible to the user)
+   * @param {object} client Slack Client Object
+   * @param {string} teams Teams array from google sheet
+   */
+  logic.getTeamsAssignmentText = async(client, teams) => {
+    const textArray = await Promise.all(
+      teams.map( async (team) => {
+        let user = await routing.getOnCallUser(client, team.value)
+        return `${team.text}: ${user} \n`;
+      })
+    )
+    return textArray.join('');
+  }
+
   /**
    * Updates the timestamp of first reaction from user to a support ticket
    * @param {string} slackMessageId Slack Message Id
@@ -65,16 +81,18 @@ module.exports = function (logger) {
   };
 
   /**
-   * Displays on-call modal to the user.
+   * Displays on-support modal to the user.
    * @param {object} client Slack Client Object
    * @param {string} user Current User Id
    * @param {string} trigger_id Trigger Id to generate modal
    */
-  logic.displayOnCallModal = async (client, user, trigger_id) => {
-    logger.debug('displayOnCallModal()');
+  logic.displayOnSupportModal = async (client, user, trigger_id) => {
+    logger.debug('displayOnSupportModal()');
 
     const teamOptions = await sheets.getTeams();
-    const view = modalBuilder.buildOnCallModal(user, teamOptions);
+    const teamsText = await logic.getTeamsAssignmentText(client, teamOptions);
+
+    const view = modalBuilder.buildOnSupportModal(user, teamOptions, teamsText);
 
     const result = await client.views.open({
       trigger_id,
@@ -180,24 +198,24 @@ module.exports = function (logger) {
      * @param {object} body Slack Message Body
      * @param {object} view Slack View
      */
-  logic.handleOnCallFormSubmission = async (client, body, view) => {
-    logger.debug('handleOnCallFormSubmission()');
+  logic.handleOnSupportFormSubmission = async (client, body, view) => {
+    logger.debug('handleOnSupportFormSubmission()');
 
     // Ticket ID is used for reassignment button to reference
     // the slack message
     const ticketId = nanoid();
 
-    const formData = await formSupport.extractOnCallFormData(
+    const formData = await formSupport.extractOnSupportFormData(
       client,
       body,
       view
     );
-    await sheets.captureOnCall(
+    await sheets.captureOnSupport(
       formData.selectedTeam.id,
-      formData.user.selected.selected_user
+      formData.user.selected.selected_users.join(',')
     );
 
-    await formSupport.postOnCallMessage(
+    await formSupport.postOnSupportMessage(
       formData,
       client
     );
@@ -241,7 +259,7 @@ module.exports = function (logger) {
 
     if (!message) return sendErrorMessageToUser();
 
-    const onCallUser = await routing.getOnCallUser(client, team.id);
+    const onSupportUsers = await routing.getOnCallUser(client, team.id);
 
     let blocks = message.blocks;
 
@@ -249,7 +267,7 @@ module.exports = function (logger) {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*Assigned to: ${onCallUser}* (${team.display})`,
+        text: `*Assigned to: ${onSupportUsers}* (${team.display})`,
         verbatim: false,
       },
       accessory: {

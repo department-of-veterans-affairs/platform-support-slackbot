@@ -177,17 +177,17 @@ module.exports = function (app, logger) {
   });
 
 /**
-   * Command: /oncall
+   * Command: /on-support
    * Brings up the platform support request modal when someone
-   * types the /oncall command.
+   * types the /on-support command.
    */
- app.command('/oncall', async ({ ack, body, client }) => {
+ app.command('/on-support', async ({ ack, body, client }) => {
   try {
-    logger.info('COMMAND: /oncall');
+    logger.info('COMMAND: /on-support');
 
     await ack();
 
-    await logic.displayOnCallModal(
+    await logic.displayOnSupportModal(
       client,
       body.user_id,
       body.trigger_id
@@ -201,18 +201,18 @@ module.exports = function (app, logger) {
 
 
   /**
-   * Shortcut: oncall
-   * Brings up the platform on-call modal when someone
-   * clicks on the Platform On-call bot's shortcut in the app.
+   * Shortcut: onsupport
+   * Brings up the platform on support modal when someone
+   * clicks on the Platform on support bot's shortcut in the app.
    * (Note: Not the channel specific shortcut, the global one.)
    */
-   app.shortcut('oncall', async ({ shortcut, ack, client }) => {
+   app.shortcut('onsupport', async ({ shortcut, ack, client }) => {
     try {
       logger.info('SHORTCUT: support');
 
       await ack();
 
-      await logic.displayOnCallModal(
+      await logic.displayOnSupportModal(
         client,
         shortcut.user.id,
         shortcut.trigger_id
@@ -242,16 +242,16 @@ module.exports = function (app, logger) {
   });
 
     /**
-   * View: oncall_modal_view
-   * Handles the form submission when someone submits the oncall form.
+   * View: onsupport_modal_view
+   * Handles the form submission when someone submits the onsupport form.
    */
-     app.view('oncall_modal_view', async ({ ack, body, view, client }) => {
+     app.view('onsupport_modal_view', async ({ ack, body, view, client }) => {
       try {
-        logger.info('VIEW: oncall_modal_view (FORM SUBMISSION)');
+        logger.info('VIEW: onsupport_modal_view (FORM SUBMISSION)');
   
         await ack();
   
-        await logic.handleOnCallFormSubmission(client, body, view);
+        await logic.handleOnSupportFormSubmission(client, body, view);
       } catch (error) {
         logger.error(error);
       }

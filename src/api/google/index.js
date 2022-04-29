@@ -114,7 +114,7 @@ module.exports = function (logger) {
       return {
         text: row.Display,
         value: row.Id,
-        onCallUser: row.OnCallUser,
+        onSupportUsers: row.OnSupportUsers,
         slackGroup: row.SlackGroup
       };
     });
@@ -213,20 +213,20 @@ module.exports = function (logger) {
   };
 
   /**
-   * Capture form responses for on-call and saves them to the teams sheet
+   * Capture form responses for on-support and saves them to the teams sheet
    * @param {string} teamId Ticket Id
    * @param {string} userId Message Id
    */
-   sheets.captureOnCall = async (
+   sheets.captureOnSupport = async (
     teamId,
-    userId
+    userIds
   ) => {
     const sheet = await sheets.getTeamsSheet(),
           rows = await sheet.getRows(),
           row = rows.find((row) => row.Id === teamId);
 
     if (row) {
-      row.OnCallUser = userId || '';
+      row.OnSupportUsers = userIds || '';
       await row.save();
     } else if (!row) {
       logger.info(`Row not found for teamId: ${teamId}`);

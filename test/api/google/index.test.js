@@ -16,8 +16,8 @@ describe('api/google', () => {
     sinon.stub(sheets, 'getResponsesSheet').resolves(obj);
 
     sinon.stub(sheets, 'getTeamsSheetRows').resolves([
-      { Display: 'Frontend Tools', Id: 'FE', SlackGroup: '', OnCallUser: '' },
-      { Display: 'Backend Tools', Id: 'BE', SlackGroup: '', OnCallUser: '' },
+      { Display: 'Frontend Tools', Id: 'FE', SlackGroup: '', OnSupportUsers: '' },
+      { Display: 'Backend Tools', Id: 'BE', SlackGroup: '', OnSupportUsers: '' },
     ]);
 
     sinon.stub(sheets, 'getTopicsSheetRows').resolves([
@@ -38,8 +38,8 @@ describe('api/google', () => {
       const result = await sheets.getTeams();
 
       expect(result).to.eql([
-        { text: 'Backend Tools', value: 'BE', slackGroup: '', onCallUser: '' },
-        { text: 'Frontend Tools', value: 'FE', slackGroup: '', onCallUser: '' }
+        { text: 'Backend Tools', value: 'BE', slackGroup: '', onSupportUsers: '' },
+        { text: 'Frontend Tools', value: 'FE', slackGroup: '', onSupportUsers: '' }
       ]);
     });
   });
@@ -52,7 +52,7 @@ describe('api/google', () => {
         Display: 'Backend Tools',
         Id: 'BE',
         SlackGroup: '', 
-        OnCallUser: ''
+        OnSupportUsers: ''
       });
     });
 

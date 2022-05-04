@@ -41,23 +41,23 @@ const buildSupportResponse = (
   ];
 };
 
-const buildOnCallResponse = (
+const buildOnSupportResponse = async (
   userId,
-  teams
+  text
 ) => {
   return [
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*<@${userId}>* updated an on-call assignment:`,
+        text: `*<@${userId}>* updated a support assignment:`,
       },
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `${teams.map((team) => `${team.text}: ${team.onCallUser ? `<@${team.onCallUser}>` : team.slackGroup} \n`).join('')}`,
+        text: text,
       },
     },
   ];
@@ -105,5 +105,5 @@ const buildHelpResponse = (userId = null) => {
 module.exports = {
   buildSupportResponse,
   buildHelpResponse,
-  buildOnCallResponse
+  buildOnSupportResponse
 };

@@ -78,7 +78,7 @@ module.exports = function (logger) {
      * @param {object} view Slack View
      * @returns Form Data Object
      */
-  formSupport.extractOnCallFormData = async (client, body, view) => {
+  formSupport.extractOnSupportFormData = async (client, body, view) => {
     const { id, username } = body.user;
     const {
       team,
@@ -174,19 +174,21 @@ module.exports = function (logger) {
     };
   };
 
-  formSupport.postOnCallMessage = async (
+  formSupport.postOnSupportMessage = async (
     formData,
     client
   ) => {
+    const routing = require('../logic/index')(logger); 
     const teams = await sheets.getTeams();
+    const text = await routing.getTeamsAssignmentText(client, teams);
     const postedMessage = await client.chat.postMessage({
       channel: SUPPORT_CHANNEL_ID,
       link_names: 1,
-      blocks: responseBuilder.buildOnCallResponse(
+      blocks: await responseBuilder.buildOnSupportResponse(
         formData.submittedBy.id,
-        teams
+        text
       ),
-      text: `On-call assignments updated!`,
+      text: `On-support assignments updated!`,
       unfurl_links: false, // Remove Link Previews
     });
 

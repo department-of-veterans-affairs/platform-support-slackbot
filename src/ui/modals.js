@@ -163,7 +163,7 @@ const buildOnSupportModal = (user, teamOptions, teamsText) => {
           type: 'static_select',
           placeholder: {
             type: 'plain_text',
-            text: 'Select an team',
+            text: 'Select a team',
             emoji: true,
           },
           options: buildDropDown(teamOptions),

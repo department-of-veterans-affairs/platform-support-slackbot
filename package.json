@@ -12,6 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "@pagerduty/pdjs": "^2.2.2",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/github": "^8.0.4",
+    "@semantic-release/release-notes-generator": "^10.0.3",
     "@slack/bolt": "^3.3.0",
     "dotenv": "^8.2.0",
     "google-spreadsheet": "^3.1.15",
@@ -22,6 +25,7 @@
     "node-fetch": "^2.0",
     "pino": "^6.11.3",
     "pino-pretty": "^4.7.1",
+    "semantic-release": "^19.0.2",
     "ws": "^7.4.6"
   },
   "devDependencies": {
@@ -31,7 +35,7 @@
     "sinon": "^10.0.0"
   },
   "engines": {
-    "node": ">=14.15.0",
+    "node": ">=16.15.0",
     "yarn": ">=1.21.1"
   }
 }

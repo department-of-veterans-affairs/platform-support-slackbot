@@ -1,0 +1,49 @@
+name: Mirror support-slackbot images to ECR when versions.json/Dockerfile* changes
+
+on:
+  push:
+    paths:
+      - "versions.json"
+      - "Dockerfile"
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 1,15 * *'
+  workflow_dispatch:
+
+jobs:
+  prepare-build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Capture support slackbot image versions
+        id: componentVersions
+        run: |
+          echo "::set-output name=config::$(jq -c .components versions.json)"
+      - name: Upload versions file
+        uses: actions/upload-artifact@v2
+        with:
+          name: versions
+          path: versions.json
+    outputs:
+      config: ${{ steps.componentVersions.outputs.config }}
+
+  mirror:
+    runs-on: ubuntu-20.04
+    needs: prepare-build
+    strategy:
+      matrix:
+        versions: ${{ fromJson(needs.prepare-build.outputs.config) }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and push support-slackbot images to ECR
+        uses: kciter/aws-ecr-action@v4
+        with:
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          repo: dsva/platform-support-slackbot
+          region: us-gov-west-1
+          tags: "${{ matrix.versions['name']}}-${{ matrix.versions['version'] }}"
+          dockerfile: Dockerfile
+          extra_build_args: "--build-arg APP_VERSION=${{ matrix.versions['version'] }} --build-arg REPO=${{ matrix.versions['repo'] }}"

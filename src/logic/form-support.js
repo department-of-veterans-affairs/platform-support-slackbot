@@ -52,8 +52,8 @@ module.exports = function (logger) {
 
     const selectedTopic = topicData
       ? {
-        id: selectedTopicId,
-        name: topicData
+        id: topicData.Id,
+        name: topicData.Topic
       }
       : {};
 
@@ -157,6 +157,43 @@ module.exports = function (logger) {
       ),
       text: `Hey there ${oncallUser}, you have a new Platform Support ticket!`,
       unfurl_links: false, // Remove Link Previews
+    });
+
+    if (!postedMessage.ok) {
+      logger.error(`Unable to post message. ${JSON.stringify(postedMessage)}`);
+      return {
+        messageId: null,
+        channel: null,
+        error: 'Error Posting Message',
+      };
+    }
+
+    return {
+      messageId: postedMessage.ts,
+      channel: postedMessage.channel,
+    };
+  };
+
+  /**
+   * Post an automatic response to a support ticket
+   * @param {object} client Slack Client
+   * @param {string} thread The thread id
+   * @param {object} autoResponses An array of responses to post
+   * @returns Posted Message Id and Channel
+   */
+   formSupport.postAutoAnswerMessage = async (
+    client,
+    thread,
+    autoResponses
+  ) => {
+    const postedMessage = await client.chat.postMessage({
+      channel: SUPPORT_CHANNEL_ID,
+      thread_ts: thread,
+      blocks: responseBuilder.buildAutoAnswerResponse(
+        autoResponses
+      ),
+      text: `We found documentation that may help while you wait for a response!`,
+      unfurl_links: false, 
     });
 
     if (!postedMessage.ok) {

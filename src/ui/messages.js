@@ -41,6 +41,36 @@ const buildSupportResponse = (
   ];
 };
 
+
+const buildAutoAnswerResponse = (
+  autoAnswers
+) => {
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `:page_facing_up:  We found some documentation that may help.`,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: autoAnswers.map((answer) => `:point_right:  <${answer.link}|${answer.title}>`).join('\n'),
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `A support representative will respond shortly.`,
+      },
+    },
+  ];
+};
+
+
 const buildOnSupportResponse = async (
   userId,
   text
@@ -105,5 +135,6 @@ const buildHelpResponse = (userId = null) => {
 module.exports = {
   buildSupportResponse,
   buildHelpResponse,
-  buildOnSupportResponse
+  buildOnSupportResponse,
+  buildAutoAnswerResponse
 };

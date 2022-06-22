@@ -174,12 +174,15 @@ module.exports = function (logger) {
    * Reads the automatic answers from the responses google sheet returns an array of
    * automatic answers and associated values.
    * @param {topicId} optional restrict results to a topic
+   * @param {teamId} optional Used in conjunction with message to filter auto-answers
+   * @param {message} optional Used in conjunction with teamId to filter auto-answers
    * @returns Array of text/values
    */
    sheets.getAutoAnswers = async (topicId, teamId, message) => {
     let rows = await sheets.getAutoAnswerSheetRows(),
         answers = [];
 
+    // Search by keyword first to find most relevent answers
     if (teamId && message) {
         rows.filter((row) => {
           return row.TeamId === teamId; 
@@ -200,6 +203,7 @@ module.exports = function (logger) {
 
     }
 
+    // If no keyword results, just return the answers for the topic if there are any
     if (topicId && answers.length < 1) {
       rows.map((row) => {
         if (row.TopicId === topicId) answers.push(row);

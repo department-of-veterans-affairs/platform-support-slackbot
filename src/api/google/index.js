@@ -176,16 +176,37 @@ module.exports = function (logger) {
    * @param {topicId} optional restrict results to a topic
    * @returns Array of text/values
    */
-   sheets.getAutoAnswers = async (topicId) => {
-    let rows = await sheets.getAutoAnswerSheetRows();
+   sheets.getAutoAnswers = async (topicId, teamId, message) => {
+    let rows = await sheets.getAutoAnswerSheetRows(),
+        answers = [];
 
-    if (topicId) {
-      rows = rows.filter((row) => {
-        return row.TopicId === topicId;
+    if (teamId && message) {
+        rows.filter((row) => {
+          return row.TeamId === teamId; 
+        }).map((row) => {
+          let keywords = row.Keywords.split(','),
+              hasMatch = false;
+
+          keywords.forEach((keyword) => {
+            if (message.toLowerCase().indexOf(keyword.toLowerCase()) !== -1) {
+              hasMatch = true;
+            }
+          });
+
+          if (hasMatch) {
+            answers.push(row);
+          }
+        });
+
+    }
+
+    if (topicId && answers.length < 1) {
+      rows.map((row) => {
+        if (row.TopicId === topicId) answers.push(row);
       })
     }
 
-    const promises = await rows.map( async (row) => {
+    const promises = await answers.map( async (row) => {
       let title = await sheets.getPageTitle(row.Link);
       return {
         link: row.Link,

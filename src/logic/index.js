@@ -121,7 +121,7 @@ module.exports = function (logger) {
 
 
   logic.generateAutoAnswer = async(client, messageId, formData) => {
-    const autoAnswers = await sheets.getAutoAnswers(formData.selectedTopic.id);
+    const autoAnswers = await sheets.getAutoAnswers(formData.selectedTopic.id, formData.selectedTeam.id, formData.summaryDescription);
 
     if (autoAnswers.length > 0) {
       formSupport.postAutoAnswerMessage(client, messageId, autoAnswers);

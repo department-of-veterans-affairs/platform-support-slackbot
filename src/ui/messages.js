@@ -43,6 +43,7 @@ const buildSupportResponse = (
 
 
 const buildAutoAnswerResponse = (
+  ticketId,
   autoAnswers
 ) => {
   return [
@@ -66,6 +67,41 @@ const buildAutoAnswerResponse = (
         type: 'mrkdwn',
         text: `A support representative will respond shortly.`,
       },
+    },
+    {
+      type: 'divider',
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Did this help?`,
+      },
+    },{
+      type: 'actions',
+      elements: [{
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'Yes',
+        },
+        action_id: 'auto_answer_yes',
+        value: JSON.stringify({
+          value: 'yes',
+          ticketId,
+        })
+      },{
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'No',
+        },
+        action_id: 'auto_answer_no',
+        value: JSON.stringify({
+          value: 'no',
+          ticketId,
+        })
+      }]
     },
   ];
 };

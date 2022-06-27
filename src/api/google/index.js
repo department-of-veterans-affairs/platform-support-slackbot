@@ -70,6 +70,16 @@ module.exports = function (logger) {
     return doc.sheetsById[process.env.AUTO_ANSWER_SHEET_ID];
   };
 
+  /**
+   * Returns the Google Sheet containing the list of automatic answers and mappings
+   * @returns Auto Answer Sheet
+   */
+   sheets.getAnswerAnalyticsSheet = async () => {
+    const doc = await sheets.getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
+
+    // Return first tab
+    return doc.sheetsById[process.env.ANSWER_ANALYTICS_SHEET_ID];
+  };
 
   /**
    * Returns the Google Sheet collecting all form responses
@@ -293,6 +303,20 @@ module.exports = function (logger) {
       Summary: summaryDescription,
       MessageLink: messageLink,
     });
+  };
+
+  /**
+   * Capture analytic from user response to auto answer post
+   * @param {JSON} analytic Ticket Id and value
+   */
+   sheets.captureAnswerAnalytic = async (
+    analytic,
+  ) => {
+    const sheet = await sheets.getAnswerAnalyticsSheet();
+    await sheet.addRow({
+      TicketId: `msgId:${analytic.ticketId}`,
+      Helpful: analytic.value
+    })
   };
 
   /**

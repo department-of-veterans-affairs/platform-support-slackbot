@@ -190,6 +190,7 @@ module.exports = function (logger) {
       channel: SUPPORT_CHANNEL_ID,
       thread_ts: thread,
       blocks: responseBuilder.buildAutoAnswerResponse(
+        thread,
         autoResponses
       ),
       text: `We found documentation that may help while you wait for a response!`,

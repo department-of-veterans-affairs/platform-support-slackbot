@@ -204,6 +204,9 @@ module.exports = function (logger) {
 
   };
 
+  logic.recordAnswerAnalytic = async(client, value, trigger_id) => {
+    await sheets.captureAnswerAnalytic(JSON.parse(value));
+  }
 
   /**
      * Handles on-call form submission.

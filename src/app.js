@@ -34,8 +34,8 @@ workflowHandler(app, logger);
     res.writeHead(200, {'Content-Type': 'text/plain'});
     res.end('Hello, World!\n');
   });
-  server.listen(7172);
-  console.log('Server running on port 7172');
+  server.listen(process.env.PORT || 7172);
+  console.log(`Server running on port ${process.env.PORT || 7172}`);
   await app.start();
 
   logger.info('⚡️Platform Support Bot is running! ⚡️');

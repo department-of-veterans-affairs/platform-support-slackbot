@@ -41,6 +41,72 @@ const buildSupportResponse = (
   ];
 };
 
+
+const buildAutoAnswerResponse = (
+  ticketId,
+  autoAnswers
+) => {
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `:page_facing_up:  We found some documentation that may help.`,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: autoAnswers.map((answer) => `:point_right:  <${answer.link}|${answer.title}>`).join('\n'),
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `A support representative will respond shortly.`,
+      },
+    },
+    {
+      type: 'divider',
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Did this help?`,
+      },
+    },{
+      type: 'actions',
+      elements: [{
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'Yes',
+        },
+        action_id: 'auto_answer_yes',
+        value: JSON.stringify({
+          value: 'yes',
+          ticketId,
+        })
+      },{
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'No',
+        },
+        action_id: 'auto_answer_no',
+        value: JSON.stringify({
+          value: 'no',
+          ticketId,
+        })
+      }]
+    },
+  ];
+};
+
+
 const buildOnSupportResponse = async (
   userId,
   text
@@ -105,5 +171,6 @@ const buildHelpResponse = (userId = null) => {
 module.exports = {
   buildSupportResponse,
   buildHelpResponse,
-  buildOnSupportResponse
+  buildOnSupportResponse,
+  buildAutoAnswerResponse
 };

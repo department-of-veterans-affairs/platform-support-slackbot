@@ -1,5 +1,6 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const client_config = require('../../../google_client.json');
+const fetch = require('node-fetch');
 const moment = require('moment-timezone');
 
 module.exports = function (logger) {
@@ -59,6 +60,28 @@ module.exports = function (logger) {
   };
 
   /**
+   * Returns the Google Sheet containing the list of automatic answers and mappings
+   * @returns Auto Answer Sheet
+   */
+   sheets.getAutoAnswerSheet = async () => {
+    const doc = await sheets.getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
+
+    // Return first tab
+    return doc.sheetsById[process.env.AUTO_ANSWER_SHEET_ID];
+  };
+
+  /**
+   * Returns the Google Sheet containing the list of automatic answers and mappings
+   * @returns Auto Answer Sheet
+   */
+   sheets.getAnswerAnalyticsSheet = async () => {
+    const doc = await sheets.getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
+
+    // Return first tab
+    return doc.sheetsById[process.env.ANSWER_ANALYTICS_SHEET_ID];
+  };
+
+  /**
    * Returns the Google Sheet collecting all form responses
    * @returns Responses Sheet
    */
@@ -82,12 +105,21 @@ module.exports = function (logger) {
   };
 
    /**
-* Gets all rows for the Google Topics Sheet
+   * Gets all rows for the Google Topics Sheet
    * @returns Google Sheet Rows
    */
     sheets.getTopicsSheetRows = async () => {
       const sheet = await sheets.getTopicsSheet();
-      return await sheet.getCellsInRange('A1:A100');
+      return await sheet.getRows();
+    };
+
+    /**
+    * Gets all rows for the Google Auto Anser Sheet
+    * @returns Google Sheet Rows
+    */
+    sheets.getAutoAnswerSheetRows = async () => {
+      const sheet = await sheets.getAutoAnswerSheet();
+      return await sheet.getRows();
     };
 
   /**
@@ -120,22 +152,85 @@ module.exports = function (logger) {
     });
   };
 
-   /**
-   * Reads the topics from the responses google sheet returns an array of
-   * topics and associated values.
+  /**
+ * Reads the topics from the responses google sheet returns an array of
+ * topics and associated values.
+ * @returns Array of text/values
+ */
+  sheets.getTopics = async () => {
+    const rows = await sheets.getTopicsSheetRows();
+    return rows.sort((row1, row2) => {
+      return row1.Topic > row2.Topic ? 1 : row1.Topic < row2.Topic ? -1 : 0;
+    }).map((row, index) => {
+      return {
+        text: row.Topic,
+        value: row.Id,
+      };
+    });
+  };
+
+  /**
+   * fetches the url and returns the value of title from the html body
+   * @param {url} string the url of the page to be requested
+   * @returns String of HTML title from body
+   */
+  sheets.getPageTitle = async (url) => {
+    const response = await fetch(url);
+    const body = await response.text();
+    return body.split('<title>')[1].split('</title>')[0];
+  }
+
+  /**
+   * Reads the automatic answers from the responses google sheet returns an array of
+   * automatic answers and associated values.
+   * @param {topicId} optional restrict results to a topic
+   * @param {teamId} optional Used in conjunction with message to filter auto-answers
+   * @param {message} optional Used in conjunction with teamId to filter auto-answers
    * @returns Array of text/values
    */
-    sheets.getTopics = async () => {
-      const rows = await sheets.getTopicsSheetRows();
-      return rows.sort((row1, row2) => {
-        return row1 > row2 ? 1 : row1 < row2 ? -1 : 0;
-      }).map((row, index) => {
-        return {
-          text: row[0],
-          value: `${index + 1}`,
-        };
-      });
-    };
+   sheets.getAutoAnswers = async (topicId, teamId, message) => {
+    let rows = await sheets.getAutoAnswerSheetRows(),
+        answers = [];
+
+    // Search by keyword first to find most relevent answers
+    if (teamId && message) {
+        rows.filter((row) => {
+          return row.TeamId === teamId; 
+        }).map((row) => {
+          let keywords = row.Keywords.split(','),
+              hasMatch = false;
+
+          keywords.forEach((keyword) => {
+            if (message.toLowerCase().indexOf(keyword.toLowerCase()) !== -1) {
+              hasMatch = true;
+            }
+          });
+
+          if (hasMatch) {
+            answers.push(row);
+          }
+        });
+
+    }
+
+    // If no keyword results, just return the answers for the topic if there are any
+    if (topicId && answers.length < 1) {
+      rows.map((row) => {
+        if (row.TopicId === topicId) answers.push(row);
+      })
+    }
+
+    const promises = await answers.map( async (row) => {
+      let title = await sheets.getPageTitle(row.Link);
+      return {
+        link: row.Link,
+        topicId: row.TopicId,
+        title
+      };
+    });
+    const results = await Promise.all(promises);
+    return results;
+  };
 
   /**
    * Get team based on teamId (1-based index)
@@ -157,12 +252,10 @@ module.exports = function (logger) {
    */
    sheets.getTopicById = async (topicId) => {
     const rows = await sheets.getTopicsSheetRows();
-    const sortedRows = rows.sort((row1, row2) => {
-      return row1 > row2 ? 1 : row1 < row2 ? -1 : 0;
-    })
-    if (sortedRows.length < topicId) return null;
+    
+    if (rows.length < topicId) return null;
 
-    return sortedRows[topicId - 1][0];
+    return rows[topicId - 1];
   };
 
   /**
@@ -210,6 +303,20 @@ module.exports = function (logger) {
       Summary: summaryDescription,
       MessageLink: messageLink,
     });
+  };
+
+  /**
+   * Capture analytic from user response to auto answer post
+   * @param {JSON} analytic Ticket Id and value
+   */
+   sheets.captureAnswerAnalytic = async (
+    analytic,
+  ) => {
+    const sheet = await sheets.getAnswerAnalyticsSheet();
+    await sheet.addRow({
+      TicketId: `msgId:${analytic.ticketId}`,
+      Helpful: analytic.value
+    })
   };
 
   /**

@@ -239,7 +239,7 @@ module.exports = function (logger) {
    *       the right Message ID.
    * @param {string} messageId - Message ID in Google Sheet to be updated.
    */
-  sheets.updateReplyTimeStampForMessage = async (messageId) => {
+  sheets.updateReplyTimeStampForMessage = async (messageId, isReaction) => {
     const rows = await sheets.getResponseSheetRows();
 
     const row = rows.find((row) => row.MessageId === messageId);
@@ -251,7 +251,8 @@ module.exports = function (logger) {
         .tz(dateTime, 'America/New_York')
         .format('LLLL');
       await row.save();
-    } else if (!row) {
+    } else if (!row && !isReaction) {
+      // Reactions can be added to thread messages, which would require a request to get the original message. There is no need to log this. 
       logger.info(`Row not found for messageId: ${messageId}`);
     }
   };

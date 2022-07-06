@@ -50,7 +50,7 @@ module.exports = function (logger) {
    * Updates the timestamp of first reaction from user to a support ticket
    * @param {string} slackMessageId Slack Message Id
    */
-  logic.updateTimeStampOfSupportResponse = async (slackMessageId) => {
+  logic.updateTimeStampOfSupportResponse = async (slackMessageId, isReaction) => {
     logger.debug('updateTimeStampOfSupportResponse()');
 
     if (!slackMessageId) return;
@@ -58,7 +58,7 @@ module.exports = function (logger) {
     const messageIdString = util.stringifyMessageId(slackMessageId);
     logger.debug(`messageIdString: ${messageIdString}`);
 
-    sheets.updateReplyTimeStampForMessage(messageIdString);
+    sheets.updateReplyTimeStampForMessage(messageIdString, isReaction);
   };
 
   /**

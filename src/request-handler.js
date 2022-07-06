@@ -33,7 +33,7 @@ module.exports = function (app, logger) {
       logger.info('EVENT: reaction_added');
 
       // payload.item.ts is the associated message id of the emoji reaction
-      await logic.updateTimeStampOfSupportResponse(payload.item.ts);
+      await logic.updateTimeStampOfSupportResponse(payload.item.ts, true);
     } catch (error) {
       logger.error(error);
     }
@@ -60,13 +60,31 @@ module.exports = function (app, logger) {
    * Listens to any messages on the channel to determine if
    * the message is a reply to a support ticket.  If the reply
    * is the first reply, capture the current time of the reply.
+   * 
+   * If the message is not part of a thread, notify the user to use the /support command
    */
-  app.message('', async ({ message }) => {
+  app.message('', async ({ message, say, client }) => {
     try {
       logger.info('MESSAGE: *');
 
       // message.thread_ts only exists for replies
-      await logic.updateTimeStampOfSupportResponse(message.thread_ts);
+      if (message.thread_ts) {
+        await logic.updateTimeStampOfSupportResponse(message.thread_ts);
+      } else {
+        await client.chat.postEphemeral({
+          user: message.user, 
+          channel: message.channel,
+          text: 'Please use the `/support` command to submit a support request.',
+          parse: 'full',
+          blocks: [{
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: 'Please use the `/support` command to submit a support request. See <https://depo-platform-documentation.scrollhelp.site/support/getting-help-from-the-platform-in-slack|Getting help from the Platform in Slack> for more info.'
+            }
+          }] 
+        })
+      }
     } catch (error) {
       logger.error(error);
     }

@@ -1,0 +1,64 @@
+display_information:
+  name: Platform support
+  description: Need help from VA.gov platform support?
+  background_color: "#2c2d30"
+features:
+  bot_user:
+    display_name: Platform support
+    always_online: true
+  shortcuts:
+    - name: Need platform support?
+      type: global
+      callback_id: support
+      description: Need help from the VA.gov platform?
+    - name: On-Support
+      type: global
+      callback_id: onsupport
+      description: View and update who is on support
+  slash_commands:
+    - command: /support
+      description: Need help from platform?
+      should_escape: false
+    - command: /help
+      description: "Need help with the bot? "
+      should_escape: false
+    - command: /on-support
+      description: View and update support
+      should_escape: false
+  workflow_steps:
+    - name: Platform support request
+      callback_id: platform_support_request
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - channels:history
+      - channels:read
+      - chat:write
+      - commands
+      - groups:history
+      - groups:read
+      - im:history
+      - mpim:history
+      - reactions:read
+      - users:read
+      - users:read.email
+      - workflow.steps:execute
+      - pins:read
+      - pins:write
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+      - member_joined_channel
+      - message.channels
+      - message.groups
+      - message.im
+      - message.mpim
+      - reaction_added
+      - workflow_step_execute
+  interactivity:
+    is_enabled: true
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false

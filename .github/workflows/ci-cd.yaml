@@ -1,6 +1,9 @@
 name: support-bot
 on:
   push:
+    paths:
+      - "versions.json"
+      - "Dockerfile"
     branches:
       - master
 jobs:
@@ -8,7 +11,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
-    - uses: kciter/aws-ecr-action@v2
+    - uses: kciter/aws-ecr-action@v4
       with:
         access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

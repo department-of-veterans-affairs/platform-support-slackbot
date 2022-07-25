@@ -1,0 +1,127 @@
+name: Update manifests for support slackbot CNI
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      environments: 
+        description: "Provide a space delimited list of the cluster environments you would like to update wrapped in single quotes ex. 'dev' or 'dev staging sandbox'.  Avalable options -> dev, staging, sandbox, utility, prod sandbox"
+        required: true
+
+env:
+  autoDeployEnvs: 'dev'
+
+jobs:
+  prepare-values:
+    runs-on: ubuntu-20.04
+    outputs:
+      environments: ${{ steps.set-environments.outputs.environments }}
+    steps:
+      - name: Set to auto deploy environments when not run via workflow dispatch
+        if: github.event.inputs.environments == ''
+        run: |
+         echo "triggered via schedule"
+         echo "environments=${{ env.autoDeployEnvs }}" >> $GITHUB_ENV
+      - name: Set to environments specified in input when run via workflow dispatch
+        if: github.event.inputs.environments != ''
+        run: |
+          echo "triggered via workflow dispatch"
+          echo "environments=${{ github.event.inputs.environments }}" >> $GITHUB_ENV
+      - name: Set output
+        id: set-environments
+        run: |
+          echo "::set-output name=environments::${{ env.environments }}"
+  release:
+    needs: [prepare-values]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-gov-west-1"
+      - name: Log into ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Get bot token from Parameter Store
+        uses: marvinpinto/action-inject-ssm-secrets@latest
+        with:
+          ssm_parameter: /devops/VA_VSP_BOT_GITHUB_TOKEN
+          env_variable_name: VA_VSP_BOT_GITHUB_TOKEN
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ env.VA_VSP_BOT_GITHUB_TOKEN }}
+      - name: Install yq for updating yaml files
+        if: steps.semantic.outputs.new_release_published == 'true' || github.event.inputs.environments != ''
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
+          sudo add-apt-repository ppa:rmescandon/yq
+          sudo apt update
+          sudo apt install yq -y
+      - name: Install go for using k8split
+        uses: actions/setup-go@v2
+      - name: Set component versions as environment variables
+        run: |
+          for COMPONENT in $(cat versions.json | jq -r '.components | .[] | .name + "_version=" + (.version)')
+          do
+            echo "$COMPONENT" >> $GITHUB_ENV
+          done
+      - name: Check out Manifest Repo
+        uses: actions/checkout@v2
+        with:
+          repository: department-of-veterans-affairs/vsp-infra-application-manifests
+          token: ${{ env.VA_VSP_BOT_GITHUB_TOKEN }}
+          fetch-depth: 1
+          path: vsp-infra-application-manifests
+      - name: Update 
+        if: steps.semantic.outputs.new_release_published == 'true' || github.event.inputs.environments != ''
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: dsva/platform-support-slackbot
+        run: |
+          # ToDo: What is this and do we need it? 
+          cd vsp-infra-application-manifests/apps/platform-sre/support-slackbot
+          # Install k8split
+          go get -u github.com/brendanjryan/k8split
+          # Update support slack-bot manifests and images
+          envs=( ${{ needs.prepare-values.outputs.environments }} )
+          for env in ${envs[*]}; 
+          do
+            # Capture minor major/minor version
+            cni_minor_version=$( echo "${{ env.cni_version }}" | cut -d. -f1-2 )
+            # Pull manifest for given version
+            wget -O $env/support-slackbot-vxlan.yaml https://docs.projectcalico.org/archive/$cni_minor_version/manifests/calico-vxlan.yaml
+            # Run k8split in order to break up files
+            /home/runner/go/bin/k8split -o $env/ $env/calico-vxlan.yaml
+            # Remove unneeded manifest
+            rm $env/calico-vxlan.yaml
+            # Update image references
+            yq e -i '.spec.template.spec.containers.[0].image = "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:kube-controllers-${{ env.kube-controllers_version }}"' $env/deployment-calico-kube-controllers.yaml
+            yq e -i '.spec.template.spec.containers.[0].image = "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:node-${{ env.node_version }}"' $env/daemonset-calico-node.yaml
+            yq e -i '.spec.template.spec.initContainers.[0].image = "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cni-${{ env.cni_version }}"' $env/daemonset-calico-node.yaml
+            yq e -i '.spec.template.spec.initContainers.[1].image = "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cni-${{ env.cni_version }}"' $env/daemonset-calico-node.yaml
+            yq e -i '.spec.template.spec.initContainers.[2].image = "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:pod2daemon-flexvol-${{ env.pod2daemon-flexvol_version }}"' $env/daemonset-calico-node.yaml
+            # Add datadog prometheus scrape annotations to calico-node
+            yq e -i '.spec.template.metadata.annotations += {"prometheus.io/port": "9091", "prometheus.io/scrape": "true"}' $env/daemonset-calico-node.yaml
+            # Add datadog prometheus scape annotations to kube-controllers
+            yq e -i '.spec.template.metadata.annotations += {"prometheus.io/port": "9094", "prometheus.io/scrape": "true"}' $env/deployment-calico-kube-controllers.yaml
+            # Add env variable to enable prometheus endpoint on kube-controllers
+            yq e -i '.spec.template.spec.containers.[0].env += {"name": "FELIX_PROMETHEUSMETRICSENABLED", "value": "true"}' $env/daemonset-calico-node.yaml
+          done
+          git diff
+      - name: Add and Commit file
+        if: steps.semantic.outputs.new_release_published == 'true' || github.event.inputs.environments != ''
+        uses: EndBug/add-and-commit@v7
+        with:
+          add: '*'
+          cwd: vsp-infra-application-manifests/apps/platform-sre/support-slackbot
+          author_name: va-vsp-bot
+          author_email: devops@va.gov
+          message: 'auto update support-slackbot ${{ needs.prepare-values.outputs.environments }} manifests' 

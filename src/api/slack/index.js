@@ -66,21 +66,6 @@ module.exports = function (logger) {
   };
 
   /**
-   * Returns the support channel topic
-   * @param {object} client Slack Client Object
-   * @returns Channel Topic
-   */
-  slackApi.getChannelTopic = async (client) => {
-    logger.trace('getChannelTopic()');
-
-    const info = await client.conversations.info({
-      channel: SUPPORT_CHANNEL_ID,
-    });
-
-    return info.channel.topic.value;
-  };
-
-  /**
    * Returns a Slack Message Object by the Slack Message Id (Timestamp)
    * @param {object} client Slack Client Object
    * @param {string} messageId Slack Message Id (timestamp)

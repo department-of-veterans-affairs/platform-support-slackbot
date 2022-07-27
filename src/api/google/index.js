@@ -4,7 +4,8 @@ const moment = require('moment-timezone');
 const cacheLength = 86400000; // Cache for 1 day
 let teamsSheet,
     topicsSheet,
-    cacheTime
+    cacheTime,
+    googleSheets = {}
     
 
 module.exports = function (logger) {
@@ -19,24 +20,28 @@ module.exports = function (logger) {
    * @param {string} spreadsheetId
    * @returns Google Spreadsheet Instance
    */
-  sheets.getGoogleSheet = async (spreadsheetId) => {
-    const doc = new GoogleSpreadsheet(spreadsheetId);
+  sheets.getGoogleSheet = async (spreadsheetId, forceUpdate) => {
+    if (!googleSheets[spreadsheetId] || forceUpdate) {
+      const doc = new GoogleSpreadsheet(spreadsheetId),
+            // Authentication using Google Service Account
+            creds = {
+              "private_key_id": process.env.GOOGLE_PRIVATE_KEY_ID,
+              "private_key": process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+              "client_id": process.env.GOOGLE_CLIENT_ID
+            },
+            auth = {
+              ... client_config,
+              ... creds
+            };
+      await doc.useServiceAccountAuth(auth);
 
-    // Authentication using Google Service Account
-    const creds = {
-      "private_key_id": process.env.GOOGLE_PRIVATE_KEY_ID,
-      "private_key": process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      "client_id": process.env.GOOGLE_CLIENT_ID
-    };
-    const auth = {
-      ... client_config,
-      ... creds
-    };
-    await doc.useServiceAccountAuth(auth);
-
-    // loads document properties and worksheets
-    await doc.loadInfo();
-    return doc;
+      // loads document properties and worksheets
+      await doc.loadInfo();
+      googleSheets[spreadsheetId] = doc;
+      return doc;
+    } else {
+      return googleSheets[spreadsheetId];
+    }
   };
 
   /**
@@ -70,11 +75,11 @@ module.exports = function (logger) {
    * Returns the Google Sheet collecting all form responses
    * @returns Responses Sheet
    */
-  sheets.getResponsesSheet = async () => {
+  sheets.getResponsesSheet = async (forceUpdate) => {
     const doc = await sheets.getGoogleSheet(
-      process.env.RESPONSES_SPREADSHEET_ID
+      process.env.RESPONSES_SPREADSHEET_ID,
+      forceUpdate
     );
-
     // Return first tab
     return doc.sheetsByIndex[0];
   };
@@ -116,16 +121,20 @@ module.exports = function (logger) {
   sheets.getTeams = async () => {
     const rows = await sheets.getTeamsSheetRows();
 
-    return rows.map((row) => {
+    return rows.sort((row1, row2) => {
+      return row1.Display > row2.Display ? 1 : row1.Display < row2.Display ? -1 : 0;
+    }).map((row) => {
       return {
         text: row.Display,
         value: row.Id,
+        onSupportUsers: row.OnSupportUsers,
+        slackGroup: row.SlackGroup
       };
     });
   };
 
    /**
-   * Reads the topic Google Spreadsheet and returns an array of
+   * Reads the topics from the responses google sheet returns an array of
    * topics and associated values.
    * @returns Array of text/values
    */
@@ -193,15 +202,12 @@ module.exports = function (logger) {
     messageLink,
     dateTime = new Date()
   ) => {
-    const sheet = await sheets.getResponsesSheet();
-
-    const userList = usersRequestingSupport.join(', ');
-
-    const dateFormatted = moment
-      .tz(dateTime, 'America/New_York')
-      .format('LLLL');
-
-    const row = await sheet.addRow({
+    const sheet = await sheets.getResponsesSheet(),
+          userList = usersRequestingSupport.join(', '),
+          dateFormatted = moment
+            .tz(dateTime, 'America/New_York')
+            .format('LLLL');
+    sheet.addRow({
       TicketId: ticketId,
       MessageId: messageId,
       SubmittedBy: username,
@@ -214,6 +220,28 @@ module.exports = function (logger) {
       Summary: summaryDescription,
       MessageLink: messageLink,
     });
+    return;
+  };
+
+  /**
+   * Capture form responses for on-support and saves them to the teams sheet
+   * @param {string} teamId Ticket Id
+   * @param {string} userId Message Id
+   */
+   sheets.captureOnSupport = async (
+    teamId,
+    userIds
+  ) => {
+    const sheet = await sheets.getTeamsSheet(),
+          rows = await sheet.getRows(),
+          row = rows.find((row) => row.Id === teamId);
+
+    if (row) {
+      row.OnSupportUsers = userIds || '';
+      await row.save();
+    } else if (!row) {
+      //logger.info(`Row not found for teamId: ${teamId}`);
+    }
   };
 
   /**
@@ -235,7 +263,7 @@ module.exports = function (logger) {
         .format('LLLL');
       await row.save();
     } else if (!row) {
-      logger.info(`Row not found for messageId: ${messageId}`);
+      //logger.info(`Row not found for messageId: ${messageId}`);
     }
   };
 
@@ -245,10 +273,14 @@ module.exports = function (logger) {
    * @param {string} team updated team
    */
   sheets.updateAssignedTeamForMessage = async (ticketId, team, messageRow) => {
-    if (messageRow) {
-        messageRow.Team = team;
-        await messageRow.save();
+    if (!messageRow) { 
+      const rows = await sheets.getResponseSheetRows();
+      messageRow = rows.find((row) => row.TicketId === ticketId);
+    }
 
+    if (messageRow) {
+      messageRow.Team = team;
+      await messageRow.save();
     } else {
       const rows = await sheets.getResponseSheetRows(),
           row = rows.find((row) => row.TicketId === ticketId);
@@ -257,7 +289,7 @@ module.exports = function (logger) {
         row.Team = team;
         await row.save();
       } else {
-        logger.info(`Row not found for ticketId: ${ticketId}`);
+        //logger.info(`Row not found for ticketId: ${ticketId}`);
       }
     }
   };
@@ -270,7 +302,6 @@ module.exports = function (logger) {
   sheets.getMessageByTicketId = async (ticketId) => {
     const rows = await sheets.getResponseSheetRows(),
           row = rows.find((row) => row.TicketId === ticketId);
-
     return row ? {messageId: row.MessageId.replace('msgId:', ''), messageRow: row} : null;
   };
 

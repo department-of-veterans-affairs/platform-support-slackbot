@@ -7,15 +7,6 @@ module.exports = function (logger) {
   let routing = {};
 
   /**
-   * Parse Channel Topic and return Object Hash
-   * @param {object} client Slack Client
-   * @returns Parsed Routing Data from Channel Topic
-   */
-  routing.getRoutingFromChannelTopic = async (client) => {
-    return util.parseChannelTopic(await slack.getChannelTopic(client));
-  };
-
-  /**
    * Get Slack User from Pager Duty Schedule
    * @param {object} selectedTeam Selected Team Object
    * @returns Slack User from Pager Duty Schedule
@@ -25,7 +16,7 @@ module.exports = function (logger) {
       selectedTeam.PagerDutySchedule
     );
     if (!email) return null;
-    logger.info(`Found PagerDuty user email: ${email}`);
+    //logger.info(`Found PagerDuty user email: ${email}`);
     return await slack.getSlackUserByEmail(client, email);
   };
 
@@ -39,42 +30,38 @@ module.exports = function (logger) {
    * @param {string} selectedTeamId Selected Team Id
    * @returns On Call Slack User, null if unavailable.
    */
-  routing.getOnCallUser = async (client, selectedTeamId) => {
-    let oncallUser = null;
-
-    const selectedTeam = await sheets.getTeamById(selectedTeamId),
-          topicRouteData = await routing.getRoutingFromChannelTopic(client);
-          
-    if (topicRouteData) {
-      oncallUser = topicRouteData[selectedTeam.Title.toLowerCase()];
-      //logger.info(`Selected On-Call User: ${oncallUser} from Channel Topic`);
+  routing.getOnCallUser = async (client, selectedTeamId, selectedTeam) => {
+    if (!selectedTeam) {
+      selectedTeam = await sheets.getTeamById(selectedTeamId);
     }
+    
+    let oncallUsers =  selectedTeam.OnSupportUsers ? await selectedTeam.OnSupportUsers.split(',').map((user) => `<@${user}>`).join(', ') : null;
 
     // Check PagerDuty
-    if (!oncallUser) {
-      logger.info('User not found in Channel Topic.  Trying PagerDuty...');
+    if (!oncallUsers) {
+      //logger.info('User not found in Channel Topic.  Trying PagerDuty...');
 
       const user = await routing.getSlackUserForPagerDutySchedule(
         client,
         selectedTeam
       );
 
-      oncallUser = user ? `<@${user.userId}>` : null;
+      oncallUsers = user ? `<@${user.userId}>` : null;
 
-      if (oncallUser) {
-        //logger.info(`Selected On-Call User: ${oncallUser} from PagerDuty`);
+      if (oncallUsers) {
+        //logger.info(`Selected On-Call User: ${oncallUsers} from PagerDuty`);
       } else {
-        logger.info(`Unable to find slack user from Pager Duty...`);
+        //logger.info(`Unable to find slack user from Pager Duty...`);
       }
     }
 
     // Get Slack Group
-    if (!oncallUser) {
-      logger.info('User not found at PagerDuty.  Getting SlackGroup');
-      oncallUser = selectedTeam.SlackGroup;
+    if (!oncallUsers) {
+      //logger.info('User not found at PagerDuty.  Getting SlackGroup');
+      oncallUsers = selectedTeam.SlackGroup;
     }
 
-    return oncallUser;
+    return oncallUsers;
   };
 
   return routing;

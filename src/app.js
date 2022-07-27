@@ -18,11 +18,7 @@ const awsLambdaReceiver = new AwsLambdaReceiver({
 // Initializes bot with Slack API token and signing secret
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
-  socketMode: false,
-  appToken: process.env.SLACK_WEB_SOCKET_APP_TOKEN,
   receiver: awsLambdaReceiver,
-  processBeforeResponse: true
 });
 
 // Handles Slack Requests
@@ -30,6 +26,11 @@ requestHandler(app, logger);
 
 // Add Slack Workflow Middleware
 workflowHandler(app, logger);
+
+app.error((error) => {
+  console.error(JSON.stringify(error));
+  throw new Error(error.mesage);
+});
 
 /**
  * App Entry Point

@@ -19,7 +19,7 @@ module.exports = function (logger) {
    * @returns PagerDuty schedule instance
    */
   schedule._getScheduleForDate = async function (pd, scheduleId, date) {
-    logger.trace('getScheduleForDate()');
+    //logger.trace('getScheduleForDate()');
 
     const encodedDate = encodeURI(date.toISOString());
 
@@ -35,7 +35,7 @@ module.exports = function (logger) {
    * @returns PagerDuty user instance
    */
   schedule._getUserById = async function (pd, userId) {
-    logger.trace('getUserById()');
+    //logger.trace('getUserById()');
 
     return await pd.get(`/users/${userId}`);
   };
@@ -46,7 +46,7 @@ module.exports = function (logger) {
    * @returns
    */
   schedule.getOnCallPersonEmailForSchedule = async function (scheduleId) {
-    logger.trace('getOnCallPersonEmailForSchedule()');
+    //logger.trace('getOnCallPersonEmailForSchedule()');
 
     const api = this._getApiInstance(),
           currentDate = new Date(),

@@ -41,6 +41,28 @@ const buildSupportResponse = (
   ];
 };
 
+const buildOnSupportResponse = async (
+  userId,
+  text
+) => {
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*<@${userId}>* updated a support assignment:`,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: text,
+      },
+    },
+  ];
+};
+
 const buildHelpResponse = (userId = null) => {
   const user = userId == null ? '' : ` <@${userId}>`;
   return [
@@ -83,4 +105,5 @@ const buildHelpResponse = (userId = null) => {
 module.exports = {
   buildSupportResponse,
   buildHelpResponse,
+  buildOnSupportResponse
 };

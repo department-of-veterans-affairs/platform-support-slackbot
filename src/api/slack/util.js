@@ -26,33 +26,5 @@ module.exports = function (logger) {
     const updatedId = messageId.replace('.', '');
     return `https://${host}/archives/${channel}/p${updatedId}`;
   };
-
-  /**
-   * Parses Channel Topic
-   * @param {string} topic
-   * @returns Channel Oncall User Mapping
-   */
-  util.parseChannelTopic = (topic) => {
-    const formatKey = (key) => key.toLowerCase().trim();
-
-    const formatValue = (value) => {
-      const trimmed = value.trim();
-      const slackIdMatch = trimmed.match(/^(<@.+>)|(<!subteam\^.+\|@.+>)$/);
-      return slackIdMatch ? slackIdMatch[0] : null;
-    };
-
-    const supportList = topic
-      .split(/\r?\n/)
-      .filter((line) => line.match(/^.+:\s*<[@!].+>$/))
-      .map((line) => line.split(':'))
-      .map((ar) => {
-        return [formatKey(ar[0]), formatValue(ar[1])];
-      });
-
-    const onCall = Object.fromEntries(supportList);
-
-    return onCall;
-  };
-
   return util;
 };

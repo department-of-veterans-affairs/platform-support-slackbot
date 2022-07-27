@@ -119,7 +119,86 @@ const buildSupportModal = (user, teamOptions, topicOptions) => {
   };
 };
 
-const buildReassignmentModal = (options, ticketId) => {
+const buildOnSupportModal = (user, teamOptions, teamsText) => {
+  return {
+    type: 'modal',
+    callback_id: 'onsupport_modal_view',
+    submit: {
+      type: 'plain_text',
+      text: 'Submit',
+      emoji: true,
+    },
+    close: {
+      type: 'plain_text',
+      text: 'Cancel',
+      emoji: true,
+    },
+    title: {
+      type: 'plain_text',
+      text: 'Who is on support?',
+      emoji: true,
+    },
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: teamsText,
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*Update a team assignment*`,
+        },
+      },
+      {
+        type: 'input',
+        block_id: 'team',
+        element: {
+          type: 'static_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select a team',
+            emoji: true,
+          },
+          options: buildDropDown(teamOptions),
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'Team',
+          emoji: true,
+        },
+      },
+      {
+        type: 'input',
+        block_id: 'user',
+        optional: true,
+        element: {
+          type: 'multi_users_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select user(s)',
+            emoji: true,
+          },
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'User(s)',
+          emoji: true,
+        },
+      },
+    ],
+  };
+};
+
+const buildReassignmentModal = (options, ticketId, message) => {
   return {
     type: 'modal',
     callback_id: 'reassign_modal_view',
@@ -170,11 +249,15 @@ const buildReassignmentModal = (options, ticketId) => {
         },
       },
     ],
-    private_metadata: ticketId,
+    private_metadata: JSON.stringify({
+      ticketId,
+      message
+    })
   };
 };
 
 module.exports = {
   buildSupportModal,
+  buildOnSupportModal,
   buildReassignmentModal,
 };

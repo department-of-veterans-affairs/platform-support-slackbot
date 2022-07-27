@@ -1,0 +1,31 @@
+service: serverless-bolt-js
+useDotenv: true
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: nodejs14.x
+  environment:
+    SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
+    SLACK_WEB_SOCKET_APP_TOKEN: ${env:SLACK_WEB_SOCKET_APP_TOKEN}
+    SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+    SLACK_SUPPORT_CHANNEL: ${env:SLACK_SUPPORT_CHANNEL}
+    SLACK_SUPPORT_HOSTNAME: ${env:SLACK_SUPPORT_HOSTNAME}
+    TEAMS_SPREADSHEET_ID: ${env:TEAMS_SPREADSHEET_ID}
+    RESPONSES_SPREADSHEET_ID: ${env:RESPONSES_SPREADSHEET_ID}
+    TOPICS_SPREADSHEET_ID: ${env:TOPICS_SPREADSHEET_ID}
+    LOG_LEVEL: ${env:LOG_LEVEL}
+    PAGER_DUTY_API_KEY: ${env:PAGER_DUTY_API_KEY}
+    GOOGLE_CLIENT_ID: ${env:GOOGLE_CLIENT_ID}
+    GOOGLE_PRIVATE_KEY_ID: ${env:GOOGLE_PRIVATE_KEY_ID}
+    GOOGLE_PRIVATE_KEY: ${env:GOOGLE_PRIVATE_KEY}
+
+
+functions:
+  slack:
+    handler: src/app.handler
+    events:
+      - http:
+          path: slack/events
+          method: post
+plugins:
+  - serverless-offline

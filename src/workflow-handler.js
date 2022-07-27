@@ -21,7 +21,7 @@ module.exports = function (app, logger) {
       try {
         await ack();
 
-        logger.info(`WORKFLOW STEP: Edit - ${WORKFLOW_CALLBACK_ID}`);
+        //logger.info(`WORKFLOW STEP: Edit - ${WORKFLOW_CALLBACK_ID}`);
 
         const blocks = [
           {
@@ -61,7 +61,7 @@ module.exports = function (app, logger) {
       try {
         await ack();
 
-        logger.info(`WORKFLOW STEP: Save - ${WORKFLOW_CALLBACK_ID}`);
+        //logger.info(`WORKFLOW STEP: Save - ${WORKFLOW_CALLBACK_ID}`);
 
         const { values } = view.state;
         const username = values.user_input.value;
@@ -93,7 +93,7 @@ module.exports = function (app, logger) {
       const outputs = {};
 
       try {
-        logger.info(`WORKFLOW STEP: execute - ${WORKFLOW_CALLBACK_ID}`);
+        //logger.info(`WORKFLOW STEP: execute - ${WORKFLOW_CALLBACK_ID}`);
 
         logic.postHelpMessageToUserOnly(
           client,

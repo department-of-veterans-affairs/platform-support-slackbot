@@ -16,7 +16,7 @@ module.exports = function (logger) {
       selectedTeam.PagerDutySchedule
     );
     if (!email) return null;
-    logger.info(`Found PagerDuty user email: ${email}`);
+    //logger.info(`Found PagerDuty user email: ${email}`);
     return await slack.getSlackUserByEmail(client, email);
   };
 
@@ -30,13 +30,16 @@ module.exports = function (logger) {
    * @param {string} selectedTeamId Selected Team Id
    * @returns On Call Slack User, null if unavailable.
    */
-  routing.getOnCallUser = async (client, selectedTeamId) => {
-    const selectedTeam = await sheets.getTeamById(selectedTeamId);
-    let oncallUsers =  selectedTeam.OnSupportUsers ? selectedTeam.OnSupportUsers.split(',').map((user) => `<@${user}>`).join(', ') : null;
+  routing.getOnCallUser = async (client, selectedTeamId, selectedTeam) => {
+    if (!selectedTeam) {
+      selectedTeam = await sheets.getTeamById(selectedTeamId);
+    }
+    
+    let oncallUsers =  selectedTeam.OnSupportUsers ? await selectedTeam.OnSupportUsers.split(',').map((user) => `<@${user}>`).join(', ') : null;
 
     // Check PagerDuty
     if (!oncallUsers) {
-      logger.info('User not found in Channel Topic.  Trying PagerDuty...');
+      //logger.info('User not found in Channel Topic.  Trying PagerDuty...');
 
       const user = await routing.getSlackUserForPagerDutySchedule(
         client,
@@ -46,15 +49,15 @@ module.exports = function (logger) {
       oncallUsers = user ? `<@${user.userId}>` : null;
 
       if (oncallUsers) {
-        logger.info(`Selected On-Call User: ${oncallUsers} from PagerDuty`);
+        //logger.info(`Selected On-Call User: ${oncallUsers} from PagerDuty`);
       } else {
-        logger.info(`Unable to find slack user from Pager Duty...`);
+        //logger.info(`Unable to find slack user from Pager Duty...`);
       }
     }
 
     // Get Slack Group
     if (!oncallUsers) {
-      logger.info('User not found at PagerDuty.  Getting SlackGroup');
+      //logger.info('User not found at PagerDuty.  Getting SlackGroup');
       oncallUsers = selectedTeam.SlackGroup;
     }
 

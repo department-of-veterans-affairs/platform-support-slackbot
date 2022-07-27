@@ -16,46 +16,40 @@ module.exports = function (logger) {
    * @param {object} view Slack View
    * @returns Form Data Object
    */
-  formSupport.extractSupportFormData = async (client, body, view) => {
-    const { id, username } = body.user;
-    const {
-      users_requesting_support: users,
-      team,
-      topic,
-      summary,
-    } = view.state.values;
+  formSupport.extractSupportFormData = async (client, body, view, teamData) => {
+    const { id, username } = body.user,
+          {
+            users_requesting_support: users,
+            team,
+            topic,
+            summary,
+          } = view.state.values,
+          selectedTeamId = team.selected.selected_option.value,
+          selectedTopicId = topic.selected.selected_option.value;
+          whoNeedsSupportUserIds = users?.users?.selected_users ?? [],
+          summaryDescription = summary.value.value,
+          whoNeedsSupport = (
+            await slack.getSlackUsers(client, whoNeedsSupportUserIds)
+          ).map((user) => {
+            return { id: user.user.id, username: user.user.name };
+          }),
+          selectedTeam = teamData
+            ? {
+              id: selectedTeamId,
+              title: teamData.Title,
+              name: teamData.Display,
+              pagerDutySchedule: teamData.PagerDutySchedule,
+              slackGroup: teamData.SlackGroup,
+            }
+            : {},
 
-    const selectedTeamId = team.selected.selected_option.value;
-    const selectedTopicId = topic.selected.selected_option.value;
-    const whoNeedsSupportUserIds = users?.users?.selected_users ?? [];
-    const summaryDescription = summary.value.value;
-
-    const whoNeedsSupport = (
-      await slack.getSlackUsers(client, whoNeedsSupportUserIds)
-    ).map((user) => {
-      return { id: user.user.id, username: user.user.name };
-    });
-
-    const teamData = await sheets.getTeamById(selectedTeamId);
-
-    const selectedTeam = teamData
-      ? {
-        id: selectedTeamId,
-        title: teamData.Title,
-        name: teamData.Display,
-        pagerDutySchedule: teamData.PagerDutySchedule,
-        slackGroup: teamData.SlackGroup,
-      }
-      : {};
-
-    const topicData = await sheets.getTopicById(selectedTopicId);
-
-    const selectedTopic = topicData
-      ? {
-        id: selectedTopicId,
-        name: topicData
-      }
-      : {};
+          topicData = await sheets.getTopicById(selectedTopicId),
+          selectedTopic = topicData
+            ? {
+              id: selectedTopicId,
+              name: topicData
+            }
+            : {};
 
     return {
       submittedBy: {
@@ -79,24 +73,24 @@ module.exports = function (logger) {
      * @returns Form Data Object
      */
   formSupport.extractOnSupportFormData = async (client, body, view) => {
-    const { id, username } = body.user;
-    const {
-      team,
-      user
-    } = view.state.values;
+    const { id, username } = body.user,
+          {
+            team,
+            user
+          } = view.state.values
 
-    const selectedTeamId = team.selected.selected_option.value;
-    const teamData = await sheets.getTeamById(selectedTeamId);
+          selectedTeamId = team.selected.selected_option.value,
+          teamData = await sheets.getTeamById(selectedTeamId),
 
-    const selectedTeam = teamData
-      ? {
-        id: selectedTeamId,
-        title: teamData.Title,
-        name: teamData.Display,
-        pagerDutySchedule: teamData.PagerDutySchedule,
-        slackGroup: teamData.SlackGroup,
-      }
-      : {};
+          selectedTeam = teamData
+            ? {
+              id: selectedTeamId,
+              title: teamData.Title,
+              name: teamData.Display,
+              pagerDutySchedule: teamData.PagerDutySchedule,
+              slackGroup: teamData.SlackGroup,
+            }
+            : {};
 
 
     return {
@@ -116,11 +110,9 @@ module.exports = function (logger) {
    * @returns Selected Team Object
    */
   formSupport.extractReassignFormData = async (view) => {
-    const { topic } = view.state.values;
-
-    const selectedValue = topic.selected.selected_option.value;
-
-    const team = await sheets.getTeamById(selectedValue);
+    const { topic } = view.state.values,
+          selectedValue = topic.selected.selected_option.value,
+          team = await sheets.getTeamById(selectedValue);
 
     return {
       id: selectedValue,

@@ -198,7 +198,7 @@ const buildOnSupportModal = (user, teamOptions, teamsText) => {
   };
 };
 
-const buildReassignmentModal = (options, ticketId) => {
+const buildReassignmentModal = (options, ticketId, message) => {
   return {
     type: 'modal',
     callback_id: 'reassign_modal_view',
@@ -249,7 +249,10 @@ const buildReassignmentModal = (options, ticketId) => {
         },
       },
     ],
-    private_metadata: ticketId,
+    private_metadata: JSON.stringify({
+      ticketId,
+      message
+    })
   };
 };
 

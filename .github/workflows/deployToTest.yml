@@ -31,6 +31,6 @@ jobs:
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: us-east-1
+          aws_region: us-gov-west-1
           function_name: platform-sre-test-support-slackbot
           zip_file: bundle.zip

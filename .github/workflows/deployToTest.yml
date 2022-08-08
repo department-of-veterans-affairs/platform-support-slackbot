@@ -1,0 +1,36 @@
+name: Deploy To Test
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_source:
+    name: Deploy
+    strategy:
+      matrix:
+        node-version: [14.x]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          ref: convert-to-aws-lambda
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with: 
+          node-version: ${{ matrix.node-version }}
+      - name: Install
+        run: |
+          npm ci
+        env: 
+          CI: true
+      - name: Compress
+        uses: montudor/action-zip@v0.1.0
+        with:
+          args: zip -qq -r ./bundle.zip ./
+      - name: Execute Deploy
+        uses: appleboy/lambda-action@master
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          function_name: platform-sre-test-support-slackbot
+          zip_file: bindle.zip

@@ -54,19 +54,19 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
 // Add Slack Workflow Middleware
   workflowHandler(app, logger);
 
-  /**
-   * App Entry Point
-   */
-  (async () => {
-    console.log("ENTRY === here -- ")
-    let http = require('http');
-    let server = http.createServer(function (req, res) {
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('Hello, World!\n');
-    });
-    server.listen(7172);
-    console.log('Server running on port 7172');
-    await app.start();
+/**
+ * App Entry Point
+ */
+(async () => {
+  console.log("ENTRY === here -- ")
+  let http = require('http');
+  let server = http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Hello, World!\n');
+  });
+  server.listen(process.env.PORT || 7172);
+  console.log(`Server running on port ${process.env.PORT || 7172}`);
+  await app.start();
 
     logger.info('⚡️Platform Support Bot is running! ⚡️');
   })();

@@ -25,7 +25,7 @@ jobs:
       - name: Compress
         uses: montudor/action-zip@v0.1.0
         with:
-          args: zip -qq -r bundle.zip build
+          args: zip -qq -r ./bundle.zip ./
       - name: Execute Deploy
         uses: appleboy/lambda-action@master
         with:
@@ -33,4 +33,4 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
           function_name: platform-sre-test-support-slackbot
-          zip_file: build/bundle.zip
+          zip_file: bundle.zip

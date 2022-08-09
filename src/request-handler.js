@@ -112,6 +112,53 @@ module.exports = function (app, logger) {
     }
   });
 
+
+
+  /**
+   * Action: reassign_ticket
+   * This function gets called when the "Reassign Ticket" button
+   * is clicked on.  It brings up a reassign ticket modal.
+   */
+   app.action('auto_answer_yes', async ({ ack, body, client, payload }) => {
+    try {
+      logger.info('ACTION: auto_answer_yes');
+
+      await ack();
+
+      await logic.recordAnswerAnalytic(
+        client,
+        payload.value,
+        body.trigger_id
+      );
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
+
+  /**
+   * Action: reassign_ticket
+   * This function gets called when the "Reassign Ticket" button
+   * is clicked on.  It brings up a reassign ticket modal.
+   */
+   app.action('auto_answer_no', async ({ ack, body, client, payload }) => {
+    try {
+      logger.info('ACTION: auto_answer_no');
+
+      await ack();
+
+      await logic.recordAnswerAnalytic(
+        client,
+        payload.value,
+        body.trigger_id
+      );
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
+
+
   /* COMMAND LISTENERS */
 
   /**

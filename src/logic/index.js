@@ -119,6 +119,17 @@ module.exports = function (logger) {
     });
   };
 
+
+  logic.generateAutoAnswer = async(client, messageId, formData) => {
+    const autoAnswers = await sheets.getAutoAnswers(formData.selectedTopic.id, formData.selectedTeam.id, formData.summaryDescription);
+
+    if (autoAnswers.length > 0) {
+      formSupport.postAutoAnswerMessage(client, messageId, autoAnswers);
+    } else {
+      return;
+    }
+  }
+
   /**
    * Handles support form submission.
    * @param {object} client Slack Client Object
@@ -176,6 +187,8 @@ module.exports = function (logger) {
       messageLink
     );
 
+    await logic.generateAutoAnswer(client, messageData.messageId, formData);
+
     await fetch('https://sreautoanswer01.vercel.app/api/getanswer', {
       method: 'POST',
       headers: {
@@ -191,6 +204,9 @@ module.exports = function (logger) {
 
   };
 
+  logic.recordAnswerAnalytic = async(client, value, trigger_id) => {
+    await sheets.captureAnswerAnalytic(JSON.parse(value));
+  }
 
   /**
      * Handles on-call form submission.

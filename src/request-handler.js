@@ -137,10 +137,10 @@ module.exports = function (app, logger) {
    * This function gets called when the "Reassign Ticket" button
    * is clicked on.  It brings up a reassign ticket modal.
    */
-   app.action('auto_answer_yes', async ({ ack, body, client, payload }) => {
+   app.action('auto_answer_yes', async ({ ack, body, client, payload, respond }) => {
     try {
       logger.info('ACTION: auto_answer_yes');
-
+      
       await ack();
 
       await logic.recordAnswerAnalytic(
@@ -148,6 +148,15 @@ module.exports = function (app, logger) {
         payload.value,
         body.trigger_id
       );
+      let actions = body.message.blocks[5];
+      actions.type = 'section',
+      actions.text = {
+        type: 'mrkdwn',
+        text: `"Yes" response recorded \n\n Thank you for your feedback!`
+      }
+      delete actions.elements;
+
+      await respond(body.message)
     } catch (error) {
       logger.error(error);
     }
@@ -159,7 +168,7 @@ module.exports = function (app, logger) {
    * This function gets called when the "Reassign Ticket" button
    * is clicked on.  It brings up a reassign ticket modal.
    */
-   app.action('auto_answer_no', async ({ ack, body, client, payload }) => {
+   app.action('auto_answer_no', async ({ ack, body, client, payload, respond }) => {
     try {
       logger.info('ACTION: auto_answer_no');
 
@@ -170,6 +179,16 @@ module.exports = function (app, logger) {
         payload.value,
         body.trigger_id
       );
+
+      let actions = body.message.blocks[5];
+      actions.type = 'section',
+      actions.text = {
+        type: 'mrkdwn',
+        text: `"No" response recorded \n\n Thank you for your feedback!`
+      }
+      delete actions.elements;
+
+      await respond(body.message)
     } catch (error) {
       logger.error(error);
     }

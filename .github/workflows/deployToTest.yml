@@ -34,3 +34,4 @@ jobs:
           aws_region: us-gov-west-1
           function_name: platform-sre-test-support-slackbot
           zip_file: bundle.zip
+          role: arn:aws-us-gov:iam::008577686731:role/service-role/platform-sre-test-support-slackbot-role-vqp58t3t

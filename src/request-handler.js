@@ -67,23 +67,25 @@ module.exports = function (app, logger) {
     try {
       logger.info('MESSAGE: *');
 
-      // message.thread_ts only exists for replies
-      if (message.thread_ts) {
-        await logic.updateTimeStampOfSupportResponse(message.thread_ts);
-      } else {
-        await client.chat.postEphemeral({
-          user: message.user, 
-          channel: message.channel,
-          text: 'Please use the `/support` command to submit a support request.',
-          parse: 'full',
-          blocks: [{
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: 'Please use the `/support` command to submit a support request. See <https://depo-platform-documentation.scrollhelp.site/support/getting-help-from-the-platform-in-slack|Getting help from the Platform in Slack> for more info.'
-            }
-          }] 
-        })
+      if (message.channel === process.env.SLACK_CHANNEL) {
+        // message.thread_ts only exists for replies
+        if (message.thread_ts) {
+          await logic.updateTimeStampOfSupportResponse(message.thread_ts);
+        } else {
+          await client.chat.postEphemeral({
+            user: message.user, 
+            channel: message.channel,
+            text: 'Please use the `/support` command to submit a support request.',
+            parse: 'full',
+            blocks: [{
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: 'Please use the `/support` command to submit a support request. See <https://depo-platform-documentation.scrollhelp.site/support/getting-help-from-the-platform-in-slack|Getting help from the Platform in Slack> for more info.'
+              }
+            }] 
+          })
+        }
       }
     } catch (error) {
       logger.error(error);

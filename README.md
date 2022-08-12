@@ -90,6 +90,8 @@ To configure the Slackbot, the following environment variables are used:
 - **TEAMS_SPREADSHEET_ID** - The id of the Google sheet where teams and associated information is stored. This is for the team drop down selection. See below regarding how to get a Google sheet id.
 - **TOPICS_SPREADSHEET_ID** - The id of the sheet in the responses doc where topic are stored. This is for the topic drop down selection. This id can be found at the end of the URL when the Topics sheet is active ex. gid=`1990856050`.
 - **RESPONSES_SPREADSHEET_ID** - The id of the Google sheet where the responses are stored and written to. See below regarding how to get a Google sheet id.
+- **AUTO_ANSWER_SHEET_ID** - The id of the Google sheet that contains mappings for auto answering request tickets.
+- **ANSWER_ANALYTICS_SHEET_ID** - The id of the Google sheet that contains survey responses for if an auto-answer was helpful.
 - **LOG_LEVEL** - The level for application logs. See below for more details.
 - **PAGER_DUTY_API_KEY** - The API key to access data in the PagerDuty application.
 - **GOOGLE_CLIENT_ID** - Google Client Id used for accessing Google Sheets

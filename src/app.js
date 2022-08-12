@@ -6,7 +6,7 @@ const logger = require('pino')();
 logger.level = process.env.LOG_LEVEL || 'info';
 
 // Initialize Platform Support Slack Bot
-const { App } = require('@slack/bolt');
+const { App, AwsLambdaReceiver } = require('@slack/bolt');
 const requestHandler = require('./request-handler');
 const workflowHandler = require('./workflow-handler');
 
@@ -40,35 +40,36 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
 
 } else {
 
-// Initializes bot with Slack API token and signing secret
+  // Initializes bot with Slack API token and signing secret
+  const awsLambdaReceiver = new AwsLambdaReceiver({
+    signingSecret: process.env.SLACK_SIGNING_SECRET,
+    processBeforeResponse: true
+  });
+
+  // Initializes bot with Slack API token and signing secret
   const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
-    signingSecret: process.env.SLACK_SIGNING_SECRET,
-    socketMode: true,
-    appToken: process.env.SLACK_WEB_SOCKET_APP_TOKEN,
+    receiver: awsLambdaReceiver,
   });
 
-// Handles Slack Requests
+  // Handles Slack Requests
   requestHandler(app, logger);
 
-// Add Slack Workflow Middleware
+  // Add Slack Workflow Middleware
   workflowHandler(app, logger);
 
-/**
- * App Entry Point
- */
-(async () => {
-  console.log("ENTRY === here -- ")
-  let http = require('http');
-  let server = http.createServer(function (req, res) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end('Hello, World!\n');
+  app.error((error) => {
+    console.error(JSON.stringify(error));
+    throw new Error(error.mesage);
   });
-  server.listen(process.env.PORT || 7172);
-  console.log(`Server running on port ${process.env.PORT || 7172}`);
-  await app.start();
 
+  /**
+   * App Entry Point
+   */
+  module.exports.handler = async (event, context, callback) => {
+    context.callbackWaitsForEmptyEventLoop = true;
+    const handler = await awsLambdaReceiver.start();
     logger.info('⚡️Platform Support Bot is running! ⚡️');
-  })();
-
+    return await handler(event, context, callback);
+  }
 }

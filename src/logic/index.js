@@ -50,15 +50,15 @@ module.exports = (logger) => {
    * Updates the timestamp of first reaction from user to a support ticket
    * @param {string} slackMessageId Slack Message Id
    */
-  logic.updateTimeStampOfSupportResponse = async (slackMessageId) => {
-    //logger.debug('updateTimeStampOfSupportResponse()');
+  logic.updateTimeStampOfSupportResponse = async (slackMessageId, isReaction) => {
+    logger.debug('updateTimeStampOfSupportResponse()');
 
     if (!slackMessageId) return;
 
     const messageIdString = util.stringifyMessageId(slackMessageId);
     //logger.debug(`messageIdString: ${messageIdString}`);
 
-    await sheets.updateReplyTimeStampForMessage(messageIdString);
+    sheets.updateReplyTimeStampForMessage(messageIdString, isReaction);
   };
 
   /**
@@ -117,6 +117,17 @@ module.exports = (logger) => {
       view,
     });
   };
+
+
+  logic.generateAutoAnswer = async(client, messageId, formData) => {
+    const autoAnswers = await sheets.getAutoAnswers(formData.selectedTopic.id, formData.selectedTeam.id, formData.summaryDescription);
+
+    if (autoAnswers.length > 0) {
+      formSupport.postAutoAnswerMessage(client, messageId, autoAnswers);
+    } else {
+      return;
+    }
+  }
 
   /**
    * Handles support form submission.
@@ -179,7 +190,9 @@ module.exports = (logger) => {
       formData.summaryDescription,
       messageLink
     );
-    sheets.getResponsesSheet(true)
+
+    await logic.generateAutoAnswer(client, messageData.messageId, formData);
+
     /*await fetch('https://sreautoanswer01.vercel.app/api/getanswer', {
       method: 'POST',
       headers: {
@@ -196,6 +209,9 @@ module.exports = (logger) => {
 
   };
 
+  logic.recordAnswerAnalytic = async(client, value, trigger_id) => {
+    await sheets.captureAnswerAnalytic(JSON.parse(value));
+  }
 
   /**
      * Handles on-call form submission.

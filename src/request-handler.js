@@ -33,7 +33,7 @@ module.exports = function (app, logger) {
       //logger.info('EVENT: reaction_added');
 
       // payload.item.ts is the associated message id of the emoji reaction
-      await logic.updateTimeStampOfSupportResponse(payload.item.ts);
+      await logic.updateTimeStampOfSupportResponse(payload.item.ts, true);
     } catch (error) {
       logger.error(error);
     }
@@ -60,13 +60,33 @@ module.exports = function (app, logger) {
    * Listens to any messages on the channel to determine if
    * the message is a reply to a support ticket.  If the reply
    * is the first reply, capture the current time of the reply.
+   * 
+   * If the message is not part of a thread, notify the user to use the /support command
    */
-  app.message('', async ({ message }) => {
+  app.message('', async ({ message, say, client }) => {
     try {
       //logger.info('MESSAGE: *');
 
-      // message.thread_ts only exists for replies
-      await logic.updateTimeStampOfSupportResponse(message.thread_ts);
+      if (message.channel === process.env.SLACK_CHANNEL) {
+        // message.thread_ts only exists for replies
+        if (message.thread_ts) {
+          await logic.updateTimeStampOfSupportResponse(message.thread_ts);
+        } else {
+          await client.chat.postEphemeral({
+            user: message.user, 
+            channel: message.channel,
+            text: 'Please use the `/support` command to submit a support request.',
+            parse: 'full',
+            blocks: [{
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: 'Please use the `/support` command to submit a support request. See <https://depo-platform-documentation.scrollhelp.site/support/getting-help-from-the-platform-in-slack|Getting help from the Platform in Slack> for more info.'
+              }
+            }] 
+          })
+        }
+      }
     } catch (error) {
       logger.error(error);
     }
@@ -110,6 +130,72 @@ module.exports = function (app, logger) {
       logger.error(error);
     }
   });
+
+
+
+  /**
+   * Action: reassign_ticket
+   * This function gets called when the "Reassign Ticket" button
+   * is clicked on.  It brings up a reassign ticket modal.
+   */
+   app.action('auto_answer_yes', async ({ ack, body, client, payload, respond }) => {
+    try {
+      logger.info('ACTION: auto_answer_yes');
+      
+      await ack();
+
+      await logic.recordAnswerAnalytic(
+        client,
+        payload.value,
+        body.trigger_id
+      );
+      let actions = body.message.blocks[5];
+      actions.type = 'section',
+      actions.text = {
+        type: 'mrkdwn',
+        text: `"Yes" response recorded \n\n Thank you for your feedback!`
+      }
+      delete actions.elements;
+
+      await respond(body.message)
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
+
+  /**
+   * Action: reassign_ticket
+   * This function gets called when the "Reassign Ticket" button
+   * is clicked on.  It brings up a reassign ticket modal.
+   */
+   app.action('auto_answer_no', async ({ ack, body, client, payload, respond }) => {
+    try {
+      logger.info('ACTION: auto_answer_no');
+
+      await ack();
+
+      await logic.recordAnswerAnalytic(
+        client,
+        payload.value,
+        body.trigger_id
+      );
+
+      let actions = body.message.blocks[5];
+      actions.type = 'section',
+      actions.text = {
+        type: 'mrkdwn',
+        text: `"No" response recorded \n\n Thank you for your feedback!`
+      }
+      delete actions.elements;
+
+      await respond(body.message)
+    } catch (error) {
+      logger.error(error);
+    }
+  });
+
+
 
   /* COMMAND LISTENERS */
 
@@ -229,7 +315,7 @@ module.exports = function (app, logger) {
    * form.
    */
   app.view('support_modal_view', async ({ ack, body, view, client }) => {
-    
+    await ack();
     try {
       //logger.info('VIEW: support_modal_view (FORM SUBMISSION)');
 
@@ -238,7 +324,7 @@ module.exports = function (app, logger) {
     } catch (error) {
       logger.error(error);
     }
-    await ack();
+    
   });
 
     /**

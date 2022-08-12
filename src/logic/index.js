@@ -5,12 +5,12 @@ const fetch = require('node-fetch');
 const SUPPORT_HOST = process.env.SLACK_SUPPORT_HOSTNAME;
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
-module.exports = function (logger) {
-  const sheets = require('../api/google')(logger);
-  const util = require('../api/slack/util')(logger);
-  const slack = require('../api/slack')(logger);
-  const formSupport = require('./form-support')(logger);
-  const routing = require('./routing')(logger);
+module.exports = (logger) => {
+  const sheets = require('../api/google')(logger),
+        util = require('../api/slack/util')(logger),
+        slack = require('../api/slack')(logger),
+        formSupport = require('./form-support')(logger),
+        routing = require('./routing')(logger);
 
   let logic = {};
 
@@ -21,7 +21,7 @@ module.exports = function (logger) {
    * @param {string} user Slack User Id
    */
   logic.postHelpMessageToUserOnly = async (client, channel, user) => {
-    logger.debug('postHelpMessageToUserOnly()');
+    //logger.debug('postHelpMessageToUserOnly()');
 
     await client.chat.postEphemeral({
       channel: channel,
@@ -56,7 +56,7 @@ module.exports = function (logger) {
     if (!slackMessageId) return;
 
     const messageIdString = util.stringifyMessageId(slackMessageId);
-    logger.debug(`messageIdString: ${messageIdString}`);
+    //logger.debug(`messageIdString: ${messageIdString}`);
 
     sheets.updateReplyTimeStampForMessage(messageIdString, isReaction);
   };
@@ -68,7 +68,7 @@ module.exports = function (logger) {
    * @param {string} trigger_id Trigger Id to generate modal
    */
   logic.displaySupportModal = async (client, user, trigger_id) => {
-    logger.debug('displaySupportModal()');
+    //logger.debug('displaySupportModal()');
 
     const teamOptions = await sheets.getTeams();
     const topicOptions = await sheets.getTopics();
@@ -87,7 +87,7 @@ module.exports = function (logger) {
    * @param {string} trigger_id Trigger Id to generate modal
    */
   logic.displayOnSupportModal = async (client, user, trigger_id) => {
-    logger.debug('displayOnSupportModal()');
+    //logger.debug('displayOnSupportModal()');
 
     const teamOptions = await sheets.getTeams();
     const teamsText = await logic.getTeamsAssignmentText(client, teamOptions);
@@ -106,12 +106,11 @@ module.exports = function (logger) {
    * @param {string} ticketId Nanoid generated ticket Id to be used to reference Google Sheet
    * @param {string} trigger_id Trigger Id to generate modal
    */
-  logic.displayReassignmentModal = async (client, ticketId, trigger_id) => {
-    logger.debug('displayReassignmentModal()');
+  logic.displayReassignmentModal = async (client, ticketId, trigger_id, message) => {
+    //logger.debug('displayReassignmentModal()');
 
     const options = await sheets.getTeams();
-
-    const view = modalBuilder.buildReassignmentModal(options, ticketId);
+    const view = modalBuilder.buildReassignmentModal(options, ticketId, message);
 
     const result = await client.views.open({
       trigger_id,
@@ -137,45 +136,50 @@ module.exports = function (logger) {
    * @param {object} view Slack View
    */
   logic.handleSupportFormSubmission = async (client, body, view) => {
-    logger.debug('handleSupportFormSubmission()');
+    //logger.debug('handleSupportFormSubmission()');
 
     // Ticket ID is used for reassignment button to reference
     // the slack message
-    const ticketId = nanoid();
+    const ticketId = nanoid(),
+          {
+            team,
+          } = view.state.values,
+          selectedTeamId = team.selected.selected_option.value,
+          teamData = await sheets.getTeamById(selectedTeamId),
+          formData = await formSupport.extractSupportFormData(
+            client,
+            body,
+            view,
+            teamData
+          ),
 
-    const formData = await formSupport.extractSupportFormData(
-      client,
-      body,
-      view
-    );
+          oncalluser = await routing.getOnCallUser(
+            client,
+            formData.selectedTeam.id,
+            teamData
+          ),
 
-    const oncalluser = await routing.getOnCallUser(
-      client,
-      formData.selectedTeam.id
-    );
+          messageData = await formSupport.postSupportTicketMessage(
+            client,
+            ticketId,
+            formData,
+            oncalluser
+          ),
 
-    const messageData = await formSupport.postSupportTicketMessage(
-      client,
-      ticketId,
-      formData,
-      oncalluser
-    );
-
-    const messageLink = util.createMessageLink(
-      SUPPORT_HOST,
-      messageData.channel,
-      messageData.messageId
-    );
+          messageLink = util.createMessageLink(
+            SUPPORT_HOST,
+            messageData.channel,
+            messageData.messageId
+          ),
 
     // Slack uses a numeric timestamp (double) for a message id. Saving the value
     // into Google Sheets is problematic as it tries to truncate values. Converting
     // the message id to a string value prevents Google Sheets from modifying the
     // message id.
-    const messageIdString = util.stringifyMessageId(messageData.messageId);
+          messageIdString = util.stringifyMessageId(messageData.messageId);
 
-    logger.debug(`Posted Message ID: ${messageData.messageId}`);
-    logger.debug(`Posted Message ID Hashed: ${messageIdString}`);
-
+    //logger.debug(`Posted Message ID: ${messageData.messageId}`);
+    //logger.debug(`Posted Message ID Hashed: ${messageIdString}`);
     await sheets.captureResponses(
       ticketId,
       messageIdString,
@@ -189,7 +193,7 @@ module.exports = function (logger) {
 
     await logic.generateAutoAnswer(client, messageData.messageId, formData);
 
-    await fetch('https://sreautoanswer01.vercel.app/api/getanswer', {
+    /*await fetch('https://sreautoanswer01.vercel.app/api/getanswer', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -200,7 +204,8 @@ module.exports = function (logger) {
         messageLink,
         ...formData
       })
-    })
+    })*/
+    return;
 
   };
 
@@ -215,18 +220,17 @@ module.exports = function (logger) {
      * @param {object} view Slack View
      */
   logic.handleOnSupportFormSubmission = async (client, body, view) => {
-    logger.debug('handleOnSupportFormSubmission()');
+    //logger.debug('handleOnSupportFormSubmission()');
 
     // Ticket ID is used for reassignment button to reference
     // the slack message
-    const ticketId = nanoid();
-
     const formData = await formSupport.extractOnSupportFormData(
       client,
       body,
       view
     );
-    await sheets.captureOnSupport(
+
+    sheets.captureOnSupport(
       formData.selectedTeam.id,
       formData.user.selected.selected_users.join(',')
     );
@@ -240,12 +244,11 @@ module.exports = function (logger) {
   /**
    * Handles Support Ticket Reassignment Form
    * @param {object} client Slack Client Object
-   * @param {object} payload Slack Payload Object
    * @param {object} view Slack View Object
+   * @param {object} body Slack Body Object
    */
   logic.handleReassignmentFormSubmission = async (
     client,
-    payload,
     view,
     body
   ) => {
@@ -257,21 +260,11 @@ module.exports = function (logger) {
         body.user.id
       );
     }
-
-    logger.debug('handleReassignmentFormSubmission()');
-
-    const ticketId = payload.private_metadata,
-      team = await formSupport.extractReassignFormData(view),
-      { messageId, messageRow } = await sheets.getMessageByTicketId(ticketId);
-
-    await sheets.updateAssignedTeamForMessage(ticketId, team.title, messageRow);
-    if (!messageId) return sendErrorMessageToUser();
-
-    const message = await slack.getMessageById(
-      client,
-      messageId,
-      SUPPORT_CHANNEL_ID
-    );
+    //logger.debug('handleReassignmentFormSubmission()');
+    const { message, ticketId} = JSON.parse(body.view.private_metadata),
+          team = await formSupport.extractReassignFormData(view);
+    
+    let sheetMessage;
 
     if (!message) return sendErrorMessageToUser();
 
@@ -297,7 +290,9 @@ module.exports = function (logger) {
       },
     };
 
-    await slack.updateMessageById(client, messageId, SUPPORT_CHANNEL_ID, blocks);
+    await slack.updateMessageById(client, message.ts, SUPPORT_CHANNEL_ID, blocks);
+
+    sheets.updateAssignedTeamForMessage(ticketId, team.title);
   };
 
   logic.handleError = async (client, friendlyErrorMessage, channel, user) => {

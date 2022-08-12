@@ -11,7 +11,7 @@ module.exports = function (app, logger) {
    */
   app.event('app_mention', async ({ client, payload }) => {
     try {
-      logger.info('EVENT: app_mention');
+      //logger.info('EVENT: app_mention');
 
       await logic.postHelpMessageToUserOnly(
         client,
@@ -30,7 +30,7 @@ module.exports = function (app, logger) {
    */
   app.event('reaction_added', async ({ payload }) => {
     try {
-      logger.info('EVENT: reaction_added');
+      //logger.info('EVENT: reaction_added');
 
       // payload.item.ts is the associated message id of the emoji reaction
       await logic.updateTimeStampOfSupportResponse(payload.item.ts, true);
@@ -45,7 +45,7 @@ module.exports = function (app, logger) {
    */
   app.event('member_joined_channel', async ({ event, client }) => {
     try {
-      logger.info('EVENT: member_joined_channel');
+      //logger.info('EVENT: member_joined_channel');
 
       await logic.postHelpMessageToUserOnly(client, event.channel, event.user);
     } catch (error) {
@@ -65,7 +65,7 @@ module.exports = function (app, logger) {
    */
   app.message('', async ({ message, say, client }) => {
     try {
-      logger.info('MESSAGE: *');
+      //logger.info('MESSAGE: *');
 
       if (message.channel === process.env.SLACK_CHANNEL) {
         // message.thread_ts only exists for replies
@@ -101,7 +101,7 @@ module.exports = function (app, logger) {
    */
   app.action('platform_support', async ({ ack, body, client }) => {
     try {
-      logger.info('ACTION: platform_support');
+      //logger.info('ACTION: platform_support');
 
       await ack();
 
@@ -118,15 +118,14 @@ module.exports = function (app, logger) {
    */
   app.action('reassign_ticket', async ({ ack, body, client, payload }) => {
     try {
-      logger.info('ACTION: reassign_ticket');
-
-      await ack();
-
+      //logger.info('ACTION: reassign_ticket');
       await logic.displayReassignmentModal(
         client,
         payload.value,
-        body.trigger_id
+        body.trigger_id,
+        body.message
       );
+      await ack();
     } catch (error) {
       logger.error(error);
     }
@@ -207,7 +206,7 @@ module.exports = function (app, logger) {
    */
   app.command('/help', async ({ ack, body, client }) => {
     try {
-      logger.info('COMMAND: /help');
+      //logger.info('COMMAND: /help');
 
       await ack();
 
@@ -228,7 +227,7 @@ module.exports = function (app, logger) {
    */
   app.command('/support', async ({ ack, body, client }) => {
     try {
-      logger.info('COMMAND: /support');
+      //logger.info('COMMAND: /support');
 
       await ack();
 
@@ -248,7 +247,7 @@ module.exports = function (app, logger) {
    */
   app.shortcut('support', async ({ shortcut, ack, client }) => {
     try {
-      logger.info('SHORTCUT: support');
+      //logger.info('SHORTCUT: support');
 
       await ack();
 
@@ -269,7 +268,7 @@ module.exports = function (app, logger) {
    */
  app.command('/on-support', async ({ ack, body, client }) => {
   try {
-    logger.info('COMMAND: /on-support');
+    //logger.info('COMMAND: /on-support');
 
     await ack();
 
@@ -294,7 +293,7 @@ module.exports = function (app, logger) {
    */
    app.shortcut('onsupport', async ({ shortcut, ack, client }) => {
     try {
-      logger.info('SHORTCUT: support');
+      //logger.info('SHORTCUT: support');
 
       await ack();
 
@@ -316,15 +315,16 @@ module.exports = function (app, logger) {
    * form.
    */
   app.view('support_modal_view', async ({ ack, body, view, client }) => {
+    await ack();
     try {
-      logger.info('VIEW: support_modal_view (FORM SUBMISSION)');
-
-      await ack();
+      //logger.info('VIEW: support_modal_view (FORM SUBMISSION)');
 
       await logic.handleSupportFormSubmission(client, body, view);
+
     } catch (error) {
       logger.error(error);
     }
+    
   });
 
     /**
@@ -332,11 +332,9 @@ module.exports = function (app, logger) {
    * Handles the form submission when someone submits the onsupport form.
    */
      app.view('onsupport_modal_view', async ({ ack, body, view, client }) => {
+      await ack();
       try {
-        logger.info('VIEW: onsupport_modal_view (FORM SUBMISSION)');
-  
-        await ack();
-  
+        //logger.info('VIEW: onsupport_modal_view (FORM SUBMISSION)');
         await logic.handleOnSupportFormSubmission(client, body, view);
       } catch (error) {
         logger.error(error);
@@ -348,15 +346,11 @@ module.exports = function (app, logger) {
    * Handles the form submission when someone submits the reassigns
    * a ticket
    */
-  app.view(
-    'reassign_modal_view',
-    async ({ ack, payload, client, view, body }) => {
+  app.view('reassign_modal_view', async ({ ack, body, view, client }) => {
+      await ack();
       try {
-        logger.info('VIEW: reassign_modal_view (FORM SUBMISSION)');
-
-        await ack();
-
-        await logic.handleReassignmentFormSubmission(client, payload, view, body);
+        //logger.info('VIEW: reassign_modal_view (FORM SUBMISSION)');
+        await logic.handleReassignmentFormSubmission(client, view, body);
       } catch (error) {
         logger.error(error);
       }

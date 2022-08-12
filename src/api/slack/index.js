@@ -55,7 +55,6 @@ module.exports = function (logger) {
       const { user } = await client.users.lookupByEmail({
         email,
       });
-      logger.debug('getSlackUserByEmail');
       return {
         userId: user.id,
         userName: user.name,

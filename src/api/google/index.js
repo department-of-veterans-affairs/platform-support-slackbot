@@ -172,8 +172,18 @@ module.exports = function (logger) {
  */
   sheets.getTopics = async () => {
     const rows = await sheets.getTopicsSheetRows();
-    return rows.sort((row1, row2) => {
+    return rows.filter((row) => {
+      return row.Disabled !== 'TRUE';
+    }).sort((row1, row2) => {
       return row1.Topic > row2.Topic ? 1 : row1.Topic < row2.Topic ? -1 : 0;
+    }).sort((row1, row2) => {
+      if (row1.Sort && row2.Sort) {
+        return row1.Sort > row2.Sort ? 1 : row1.Sort < row2.Sort ? -1 : 0;
+      } else if (row1.Sort) {
+        return -1;
+      } else {
+        return 0;
+      }
     }).map((row, index) => {
       return {
         text: row.Topic,

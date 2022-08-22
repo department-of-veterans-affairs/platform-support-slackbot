@@ -77,18 +77,17 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
         authorized.ok = false;
       }
       
-      console.log('App authorization status', authorized);
       if (authorized.ok) {
         await app.client.chat.postMessage({
           channel: SLACK_CHANNEL,
           token: SLACK_BOT_TOKEN,
-          text: `Platform Support Slack-bot server is running ${new Date()}`,
+          text: `Platform Support Slack-bot server is running`,
           parse: 'full',
           blocks: [{
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `Platform Support Slack-bot server is running ${new Date()}`
+              text: `Platform Support Slack-bot server is running`
             }
           }]
         })
@@ -102,13 +101,13 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
       await app.client.chat.postMessage({
         channel: SLACK_CHANNEL,
         token: SLACK_BOT_TOKEN,
-        text: `${SLACK_SUPPORT_TEAM_GROUP} Platform Support Slack-bot server is offline ${new Date()}`,
+        text: `${SLACK_SUPPORT_TEAM_GROUP} Platform Support Slack-bot server is offline`,
         parse: 'full',
         blocks: [{
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `${SLACK_SUPPORT_TEAM_GROUP} Platform Support Slack-bot server is offline ${new Date()}`
+            text: `${SLACK_SUPPORT_TEAM_GROUP} Platform Support Slack-bot server is offline`
           }
         }]
       })
@@ -117,9 +116,9 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
 
     logger.info('⚡️Platform Support Bot is running! ⚡️');
 
-    process.on('SIGTERM', warnProcessStop)
-    process.on('SIGINT', warnProcessStop)
-    process.on('exit', warnProcessStop)
+    process.on('SIGTERM', await warnProcessStop)
+    process.on('SIGINT', await warnProcessStop)
+    process.on('exit', await warnProcessStop)
   })();
 
 }

@@ -76,7 +76,7 @@ module.exports = function (logger) {
           } = view.state.values
 
           selectedTeamId = team.selected.selected_option.value,
-          teamData = await sheets.getTeamById(selectedTeamId),
+          teamData = await sheets.getTeamById(selectedTeamId, true),
 
           selectedTeam = teamData
             ? {
@@ -205,7 +205,7 @@ module.exports = function (logger) {
     client
   ) => {
     const routing = require('../logic/index')(logger); 
-    const teams = await sheets.getTeams();
+    const teams = await sheets.getTeams(true);
     const text = await routing.getTeamsAssignmentText(client, teams);
     const postedMessage = await client.chat.postMessage({
       channel: SUPPORT_CHANNEL_ID,

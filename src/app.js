@@ -69,34 +69,6 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
     console.log(`Server running on port ${process.env.PORT || 7172}`);
     await app.start();
 
-    let postStartup = async () => {
-      let authorized = {};
-      try {
-        authorized = await app.client.auth.test({token: SLACK_BOT_TOKEN});
-      } catch (error) {
-        authorized.ok = false;
-      }
-      
-      if (authorized.ok) {
-        await app.client.chat.postMessage({
-          channel: SLACK_CHANNEL,
-          token: SLACK_BOT_TOKEN,
-          text: `Platform Support Slack-bot server is running`,
-          parse: 'full',
-          blocks: [{
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: `Platform Support Slack-bot server is running`
-            }
-          }]
-        })
-      } else {
-        setTimeout(postStartup, 5000);
-      }
-    }
-    await postStartup();
-
     let warnProcessStop = async () => {
       await app.client.chat.postMessage({
         channel: SLACK_CHANNEL,

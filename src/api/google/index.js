@@ -2,11 +2,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const client_config = require('../../../google_client.json');
 const fetch = require('node-fetch');
 const moment = require('moment-timezone');
-const cacheLength = 86400000; // Cache for 1 day
-let teamsSheet,
-    topicsSheet,
-    cacheTime,
-    googleSheets = {}
+let googleSheets = {}
     
 
 module.exports = function (logger) {
@@ -49,14 +45,10 @@ module.exports = function (logger) {
    * Returns the Google Sheet containing the list of teams and mappings
    * @returns Teams Sheet
    */
-  sheets.getTeamsSheet = async () => {
-    if (!teamsSheet || (new Date() - cacheTime > cacheLength)) {
-      const doc = await sheets.getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID);
-      teamsSheet = doc.sheetsByIndex[0];
-      cacheTime = new Date();
-    }
-    // Return first tab
-    return teamsSheet
+  sheets.getTeamsSheet = async (forceUpdate) => {
+      const doc = await sheets.getGoogleSheet(process.env.TEAMS_SPREADSHEET_ID, forceUpdate),
+            teamsSheet = doc.sheetsByIndex[0];
+      return teamsSheet;
   };
 
   /**
@@ -64,12 +56,10 @@ module.exports = function (logger) {
    * @returns Topics Sheet
    */
    sheets.getTopicsSheet = async () => {
-    if (!topicsSheet || (new Date() - cacheTime > cacheLength)) {
-      const doc = await sheets.getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID);
-      topicsSheet = doc.sheetsById[process.env.TOPICS_SPREADSHEET_ID];
-    }
+      const doc = await sheets.getGoogleSheet(process.env.RESPONSES_SPREADSHEET_ID),
+            topicsSheet = doc.sheetsById[process.env.TOPICS_SPREADSHEET_ID];
 
-    return topicsSheet
+      return topicsSheet
   };
 
   /**
@@ -111,8 +101,8 @@ module.exports = function (logger) {
    * Gets all rows for the Google Teams Sheet
    * @returns Google Sheet Rows
    */
-  sheets.getTeamsSheetRows = async () => {
-    const sheet = await sheets.getTeamsSheet();
+  sheets.getTeamsSheetRows = async (forceUpdate) => {
+    const sheet = await sheets.getTeamsSheet(forceUpdate);
 
     return await sheet.getRows();
   };
@@ -150,8 +140,8 @@ module.exports = function (logger) {
    * teams and associated values.
    * @returns Array of text/values
    */
-  sheets.getTeams = async () => {
-    const rows = await sheets.getTeamsSheetRows();
+  sheets.getTeams = async (forceUpdate) => {
+    const rows = await sheets.getTeamsSheetRows(forceUpdate);
 
     return rows.sort((row1, row2) => {
       return row1.Display > row2.Display ? 1 : row1.Display < row2.Display ? -1 : 0;
@@ -260,8 +250,8 @@ module.exports = function (logger) {
    * @param {number} teamId
    * @returns
    */
-  sheets.getTeamById = async (teamId) => {
-    let rows = await sheets.getTeamsSheetRows();
+  sheets.getTeamById = async (teamId, forceUpdate) => {
+    let rows = await sheets.getTeamsSheetRows(forceUpdate);
 
     if (rows.length < teamId) return null;
 
@@ -349,7 +339,7 @@ module.exports = function (logger) {
     teamId,
     userIds
   ) => {
-    const sheet = await sheets.getTeamsSheet(),
+    const sheet = await sheets.getTeamsSheet(true),
           rows = await sheet.getRows(),
           row = rows.find((row) => row.Id === teamId);
 

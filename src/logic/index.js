@@ -230,7 +230,7 @@ module.exports = (logger) => {
       view
     );
 
-    sheets.captureOnSupport(
+    await sheets.captureOnSupport(
       formData.selectedTeam.id,
       formData.user.selected.selected_users.join(',')
     );

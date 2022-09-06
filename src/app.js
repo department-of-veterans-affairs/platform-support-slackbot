@@ -69,7 +69,7 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
     console.log(`Server running on port ${process.env.PORT || 7172}`);
     await app.start();
 
-    let warnProcessStop = async () => {
+    /*let warnProcessStop = async () => {
       await app.client.chat.postMessage({
         channel: SLACK_CHANNEL,
         token: SLACK_BOT_TOKEN,
@@ -86,11 +86,11 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
       return;
     }
 
-    logger.info('⚡️Platform Support Bot is running! ⚡️');
-
     process.on('SIGTERM', await warnProcessStop)
     process.on('SIGINT', await warnProcessStop)
-    process.on('exit', await warnProcessStop)
+    process.on('exit', await warnProcessStop)*/
+
+    logger.info('⚡️Platform Support Bot is running! ⚡️');
   })();
 
 }

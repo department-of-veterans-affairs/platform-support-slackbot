@@ -214,7 +214,7 @@ module.exports = function (logger) {
               hasMatch = false;
 
           keywords.forEach((keyword) => {
-            if (message.toLowerCase().indexOf(keyword.toLowerCase()) !== -1) {
+            if (message.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 && keyword !== '') {
               hasMatch = true;
             }
           });
@@ -223,13 +223,21 @@ module.exports = function (logger) {
             answers.push(row);
           }
         });
+    }
 
+    // Search by TeamId and Topic Second
+    if (topicId && teamId) {
+      rows.map((row) => {
+        if (row.TopicId === topicId && row.TeamId === teamId) {
+          answers.push(row);
+        }
+      })
     }
 
     // If no keyword results, just return the answers for the topic if there are any
     if (topicId && answers.length < 1) {
       rows.map((row) => {
-        if (row.TopicId === topicId) answers.push(row);
+        if (row.TopicId === topicId && row.TeamId === '') answers.push(row);
       })
     }
 

@@ -143,7 +143,9 @@ module.exports = function (logger) {
   sheets.getTeams = async (forceUpdate) => {
     const rows = await sheets.getTeamsSheetRows(forceUpdate);
 
-    return rows.sort((row1, row2) => {
+    return rows.filter((row) => {
+      return row.Disabled !== 'TRUE'
+    }).sort((row1, row2) => {
       return row1.Display > row2.Display ? 1 : row1.Display < row2.Display ? -1 : 0;
     }).map((row) => {
       return {

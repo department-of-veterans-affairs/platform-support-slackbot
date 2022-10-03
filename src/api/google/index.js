@@ -210,7 +210,7 @@ module.exports = function (logger) {
     // Search by keyword first to find most relevent answers
     if (teamId && message) {
         rows.filter((row) => {
-          return row.TeamId === teamId; 
+          return (row.TeamId === teamId || row.TopicId === topicId) && row.Keywords !== ''; 
         }).map((row) => {
           let keywords = row.Keywords.split(','),
               hasMatch = false;

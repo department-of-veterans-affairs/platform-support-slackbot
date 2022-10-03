@@ -57,7 +57,7 @@ const buildSupportModal = (user, teamOptions, topicOptions) => {
         },
         label: {
           type: 'plain_text',
-          text: 'I need help from',
+          text: 'Assign to',
           emoji: true,
         },
       },
@@ -76,7 +76,7 @@ const buildSupportModal = (user, teamOptions, topicOptions) => {
         },
         label: {
           type: 'plain_text',
-          text: 'What is the nature of the request?',
+          text: 'Request topic',
           emoji: true,
         },
       },

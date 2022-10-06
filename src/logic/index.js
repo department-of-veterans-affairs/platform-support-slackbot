@@ -291,6 +291,11 @@ module.exports = (logger) => {
     };
 
     await slack.updateMessageById(client, message.ts, SUPPORT_CHANNEL_ID, blocks);
+    await client.chat.postMessage({
+      channel: process.env.SLACK_SUPPORT_CHANNEL,
+      thread_ts: message.ts,
+      text: `<@${body.user.id}> reassigned ticket to: ${onSupportUsers} (${team.display})`
+    })
 
     sheets.updateAssignedTeamForMessage(ticketId, team.title);
   };

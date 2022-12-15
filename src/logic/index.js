@@ -2,6 +2,7 @@ const modalBuilder = require('../ui/modals');
 const responseBuilder = require('../ui/messages');
 const { nanoid } = require('nanoid');
 const fetch = require('node-fetch');
+const github = require('../api/github');
 const SUPPORT_HOST = process.env.SLACK_SUPPORT_HOSTNAME;
 const SUPPORT_CHANNEL_ID = process.env.SLACK_SUPPORT_CHANNEL;
 
@@ -10,7 +11,8 @@ module.exports = (logger) => {
         util = require('../api/slack/util')(logger),
         slack = require('../api/slack')(logger),
         formSupport = require('./form-support')(logger),
-        routing = require('./routing')(logger);
+        routing = require('./routing')(logger),
+        github = require('../api/github')(logger);
 
   let logic = {};
 
@@ -118,7 +120,12 @@ module.exports = (logger) => {
     });
   };
 
-
+/**
+   * Handles support form submission.
+   * @param {object} client Slack Client Object
+   * @param {id} messageId Slack Message Id
+   * @param {object} formData form submission data
+   */
   logic.generateAutoAnswer = async(client, messageId, formData) => {
     const autoAnswers = await sheets.getAutoAnswers(formData.selectedTopic.id, formData.selectedTeam.id, formData.summaryDescription);
 
@@ -159,11 +166,20 @@ module.exports = (logger) => {
             teamData
           ),
 
+          githubIssue = teamData.GitHubIntegrationEnabled === 'TRUE' ? 
+                        await github.createIssue(
+                          formData.summaryDescription.substring(0,60) + '...', 
+                          `Submitted By: ${formData.submittedBy.username}\n Topic: ${formData.selectedTopic.name}\nTeam: ${formData.selectedTeam.name}\n\n\n${formData.summaryDescription}`,
+                          teamData.GitHubLabel
+                        ) :
+                        null;
+
           messageData = await formSupport.postSupportTicketMessage(
             client,
             ticketId,
             formData,
-            oncalluser
+            oncalluser,
+            githubIssue
           ),
 
           messageLink = util.createMessageLink(
@@ -172,12 +188,15 @@ module.exports = (logger) => {
             messageData.messageId
           ),
 
-    // Slack uses a numeric timestamp (double) for a message id. Saving the value
-    // into Google Sheets is problematic as it tries to truncate values. Converting
-    // the message id to a string value prevents Google Sheets from modifying the
-    // message id.
+          // Slack uses a numeric timestamp (double) for a message id. Saving the value
+          // into Google Sheets is problematic as it tries to truncate values. Converting
+          // the message id to a string value prevents Google Sheets from modifying the
+          // message id.
           messageIdString = util.stringifyMessageId(messageData.messageId);
 
+    if (githubIssue) {
+      await github.commentOnIssue(githubIssue.data.number, `Slack Thread Link: ${messageLink}`);
+    }
     //logger.debug(`Posted Message ID: ${messageData.messageId}`);
     //logger.debug(`Posted Message ID Hashed: ${messageIdString}`);
     await sheets.captureResponses(

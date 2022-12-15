@@ -123,13 +123,15 @@ module.exports = function (logger) {
    * @param {string} ticketId Ticket Id (for Reassignment)
    * @param {object} formData Form Data Object
    * @param {object} oncallUser On Call Slack User Id
+   * @param {object} githubIssue GitHub issue object created for this request
    * @returns Posted Message Id and Channel
    */
   formSupport.postSupportTicketMessage = async (
     client,
     ticketId,
     formData,
-    oncallUser
+    oncallUser,
+    githubIssue
   ) => {
     const postedMessage = await client.chat.postMessage({
       channel: SUPPORT_CHANNEL_ID,
@@ -141,7 +143,8 @@ module.exports = function (logger) {
         formData.selectedTopic.name,
         formData.summaryDescription,
         oncallUser,
-        formData.selectedTeam.name
+        formData.selectedTeam.name,
+        githubIssue
       ),
       text: `Hey there ${oncallUser}, you have a new Platform Support ticket!`,
       unfurl_links: false, // Remove Link Previews

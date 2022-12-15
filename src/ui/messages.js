@@ -5,7 +5,8 @@ const buildSupportResponse = (
   selectedCategory,
   summaryDescription,
   mention,
-  team
+  team,
+  githubIssue
 ) => {
   return [
     {
@@ -20,6 +21,13 @@ const buildSupportResponse = (
       text: {
         type: 'mrkdwn',
         text: `Request Type: ${selectedCategory}`,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: githubIssue ? `GitHub Support Issue: ${githubIssue.data.html_url}` : '',
       },
     },
     {

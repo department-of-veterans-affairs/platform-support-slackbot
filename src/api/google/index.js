@@ -160,13 +160,12 @@ module.exports = function (logger) {
   /**
  * Reads the topics from the responses google sheet returns an array of
  * topics and associated values.
- * @param teamId Optional, if provided filters results by teamId
  * @returns Array of text/values
  */
-  sheets.getTopics = async (teamId) => {
+  sheets.getTopics = async () => {
     const rows = await sheets.getTopicsSheetRows();
     return rows.filter((row) => {
-      return row.Disabled !== 'TRUE' && (teamId ? row.Teams.split(',').indexOf(teamId) !== -1 : true);
+      return row.Disabled !== 'TRUE';
     }).sort((row1, row2) => {
       return row1.Topic > row2.Topic ? 1 : row1.Topic < row2.Topic ? -1 : 0;
     }).sort((row1, row2) => {

@@ -356,18 +356,4 @@ module.exports = function (app, logger) {
       }
     }
   );
-
-
-  /**
-   * View: support_modal_view
-   * Handles adding the topic field when the user selects a team
-   */
-   app.action({action_id: 'team_selected', block_id: 'team'}, async ({ ack, body, client }) => {
-    await ack();
-    try {
-      await logic.ammendTopicField(body, client);
-    } catch (error) {
-      logger.error(error);
-    }
-  });
 };

@@ -73,33 +73,14 @@ module.exports = (logger) => {
     //logger.debug('displaySupportModal()');
 
     const teamOptions = await sheets.getTeams();
-    const view = modalBuilder.buildSupportModal(user, teamOptions);
+    const topicOptions = await sheets.getTopics();
+    const view = modalBuilder.buildSupportModal(user, teamOptions, topicOptions);
 
     const result = await client.views.open({
       trigger_id,
       view,
     });
   };
-
-  /**
-   * Ammends the topic field to the support modal. Triggered after a user selects a team
-   * @param {object} body Slack event object
-   * @param {object} client Slack Client Object
-   * @returns {object} result of request to update slack view
-   */
-
-  logic.ammendTopicField = async (body, client) => {
-    const topicOptions = await sheets.getTopics(body.actions[0].selected_option.value);
-    const topicField = await modalBuilder.loadTopicField(topicOptions);
-    const teamOptions = await sheets.getTeams();
-    const view = await modalBuilder.buildSupportModal('', teamOptions, topicField);
-    const result = await client.views.update({
-      view_id: body.view.id,
-      hash: body.view.hash,
-      view
-    })
-    return result;
-  }
 
   /**
    * Displays on-support modal to the user.

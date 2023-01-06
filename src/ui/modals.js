@@ -11,79 +11,7 @@ const buildDropDown = (options) => {
   });
 };
 
-const loadTopicField = (topicOptions) => {
-  return {
-    type: 'input',
-    block_id: 'topic',
-    element: {
-      type: 'static_select',
-      placeholder: {
-        type: 'plain_text',
-        text: 'Select an item',
-        emoji: true,
-      },
-      options: buildDropDown(topicOptions),
-      action_id: 'selected',
-    },
-    label: {
-      type: 'plain_text',
-      text: 'Request topic',
-      emoji: true,
-    },
-  }
-}
-
-const buildSupportModal = (user, teamOptions, topicBlock) => {
-  let blocks = [
-    {
-      type: 'section',
-      text: {
-        type: 'plain_text',
-        text: ":wave: Hey there!\n\nPlease fill out the form below and we'll route your support request to the right team.",
-        emoji: true,
-      },
-    },
-    {
-      type: 'divider',
-    },
-    {
-      type: 'input',
-      block_id: 'team',
-      dispatch_action: true,
-      element: {
-        type: 'static_select',
-        placeholder: {
-          type: 'plain_text',
-          text: 'Select an item',
-          emoji: true,
-        },
-        options: buildDropDown(teamOptions),
-        action_id: 'team_selected'
-      },
-      label: {
-        type: 'plain_text',
-        text: 'Assign to',
-        emoji: true,
-      },
-    },
-    {
-      type: 'input',
-      block_id: 'summary',
-      label: {
-        type: 'plain_text',
-        text: 'Summary of request',
-        emoji: true,
-      },
-      element: {
-        type: 'plain_text_input',
-        multiline: true,
-        action_id: 'value',
-      },
-    },
-  ]
-  if (topicBlock) {
-    blocks.splice(3, 0, topicBlock)
-  }
+const buildSupportModal = (user, teamOptions, topicOptions) => {
   return {
     type: 'modal',
     callback_id: 'support_modal_view',
@@ -102,7 +30,92 @@ const buildSupportModal = (user, teamOptions, topicBlock) => {
       text: 'How can we help?',
       emoji: true,
     },
-    blocks,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'plain_text',
+          text: ":wave: Hey there!\n\nPlease fill out the form below and we'll route your support request to the right team.",
+          emoji: true,
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        type: 'input',
+        block_id: 'team',
+        element: {
+          type: 'static_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select an item',
+            emoji: true,
+          },
+          options: buildDropDown(teamOptions),
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'Assign to',
+          emoji: true,
+        },
+      },
+      {
+        type: 'input',
+        block_id: 'topic',
+        element: {
+          type: 'static_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select an item',
+            emoji: true,
+          },
+          options: buildDropDown(topicOptions),
+          action_id: 'selected',
+        },
+        label: {
+          type: 'plain_text',
+          text: 'Request topic',
+          emoji: true,
+        },
+      },
+      {
+        type: 'input',
+        block_id: 'summary',
+        label: {
+          type: 'plain_text',
+          text: 'Summary of request',
+          emoji: true,
+        },
+        element: {
+          type: 'plain_text_input',
+          multiline: true,
+          action_id: 'value',
+        },
+      },
+      // TODO: Enable in the future.  Commented out on 5/18 since
+      // this is not used.
+      // {
+      //   type: 'input',
+      //   block_id: 'users_requesting_support',
+      //   element: {
+      //     type: 'multi_users_select',
+      //     placeholder: {
+      //       type: 'plain_text',
+      //       text: 'Select users',
+      //       emoji: true,
+      //     },
+      //     action_id: 'users',
+      //     initial_users: [user],
+      //   },
+      //   label: {
+      //     type: 'plain_text',
+      //     text: 'User(s) requesting support',
+      //     emoji: true,
+      //   },
+      // },
+    ],
   };
 };
 
@@ -247,5 +260,4 @@ module.exports = {
   buildSupportModal,
   buildOnSupportModal,
   buildReassignmentModal,
-  loadTopicField
 };

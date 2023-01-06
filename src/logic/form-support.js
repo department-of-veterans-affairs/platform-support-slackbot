@@ -24,7 +24,7 @@ module.exports = function (logger) {
             topic,
             summary,
           } = view.state.values,
-          selectedTeamId = team.selected.selected_option.value,
+          selectedTeamId = team.team_selected.selected_option.value,
           selectedTopicId = topic.selected.selected_option.value,
           selectedTopicText = topic.selected.selected_option.text.text,
           whoNeedsSupportUserIds = users?.users?.selected_users ?? [],

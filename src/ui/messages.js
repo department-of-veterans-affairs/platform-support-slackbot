@@ -27,7 +27,7 @@ const buildSupportResponse = (
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: githubIssue ? `GitHub Support Issue: ${githubIssue.data.html_url}` : '',
+        text: githubIssue ? `GitHub Support Issue: ${githubIssue.data.html_url}` : ' ',
       },
     },
     {

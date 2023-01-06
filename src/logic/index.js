@@ -79,7 +79,6 @@ module.exports = (logger) => {
       trigger_id,
       view,
     });
-    console.log(result);
   };
 
   /**

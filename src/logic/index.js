@@ -170,7 +170,7 @@ module.exports = (logger) => {
           {
             team,
           } = view.state.values,
-          selectedTeamId = team.selected.selected_option.value,
+          selectedTeamId = team.team_selected.selected_option.value,
           teamData = await sheets.getTeamById(selectedTeamId),
           formData = await formSupport.extractSupportFormData(
             client,

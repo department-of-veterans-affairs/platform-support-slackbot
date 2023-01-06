@@ -291,7 +291,7 @@ module.exports = (logger) => {
 
     let blocks = message.blocks;
 
-    blocks[2] = {
+    blocks[3] = {
       type: 'section',
       text: {
         type: 'mrkdwn',

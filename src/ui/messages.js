@@ -10,127 +10,129 @@ const buildSupportResponse = (
 ) => {
   return [
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: `From *<@${userId}>*: ${summaryDescription}`,
       },
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: `Request Type: ${selectedCategory}`,
       },
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
-        text: githubIssue ? `GitHub Support Issue: ${githubIssue.data.html_url}` : ' ',
+        type: "mrkdwn",
+        text: githubIssue
+          ? `GitHub Support Issue: ${githubIssue.data.html_url}`
+          : " ",
       },
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
-        text: mention ? `*Assigned to: ${mention}* (${selectedTeam})\n` : `*Assigned to: ${team}*\n`,
+        type: "mrkdwn",
+        text: mention
+          ? `*Assigned to: ${mention}* (${selectedTeam})\n`
+          : `*Assigned to: ${team}*\n`,
       },
       accessory: {
-        type: 'button',
+        type: "button",
         text: {
-          type: 'plain_text',
-          text: 'Reassign Ticket',
+          type: "plain_text",
+          text: "Reassign Ticket",
         },
-        action_id: 'reassign_ticket',
+        action_id: "reassign_ticket",
         value: ticketId,
       },
     },
   ];
 };
 
-
-const buildAutoAnswerResponse = (
-  ticketId,
-  autoAnswers
-) => {
+const buildAutoAnswerResponse = (ticketId, autoAnswers) => {
   return [
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: `:page_facing_up:  We found some documentation that may help.`,
       },
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
-        text: autoAnswers.map((answer) => `:point_right:  <${answer.link}|${answer.title}>`).join('\n'),
+        type: "mrkdwn",
+        text: autoAnswers
+          .map((answer) => `:point_right:  <${answer.link}|${answer.title}>`)
+          .join("\n"),
       },
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: `A support representative will respond shortly.`,
       },
     },
     {
-      type: 'divider',
+      type: "divider",
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: `Did this help?`,
       },
-    },{
-      type: 'actions',
-      elements: [{
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: 'Yes',
+    },
+    {
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Yes",
+          },
+          action_id: "auto_answer_yes",
+          value: JSON.stringify({
+            value: "yes",
+            ticketId,
+          }),
         },
-        action_id: 'auto_answer_yes',
-        value: JSON.stringify({
-          value: 'yes',
-          ticketId,
-        })
-      },{
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: 'No',
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "No",
+          },
+          action_id: "auto_answer_no",
+          value: JSON.stringify({
+            value: "no",
+            ticketId,
+          }),
         },
-        action_id: 'auto_answer_no',
-        value: JSON.stringify({
-          value: 'no',
-          ticketId,
-        })
-      }]
+      ],
     },
   ];
 };
 
-
-const buildOnSupportResponse = async (
-  userId,
-  text
-) => {
+const buildOnSupportResponse = async (userId, text) => {
   return [
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: `*<@${userId}>* updated a support assignment:`,
       },
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: text,
       },
     },
@@ -138,39 +140,38 @@ const buildOnSupportResponse = async (
 };
 
 const buildHelpResponse = (userId = null) => {
-  const user = userId == null ? '' : ` <@${userId}>`;
+  const user = userId == null ? "" : ` <@${userId}>`;
   return [
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: `Hey there${user}! You can create a support request by clicking on the button below.`,
       },
     },
     {
-      type: 'actions',
+      type: "actions",
       elements: [
         {
-          type: 'button',
+          type: "button",
           text: {
-            type: 'plain_text',
+            type: "plain_text",
             emoji: true,
-            text: 'Platform Support Request',
+            text: "Platform Support Request",
           },
-          style: 'primary',
-          action_id: 'platform_support',
+          style: "primary",
+          action_id: "platform_support",
         },
       ],
     },
     {
-      type: 'divider',
+      type: "divider",
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
-        text:
-          'You can create a support request by typing `/support` command in the message field\nor by\n clicking on the *shortcut menu ⚡* → *Platform Support* → *Need Platform Support*',
+        type: "mrkdwn",
+        text: "You can create a support request by typing `/support` command in the message field\nor by\n clicking on the *shortcut menu ⚡* → *Need help from Platform?*",
       },
     },
   ];
@@ -180,5 +181,5 @@ module.exports = {
   buildSupportResponse,
   buildHelpResponse,
   buildOnSupportResponse,
-  buildAutoAnswerResponse
+  buildAutoAnswerResponse,
 };

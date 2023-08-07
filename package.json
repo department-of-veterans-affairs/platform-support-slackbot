@@ -1,6 +1,6 @@
 {
   "name": "supportbot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A slack support ticket app",
   "main": "src/app.js",
   "scripts": {

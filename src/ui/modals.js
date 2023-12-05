@@ -65,26 +65,6 @@ const buildSupportModal = (user, topicOptions, topicBlock) => {
         emoji: true,
       },
     },
-    // {
-    //   type: 'input',
-    //   block_id: 'team',
-    //   dispatch_action: true,
-    //   element: {
-    //     type: 'static_select',
-    //     placeholder: {
-    //       type: 'plain_text',
-    //       text: 'Select an item',
-    //       emoji: true,
-    //     },
-    //     options: buildDropDown(teamOptions),
-    //     action_id: 'team_selected'
-    //   },
-    //   label: {
-    //     type: 'plain_text',
-    //     text: 'Assign to',
-    //     emoji: true,
-    //   },
-    // },
     {
       type: 'input',
       block_id: 'summary',

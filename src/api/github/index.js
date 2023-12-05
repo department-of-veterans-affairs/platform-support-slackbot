@@ -18,7 +18,6 @@ module.exports = (logger) => {
 
         createIssue: async (title, summary, label) => {
             github.authenticate();
-            console.log('label: ', label ? [process.env.GITHUB_SUPPORT_LABEL, label] : [process.env.GITHUB_SUPPORT_LABEL])
             let response = await octokit.rest.issues.create({
                 owner: process.env.GITHUB_OWNER,
                 repo: process.env.GITHUB_ISSUE_REPO,
@@ -26,7 +25,6 @@ module.exports = (logger) => {
                 body: summary,
                 labels: label ? [process.env.GITHUB_SUPPORT_LABEL, label] : [process.env.GITHUB_SUPPORT_LABEL]
             });
-            console.log(response)
             return response;
         },
 

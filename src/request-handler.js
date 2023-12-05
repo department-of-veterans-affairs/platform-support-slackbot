@@ -105,7 +105,7 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      await logic.displaySupportModal(client, body.user.id, body.trigger_id. body);
+      await logic.displaySupportModal(client, body.user.id, body.trigger_id);
     } catch (error) {
       logger.error(error);
     }
@@ -231,7 +231,7 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      await logic.displaySupportModal(client, body.user_id, body.trigger_id, body);
+      await logic.displaySupportModal(client, body.user_id, body.trigger_id);
     } catch (error) {
       logger.error(error);
     }
@@ -355,18 +355,4 @@ module.exports = function (app, logger) {
       }
     }
   );
-
-
-  /**
-   * View: support_modal_view
-   * Handles adding the topic field when the user selects a team
-   */
-   app.action({action_id: 'team_selected', block_id: 'team'}, async ({ ack, body, client }) => {
-    await ack();
-    try {
-      await logic.ammendTopicField(body, client);
-    } catch (error) {
-      logger.error(error);
-    }
-  });
 };

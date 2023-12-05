@@ -70,10 +70,9 @@ module.exports = (logger) => {
    * @param {string} trigger_id Trigger Id to generate modal
    * @param {object} body Slack event object
    */
-  logic.displaySupportModal = async (client, user, trigger_id, body) => {
+  logic.displaySupportModal = async (client, user, trigger_id) => {
     //logger.debug('displaySupportModal()');
     const topicOptions = await sheets.getTopics();
-    // const teamOptions = await sheets.getTeams();
     const view = modalBuilder.buildSupportModal(user, topicOptions);
 
     const result = await client.views.open({
@@ -88,19 +87,6 @@ module.exports = (logger) => {
    * @param {object} client Slack Client Object
    * @returns {object} result of request to update slack view
    */
-
-  // logic.ammendTopicField = async (body, client) => {
-  //   const topicOptions = await sheets.getTopics();
-  //   const topicField = await modalBuilder.loadTopicField(topicOptions);
-  //   const teamOptions = await sheets.getTeams();
-  //   const view = await modalBuilder.buildSupportModal('', teamOptions, topicField);
-  //   const result = await client.views.update({
-  //     view_id: body.view.id,
-  //     hash: body.view.hash,
-  //     view
-  //   })
-  //   return result;
-  // }
 
   /**
    * Displays on-support modal to the user.

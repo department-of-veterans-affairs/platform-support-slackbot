@@ -105,7 +105,7 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      await logic.displaySupportModal(client, body.user.id, body.trigger_id);
+      await logic.displaySupportModal(client, body.user.id, body.trigger_id. body);
     } catch (error) {
       logger.error(error);
     }
@@ -231,7 +231,7 @@ module.exports = function (app, logger) {
 
       await ack();
 
-      await logic.displaySupportModal(client, body.user_id, body.trigger_id);
+      await logic.displaySupportModal(client, body.user_id, body.trigger_id, body);
     } catch (error) {
       logger.error(error);
     }
@@ -315,10 +315,9 @@ module.exports = function (app, logger) {
    * form.
    */
   app.view('support_modal_view', async ({ ack, body, view, client }) => {
-    await ack();
     try {
       //logger.info('VIEW: support_modal_view (FORM SUBMISSION)');
-
+      await ack();
       await logic.handleSupportFormSubmission(client, body, view);
 
     } catch (error) {

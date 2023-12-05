@@ -68,7 +68,6 @@ module.exports = (logger) => {
    * @param {object} client Slack Client Object
    * @param {string} user Current User Id
    * @param {string} trigger_id Trigger Id to generate modal
-   * @param {object} body Slack event object
    */
   logic.displaySupportModal = async (client, user, trigger_id) => {
     //logger.debug('displaySupportModal()');

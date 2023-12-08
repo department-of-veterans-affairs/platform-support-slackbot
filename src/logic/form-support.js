@@ -203,6 +203,33 @@ module.exports = function (logger) {
     };
   };
 
+  formSupport.postSurveyMessage = async (
+    client,
+    thread
+  ) => {
+    const postedMessage = await client.chat.postMessage({
+      channel: SUPPORT_CHANNEL_ID,
+      thread_ts: thread,
+      blocks: JSON.stringify(responseBuilder.buildSurveyResponse(thread)),
+      text: `Thanks for contacting support! Please feel free to reach out with any further concerns in a new ticket.`,
+      unfurl_links: false, 
+    });
+
+    if (!postedMessage.ok) {
+      logger.error(`Unable to post message. ${JSON.stringify(postedMessage)}`);
+      return {
+        messageId: null,
+        channel: null,
+        error: 'Error Posting Message',
+      };
+    }
+
+    return {
+      messageId: postedMessage.ts,
+      channel: postedMessage.channel,
+    };
+  };
+
   formSupport.postOnSupportMessage = async (
     formData,
     client

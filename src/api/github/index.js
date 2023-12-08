@@ -18,7 +18,7 @@ module.exports = (logger) => {
 
         createIssue: async (title, summary, label) => {
             github.authenticate();
-            
+
             let response = await octokit.rest.issues.create({
                 owner: process.env.GITHUB_OWNER,
                 repo: process.env.GITHUB_ISSUE_REPO,
@@ -26,6 +26,19 @@ module.exports = (logger) => {
                 body: summary,
                 labels: label ? [process.env.GITHUB_SUPPORT_LABEL, label] : [process.env.GITHUB_SUPPORT_LABEL]
             });
+            return response;
+        },
+
+        closeIssue: async (issue_number) => {
+            github.authenticate();
+
+            let response = await octokit.rest.issues.update({
+                owner: process.env.GITHUB_OWNER,
+                repo: process.env.GITHUB_ISSUE_REPO,
+                issue_number: issue_number,
+                state: 'closed'
+            })
+            
             return response;
         },
 

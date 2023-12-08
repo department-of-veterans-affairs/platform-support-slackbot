@@ -8,7 +8,23 @@ const buildSupportResponse = (
   team,
   githubIssue
 ) => {
-  return [
+  const closeButton =  {
+    type: "section",
+    text: {
+      type: 'mrkdwn',
+      text: "Click here when this support request is complete"
+    },
+    accessory: {
+      type: "button",
+      text: {
+        type: "plain_text",
+        text: "Close Ticket",
+      },
+      action_id: "close_ticket",
+      value: ticketId,
+    },
+  }
+  const blocks = [
     {
       type: "section",
       text: {
@@ -50,7 +66,12 @@ const buildSupportResponse = (
         value: ticketId,
       },
     },
-  ];
+
+  ]
+  if (githubIssue) {
+    blocks.push(closeButton)
+  }
+  return blocks;
 };
 
 const buildAutoAnswerResponse = (ticketId, autoAnswers) => {
@@ -120,6 +141,18 @@ const buildAutoAnswerResponse = (ticketId, autoAnswers) => {
   ];
 };
 
+const buildSurveyResponse = () => {
+  return [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `:thank_you: Thanks for contacting support! How would you rate your service? Please let us know <https://dj540s05.optimalworkshop.com/questions/517a0a86e79362fafb5cdc009cd147ea|HERE> so we can improve in the future.`
+      }
+    }
+  ]
+}
+
 const buildOnSupportResponse = async (userId, text) => {
   return [
     {
@@ -182,4 +215,5 @@ module.exports = {
   buildHelpResponse,
   buildOnSupportResponse,
   buildAutoAnswerResponse,
+  buildSurveyResponse
 };

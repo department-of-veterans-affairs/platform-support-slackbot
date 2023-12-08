@@ -305,6 +305,7 @@ module.exports = function (logger) {
     selectedTopic,
     summaryDescription,
     messageLink,
+    githubIssueId,
     dateTime = new Date()
   ) => {
     const sheet = await sheets.getResponsesSheet(),
@@ -324,6 +325,7 @@ module.exports = function (logger) {
       Topic: selectedTopic,
       Summary: summaryDescription,
       MessageLink: messageLink,
+      GithubIssueId: githubIssueId
     });
     return;
   };

@@ -125,6 +125,24 @@ module.exports = (logger) => {
     });
   };
 
+    /**
+   * Displays reassignment modal to the user.
+   * @param {object} client Slack Client Object
+   * @param {string} ticketId Nanoid generated ticket Id to be used to reference Google Sheet
+   * @param {string} trigger_id Trigger Id to generate modal
+   */
+    logic.closeTicket = async (client, ticketId, message) => {
+      const rows = await sheets.getResponseSheetRows();
+
+      const row = rows.find((row) => row.TicketId === ticketId);
+      await client.chat.update({channel: SUPPORT_CHANNEL_ID, ts: message.ts, text: message.text, blocks: message.blocks.slice(0, -1)})
+      await client.reactions.add({channel: SUPPORT_CHANNEL_ID, timestamp: message.ts, name: 'support-complete'})
+      formSupport.postSurveyMessage(client, message.thread_ts)
+      if (row) {
+        github.closeIssue(row.GithubIssueId)
+      }
+    }
+
 /**
    * Handles support form submission.
    * @param {object} client Slack Client Object
@@ -196,7 +214,7 @@ module.exports = (logger) => {
           // the message id to a string value prevents Google Sheets from modifying the
           // message id.
           messageIdString = util.stringifyMessageId(messageData.messageId);
-
+    
     if (githubIssue) {
       await github.commentOnIssue(githubIssue.data.number, `Slack Thread Link: ${messageLink}`);
     }
@@ -210,7 +228,8 @@ module.exports = (logger) => {
       formData.selectedTeam.title,
       formData.selectedTopic.name,
       formData.summaryDescription,
-      messageLink
+      messageLink,
+      githubIssue ? githubIssue.data.number : null
     );
 
     await logic.generateAutoAnswer(client, messageData.messageId, formData);

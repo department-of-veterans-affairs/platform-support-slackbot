@@ -142,7 +142,7 @@ module.exports = function (app, logger) {
    */
     app.action('close_ticket', async ({ ack, body, client, payload }) => {
       try {
-        //logger.info('ACTION: reassign_ticket');
+        //logger.info('ACTION: close_ticket');
         await logic.closeTicket(
           client,
           payload.value,

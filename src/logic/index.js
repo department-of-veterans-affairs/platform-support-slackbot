@@ -133,12 +133,11 @@ module.exports = (logger) => {
    */
     logic.closeTicket = async (client, ticketId, message) => {
       const rows = await sheets.getResponseSheetRows();
-
       const row = rows.find((row) => row.TicketId === ticketId);
       await client.chat.update({channel: SUPPORT_CHANNEL_ID, ts: message.ts, text: message.text, blocks: message.blocks.slice(0, -1)})
       await client.reactions.add({channel: SUPPORT_CHANNEL_ID, timestamp: message.ts, name: 'support-complete'})
-      formSupport.postSurveyMessage(client, message.thread_ts)
-      if (row) {
+      formSupport.postSurveyMessage(client, message.thread_ts || message.ts)
+      if (row && row.GithubIssueId) {
         github.closeIssue(row.GithubIssueId)
       }
     }

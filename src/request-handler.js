@@ -35,9 +35,6 @@ module.exports = function (app, logger) {
 
       // payload.item.ts is the associated message id of the emoji reaction
       await logic.updateTimeStampOfSupportResponse(payload.item.ts, true);
-      if (payload.reaction === 'support-complete') {
-        formSupport.postSurveyMessage(client, payload.item.ts)
-      }
     } catch (error) {
       logger.error(error);
     }

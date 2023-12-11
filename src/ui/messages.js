@@ -66,11 +66,26 @@ const buildSupportResponse = (
         value: ticketId,
       },
     },
-
+    {
+      type: "section",
+      text: {
+        type: 'mrkdwn',
+        text: "Click here when this support request is complete"
+      },
+      accessory: {
+        type: "button",
+        text: {
+          type: "plain_text",
+          text: "Close Ticket",
+        },
+        action_id: "close_ticket",
+        value: ticketId,
+      },
+    }
   ]
-  if (githubIssue) {
-    blocks.push(closeButton)
-  }
+  // if (githubIssue) {
+  //   blocks.push(closeButton)
+  // }
   return blocks;
 };
 

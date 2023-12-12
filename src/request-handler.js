@@ -1,6 +1,7 @@
 module.exports = function (app, logger) {
   const logic = require('./logic')(logger);
   const routing = require('./logic/routing')(logger);
+  const formSupport = require('./logic/form-support')(logger);
 
   /* EVENT LISTENERS */
 
@@ -28,7 +29,7 @@ module.exports = function (app, logger) {
    * Captures the current time the first emoji reaction to a
    * support ticket.
    */
-  app.event('reaction_added', async ({ payload }) => {
+  app.event('reaction_added', async ({ client, payload }) => {
     try {
       //logger.info('EVENT: reaction_added');
 
@@ -130,6 +131,25 @@ module.exports = function (app, logger) {
       logger.error(error);
     }
   });
+
+    /**
+   * Action: reassign_ticket
+   * This function gets called when the "Reassign Ticket" button
+   * is clicked on.  It brings up a reassign ticket modal.
+   */
+    app.action('close_ticket', async ({ ack, body, client, payload }) => {
+      try {
+        //logger.info('ACTION: close_ticket');
+        await logic.closeTicket(
+          client,
+          payload.value,
+          body.message
+        )
+        await ack();
+      } catch (error) {
+        logger.error(error);
+      }
+    });
 
 
 

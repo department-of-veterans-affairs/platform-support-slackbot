@@ -153,6 +153,9 @@ module.exports = (logger) => {
 
     if (autoAnswers.length > 0) {
       formSupport.postAutoAnswerMessage(client, messageId, autoAnswers);
+      for (const answer of autoAnswers) {
+        formSupport.postAdditionalContextMessage(client, messageId, answer);
+      }
     } else {
       return;
     }

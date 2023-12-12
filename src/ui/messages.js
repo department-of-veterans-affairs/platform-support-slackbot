@@ -8,22 +8,6 @@ const buildSupportResponse = (
   team,
   githubIssue
 ) => {
-  const closeButton =  {
-    type: "section",
-    text: {
-      type: 'mrkdwn',
-      text: "Click here when this support request is complete"
-    },
-    accessory: {
-      type: "button",
-      text: {
-        type: "plain_text",
-        text: "Close Ticket",
-      },
-      action_id: "close_ticket",
-      value: ticketId,
-    },
-  }
   const blocks = [
     {
       type: "section",
@@ -83,9 +67,6 @@ const buildSupportResponse = (
       },
     }
   ]
-  // if (githubIssue) {
-  //   blocks.push(closeButton)
-  // }
   return blocks;
 };
 

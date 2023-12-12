@@ -18,7 +18,7 @@ module.exports = (logger) => {
 
         createIssue: async (title, summary, label) => {
             github.authenticate();
-
+            
             let response = await octokit.rest.issues.create({
                 owner: process.env.GITHUB_OWNER,
                 repo: process.env.GITHUB_ISSUE_REPO,

@@ -33,7 +33,7 @@ const loadTopicField = (topicOptions) => {
   }
 }
 
-const buildSupportModal = (user, teamOptions, topicBlock) => {
+const buildSupportModal = (user, topicOptions, topicBlock) => {
   let blocks = [
     {
       type: 'section',
@@ -48,8 +48,7 @@ const buildSupportModal = (user, teamOptions, topicBlock) => {
     },
     {
       type: 'input',
-      block_id: 'team',
-      dispatch_action: true,
+      block_id: 'topic',
       element: {
         type: 'static_select',
         placeholder: {
@@ -57,12 +56,12 @@ const buildSupportModal = (user, teamOptions, topicBlock) => {
           text: 'Select an item',
           emoji: true,
         },
-        options: buildDropDown(teamOptions),
-        action_id: 'team_selected'
+        options: buildDropDown(topicOptions),
+        action_id: 'selected',
       },
       label: {
         type: 'plain_text',
-        text: 'Assign to',
+        text: 'Request topic',
         emoji: true,
       },
     },

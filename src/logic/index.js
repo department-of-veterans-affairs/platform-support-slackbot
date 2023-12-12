@@ -71,9 +71,8 @@ module.exports = (logger) => {
    */
   logic.displaySupportModal = async (client, user, trigger_id) => {
     //logger.debug('displaySupportModal()');
-
-    const teamOptions = await sheets.getTeams();
-    const view = modalBuilder.buildSupportModal(user, teamOptions);
+    const topicOptions = await sheets.getTopics();
+    const view = modalBuilder.buildSupportModal(user, topicOptions);
 
     const result = await client.views.open({
       trigger_id,
@@ -87,19 +86,6 @@ module.exports = (logger) => {
    * @param {object} client Slack Client Object
    * @returns {object} result of request to update slack view
    */
-
-  logic.ammendTopicField = async (body, client) => {
-    const topicOptions = await sheets.getTopics(body.actions[0].selected_option.value);
-    const topicField = await modalBuilder.loadTopicField(topicOptions);
-    const teamOptions = await sheets.getTeams();
-    const view = await modalBuilder.buildSupportModal('', teamOptions, topicField);
-    const result = await client.views.update({
-      view_id: body.view.id,
-      hash: body.view.hash,
-      view
-    })
-    return result;
-  }
 
   /**
    * Displays on-support modal to the user.
@@ -166,11 +152,9 @@ module.exports = (logger) => {
 
     // Ticket ID is used for reassignment button to reference
     // the slack message
+    const topicOptions = await sheets.getTopics();
     const ticketId = nanoid(),
-          {
-            team,
-          } = view.state.values,
-          selectedTeamId = team.team_selected.selected_option.value,
+          selectedTeamId = topicOptions.filter(topic => topic.text === view.state.values.topic.selected.selected_option.text.text)[0].team.split(',')[0],
           teamData = await sheets.getTeamById(selectedTeamId),
           formData = await formSupport.extractSupportFormData(
             client,

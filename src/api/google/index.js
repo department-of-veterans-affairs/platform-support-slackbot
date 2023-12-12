@@ -179,6 +179,7 @@ module.exports = function (logger) {
       }
     }).map((row, index) => {
       return {
+        team: row.Teams,
         text: row.Topic,
         value: row.Id,
       };

@@ -257,7 +257,9 @@ module.exports = function (logger) {
         link: row.Link,
         topicId: row.TopicId,
         title,
-        additionalContextPosts: row.additionalContextPosts
+        additionalContextPostText: row.AdditionalContextPostText,
+        additionalContextPostLink: row.AdditionalContextPostLink,
+        additionalContextPostTitle: row.AdditionalContextPostTitle
       };
     });
     const results = await Promise.all(promises);

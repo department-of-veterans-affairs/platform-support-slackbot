@@ -215,6 +215,12 @@ module.exports = function (logger) {
    thread,
    autoResponse
  ) => {
+
+    console.log(responseBuilder.buildAdditionalPostResponse(
+      thread,
+      autoResponse
+    ))
+    console.log(autoResponse)
    const postedMessage = await client.chat.postMessage({
      channel: SUPPORT_CHANNEL_ID,
      thread_ts: thread,

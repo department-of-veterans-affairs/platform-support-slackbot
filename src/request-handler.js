@@ -133,9 +133,9 @@ module.exports = function (app, logger) {
   });
 
     /**
-   * Action: reassign_ticket
-   * This function gets called when the "Reassign Ticket" button
-   * is clicked on.  It brings up a reassign ticket modal.
+   * Action: close_ticket
+   * This function gets called when the "Close Ticket" button
+   * is clicked on.  It closes the GitHub ticket.
    */
     app.action('close_ticket', async ({ ack, body, client, payload }) => {
       try {

@@ -42,6 +42,31 @@ module.exports = (logger) => {
             return response;
         },
 
+        removeLabelsFromIssue: async (issue_number) => {
+            github.authenticate();
+
+            let response = await octokit.rest.issues.removeAllLabels({
+                owner: process.env.GITHUB_OWNER,
+                repo: process.env.GITHUB_ISSUE_REPO,
+                issue_number: issue_number,
+            })
+            
+            return response;
+        },
+
+        labelReassignedIssue: async (issue_number, label) => {
+            github.authenticate();
+
+            let response = await octokit.rest.issues.addLabels({
+                owner: process.env.GITHUB_OWNER,
+                repo: process.env.GITHUB_ISSUE_REPO,
+                issue_number: issue_number,
+                labels: [process.env.GITHUB_SUPPORT_LABEL, label]
+            })
+
+            return response;
+        },
+
         commentOnIssue: async ( issue_number, body ) => {
             github.authenticate();
 

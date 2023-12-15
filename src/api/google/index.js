@@ -208,7 +208,6 @@ module.exports = function (logger) {
    sheets.getAutoAnswers = async (topicId, teamId, message) => {
     let rows = await sheets.getAutoAnswerSheetRows(),
         answers = [];
-        additionalMessages = [];
 
     // Search by keyword first to find most relevent answers
     if (teamId && message) {
@@ -226,7 +225,6 @@ module.exports = function (logger) {
 
           if (hasMatch) {
             answers.push(row);
-            additionalMessages.push(row.additionalContextPosts);
           }
         });
     }
@@ -236,7 +234,6 @@ module.exports = function (logger) {
       rows.map((row) => {
         if (row.TopicId === topicId && row.TeamId === teamId) {
           answers.push(row);
-          additionalMessages.push(row.additionalContextPosts);
         }
       })
     }
@@ -246,7 +243,6 @@ module.exports = function (logger) {
       rows.map((row) => {
         if (row.TopicId === topicId && row.TeamId === '') {
           answers.push(row);
-          additionalMessages.push(row.additionalContextPosts);
         }
       })
     }

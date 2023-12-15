@@ -208,7 +208,6 @@ module.exports = function (logger) {
    sheets.getAutoAnswers = async (topicId, teamId, message) => {
     let rows = await sheets.getAutoAnswerSheetRows(),
         answers = [];
-        additionalMessages = [];
 
     // Search by keyword first to find most relevent answers
     if (teamId && message) {

@@ -45,8 +45,7 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
   const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
     signingSecret: process.env.SLACK_SIGNING_SECRET,
-    // socketMode: true,
-    socketMode: false,
+    socketMode: true,
     appToken: process.env.SLACK_WEB_SOCKET_APP_TOKEN,
   });
 
@@ -68,7 +67,7 @@ if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || S
     });
     server.listen(process.env.PORT || 7172);
     console.log(`Server running on port ${process.env.PORT || 7172}`);
-    await app.start(3000);
+    await app.start();
 
     /*let warnProcessStop = async () => {
       await app.client.chat.postMessage({

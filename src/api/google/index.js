@@ -226,7 +226,6 @@ module.exports = function (logger) {
 
           if (hasMatch) {
             answers.push(row);
-            additionalMessages.push(row.additionalContextPosts);
           }
         });
     }
@@ -236,7 +235,6 @@ module.exports = function (logger) {
       rows.map((row) => {
         if (row.TopicId === topicId && row.TeamId === teamId) {
           answers.push(row);
-          additionalMessages.push(row.additionalContextPosts);
         }
       })
     }
@@ -246,7 +244,6 @@ module.exports = function (logger) {
       rows.map((row) => {
         if (row.TopicId === topicId && row.TeamId === '') {
           answers.push(row);
-          additionalMessages.push(row.additionalContextPosts);
         }
       })
     }

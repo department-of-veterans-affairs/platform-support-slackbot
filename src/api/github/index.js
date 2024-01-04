@@ -61,7 +61,7 @@ module.exports = (logger) => {
                 owner: process.env.GITHUB_OWNER,
                 repo: process.env.GITHUB_ISSUE_REPO,
                 issue_number: issue_number,
-                labels: [process.env.GITHUB_SUPPORT_LABEL, label]
+                labels: label ? [process.env.GITHUB_SUPPORT_LABEL, label] : [process.env.GITHUB_SUPPORT_LABEL]
             })
 
             return response;

@@ -137,6 +137,18 @@ const buildAutoAnswerResponse = (ticketId, autoAnswers) => {
   ];
 };
 
+const buildAdditionalPostResponse = (ticketId, answer) => {
+  return [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `${answer.additionalContextPostText} \n ${answer.additionalContextPostLink && answer.additionalContextPostTitle ? '<' + answer.additionalContextPostLink + '|' + answer.additionalContextPostTitle + '>' : ''}`
+      },
+    },
+  ];
+};
+
 const buildSurveyResponse = () => {
   return [
     {
@@ -211,5 +223,6 @@ module.exports = {
   buildHelpResponse,
   buildOnSupportResponse,
   buildAutoAnswerResponse,
+  buildAdditionalPostResponse,
   buildSurveyResponse
 };

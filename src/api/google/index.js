@@ -241,7 +241,9 @@ module.exports = function (logger) {
     // If no keyword results, just return the answers for the topic if there are any
     if (topicId && answers.length < 1) {
       rows.map((row) => {
-        if (row.TopicId === topicId && row.TeamId === '') answers.push(row);
+        if (row.TopicId === topicId && row.TeamId === '') {
+          answers.push(row);
+        }
       })
     }
 
@@ -250,7 +252,10 @@ module.exports = function (logger) {
       return {
         link: row.Link,
         topicId: row.TopicId,
-        title
+        title,
+        additionalContextPostText: row.AdditionalContextPostText,
+        additionalContextPostLink: row.AdditionalContextPostLink,
+        additionalContextPostTitle: row.AdditionalContextPostTitle
       };
     });
     const results = await Promise.all(promises);

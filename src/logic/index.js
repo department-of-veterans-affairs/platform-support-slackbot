@@ -308,7 +308,6 @@ module.exports = (logger) => {
           team = await formSupport.extractReassignFormData(view);
     
     let sheetMessage;
-
     if (!message) return sendErrorMessageToUser();
 
     const onSupportUsers = await routing.getOnCallUser(client, team.id);
@@ -333,6 +332,11 @@ module.exports = (logger) => {
       },
     };
 
+    const row = await sheets.getMessageByTicketId(ticketId);
+    if(row && row.messageRow.GithubIssueId) {
+      github.removeLabelsFromIssue(row.messageRow.GithubIssueId);
+      github.labelReassignedIssue(row.messageRow.GithubIssueId, team.githubLabel);
+    };
     await slack.updateMessageById(client, message.ts, SUPPORT_CHANNEL_ID, blocks);
     await client.chat.postMessage({
       channel: process.env.SLACK_SUPPORT_CHANNEL,

@@ -114,6 +114,7 @@ module.exports = function (logger) {
       id: selectedValue,
       title: team.Title,
       display: team.Display,
+      githubLabel: team.GitHubLabel
     };
   };
 
@@ -216,11 +217,6 @@ module.exports = function (logger) {
    autoResponse
  ) => {
 
-    console.log(responseBuilder.buildAdditionalPostResponse(
-      thread,
-      autoResponse
-    ))
-    console.log(autoResponse)
    const postedMessage = await client.chat.postMessage({
      channel: SUPPORT_CHANNEL_ID,
      thread_ts: thread,

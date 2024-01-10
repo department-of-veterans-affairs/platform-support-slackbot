@@ -216,31 +216,34 @@ module.exports = function (logger) {
    thread,
    autoResponse
  ) => {
-
-   const postedMessage = await client.chat.postMessage({
-     channel: SUPPORT_CHANNEL_ID,
-     thread_ts: thread,
-     blocks: responseBuilder.buildAdditionalPostResponse(
-       thread,
-       autoResponse
-     ),
-     text: `We found documentation that may help while you wait for a response!`,
-     unfurl_links: false, 
-   });
-
-   if (!postedMessage.ok) {
-     logger.error(`Unable to post message. ${JSON.stringify(postedMessage)}`);
-     return {
-       messageId: null,
-       channel: null,
-       error: 'Error Posting Message',
-     };
-   }
-
-   return {
-     messageId: postedMessage.ts,
-     channel: postedMessage.channel,
-   };
+  if (autoResponse.additionalContextPostText) {
+    const postedMessage = await client.chat.postMessage({
+      channel: SUPPORT_CHANNEL_ID,
+      thread_ts: thread,
+      blocks: responseBuilder.buildAdditionalPostResponse(
+        thread,
+        autoResponse
+      ),
+      text: `We found documentation that may help while you wait for a response!`,
+      unfurl_links: false, 
+    });
+ 
+    if (!postedMessage.ok) {
+      logger.error(`Unable to post message. ${JSON.stringify(postedMessage)}`);
+      return {
+        messageId: null,
+        channel: null,
+        error: 'Error Posting Message',
+      };
+    }
+ 
+    return {
+      messageId: postedMessage.ts,
+      channel: postedMessage.channel,
+    };
+  }
+  return;
+   
  };
 
   formSupport.postSurveyMessage = async (

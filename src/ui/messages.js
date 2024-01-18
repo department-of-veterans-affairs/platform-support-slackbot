@@ -155,7 +155,7 @@ const buildSurveyResponse = () => {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `:thank_you: Thanks for contacting support! How would you rate your service? Please let us know <https://dj540s05.optimalworkshop.com/questions/4f1260bbdcd3a4579c269455ee1d9b4f|HERE> so we can improve in the future.`
+        text: `:thank_you: Thanks for contacting support! Please let us know <https://dj540s05.optimalworkshop.com/questions/4f1260bbdcd3a4579c269455ee1d9b4f|how you would rate your service here> so we can improve in the future.`
       }
     }
   ]

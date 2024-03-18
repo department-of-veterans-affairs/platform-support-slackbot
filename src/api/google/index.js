@@ -331,7 +331,7 @@ module.exports = function (logger) {
       Summary: summaryDescription,
       MessageLink: messageLink,
       GithubIssueId: githubIssueId
-    });
+    }, { insert: true});
     return;
   };
 
@@ -346,7 +346,7 @@ module.exports = function (logger) {
     await sheet.addRow({
       TicketId: `msgId:${analytic.ticketId}`,
       Helpful: analytic.value
-    })
+    }, { insert: true})
   };
 
   /**

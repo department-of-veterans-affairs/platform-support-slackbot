@@ -1,4 +1,5 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { auth } = require('google-auth-library');
 const client_config = require('../../../google_client.json');
 const fetch = require('node-fetch');
 const moment = require('moment-timezone');
@@ -19,19 +20,18 @@ module.exports = function (logger) {
    */
   sheets.getGoogleSheet = async (spreadsheetId, forceUpdate) => {
     if (!googleSheets[spreadsheetId] || forceUpdate) {
-      const doc = new GoogleSpreadsheet(spreadsheetId),
-            // Authentication using Google Service Account
-            creds = {
-              "private_key_id": process.env.GOOGLE_PRIVATE_KEY_ID,
-              "private_key": process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-              "client_id": process.env.GOOGLE_CLIENT_ID
-            },
-            auth = {
-              ... client_config,
-              ... creds
-            };
-      await doc.useServiceAccountAuth(auth);
-
+      // Authentication using Google Service Account
+      const creds = {
+        "private_key_id": process.env.GOOGLE_PRIVATE_KEY_ID,
+        "private_key": process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        "client_id": process.env.GOOGLE_CLIENT_ID
+      };
+      const serviceAccountAuth = auth.fromJSON({
+        ... client_config,
+        ... creds
+      });
+      const doc = new GoogleSpreadsheet(spreadsheetId, serviceAccountAuth);
+            
       // loads document properties and worksheets
       await doc.loadInfo();
       googleSheets[spreadsheetId] = doc;

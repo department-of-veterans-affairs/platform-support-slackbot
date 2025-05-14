@@ -28,7 +28,7 @@ const buildSupportResponse = (
       text: {
         type: "mrkdwn",
         text: githubIssue
-          ? `• <${githubIssue.data.html_url}|GitHub Support Issue> \n • <https://app.zenhub.com/workspaces/platform-tech-team-support-634ebbcc35e2bc0015b382fd/issues/gh/department-of-veterans-affairs/va.gov-team/${githubIssue.data.html_url.split('/').pop()}|Zenhub Support Issue>`
+          ? `• <${githubIssue.data.html_url}|GitHub Support Issue>` // removed zenhub link here  <https://app.zenhub.com/workspaces/platform-tech-team-support-634ebbcc35e2bc0015b382fd/issues/gh/department-of-veterans-affairs/va.gov-team/${githubIssue.data.html_url.split('/').pop()}|Zenhub Support Issue>`
           : " ",
       },
     },

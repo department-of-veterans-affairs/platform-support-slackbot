@@ -196,7 +196,6 @@ module.exports = (logger) => {
                           teamData.GitHubLabel
                         ) :
                         null;
-
           messageData = await formSupport.postSupportTicketMessage(
             client,
             ticketId,

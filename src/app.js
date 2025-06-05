@@ -1,96 +1,80 @@
-// Load Environment Variables
-require('dotenv').config();
+// ───────────────────────────────────────────────────────────────
+//  src/app.js   •   single source of truth for the Bolt `App`
+// ───────────────────────────────────────────────────────────────
 
-// Setup Logger
-const logger = require('pino')();
-logger.level = process.env.LOG_LEVEL || 'info';
+// 1.  ENV --- ensure all vars are present
+require("dotenv").config();
+const missing = [
+  "SLACK_BOT_TOKEN",
+  "SLACK_SIGNING_SECRET",
+  "SLACK_WEB_SOCKET_APP_TOKEN",
+  "SLACK_CHANNEL",
+  "SLACK_SUPPORT_TEAM_GROUP",
+  "TEAMS_SPREADSHEET_ID",
+  "RESPONSES_SPREADSHEET_ID",
+  "TOPICS_SPREADSHEET_ID",
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_PRIVATE_KEY_ID",
+].filter((v) => !process.env[v]);
 
-// Initialize Platform Support Slack Bot
-const { App } = require('@slack/bolt');
-const requestHandler = require('./request-handler');
-const workflowHandler = require('./workflow-handler');
-
-SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN
-SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET
-SLACK_WEB_SOCKET_APP_TOKEN = process.env.SLACK_WEB_SOCKET_APP_TOKEN
-SLACK_CHANNEL = process.env.SLACK_CHANNEL
-SLACK_SUPPORT_TEAM_GROUP = process.env.SLACK_SUPPORT_TEAM_GROUP
-TEAMS_SPREADSHEET_ID = process.env.TEAMS_SPREADSHEET_ID
-RESPONSES_SPREADSHEET_ID = process.env.RESPONSES_SPREADSHEET_ID
-TOPICS_SPREADSHEET_ID = process.env.TOPICS_SPREADSHEET_ID
-
-PAGER_DUTY_API_KEY = process.env.PAGER_DUTY_API_KEY
-GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
-GOOGLE_PRIVATE_KEY_ID = process.env.GOOGLE_PRIVATE_KEY_ID
-
-
-if (SLACK_CHANNEL === undefined || SLACK_WEB_SOCKET_APP_TOKEN === undefined || SLACK_SIGNING_SECRET === undefined || SLACK_BOT_TOKEN === undefined
-  || TEAMS_SPREADSHEET_ID === undefined || RESPONSES_SPREADSHEET_ID === undefined || TOPICS_SPREADSHEET_ID === undefined
-  || PAGER_DUTY_API_KEY === undefined || GOOGLE_CLIENT_ID === undefined || GOOGLE_PRIVATE_KEY_ID === undefined || SLACK_SUPPORT_TEAM_GROUP === undefined) {
-  console.log("Error: Missing Environment Variables ! Verify the following: ")
-  console.log(" - SLACK_SIGNING_SECRET")
-  console.log(" - SLACK_BOT_TOKEN")
-  console.log(" - SLACK_WEB_SOCKET_APP_TOKEN")
-  console.log(" - SLACK_CHANNEL")
-  console.log(" - TEAMS_SPREADSHEET_ID")
-  console.log(" - TOPICS_SPREADSHEET_ID")
-  console.log(" - RESPONSES_SPREADSHEET_ID")
-  console.log(" - PAGER_DUTY_API_KEY")
-  console.log(" - GOOGLE_CLIENT_ID")
-  console.log(" - GOOGLE_PRIVATE_KEY_ID")
-
-} else {
-
-  // Initializes bot with Slack API token and signing secret
-  const app = new App({
-    token: process.env.SLACK_BOT_TOKEN,
-    signingSecret: process.env.SLACK_SIGNING_SECRET,
-    socketMode: true,
-    appToken: process.env.SLACK_WEB_SOCKET_APP_TOKEN,
-  });
-
-  // Handles Slack Requests
-  requestHandler(app, logger);
-
-  // Add Slack Workflow Middleware
-  workflowHandler(app, logger);
-
-  /**
-   * App Entry Point
-   */
-  (async () => {
-    console.log("ENTRY === here -- ")
-    let http = require('http');
-    let server = http.createServer(function (req, res) {
-      res.writeHead(200, { 'Content-Type': 'text/plain' });
-      res.end('Hello, World!\n');
-    });
-    server.listen(process.env.PORT || 7172);
-    console.log(`Server running on port ${process.env.PORT || 7172}`);
-    await app.start();
-
-    /*let warnProcessStop = async () => {
-      await app.client.chat.postMessage({
-        channel: SLACK_CHANNEL,
-        token: SLACK_BOT_TOKEN,
-        text: `${SLACK_SUPPORT_TEAM_GROUP} Platform Support Slack-bot server is offline`,
-        parse: 'full',
-        blocks: [{
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: `${SLACK_SUPPORT_TEAM_GROUP} Platform Support Slack-bot server is offline`
-          }
-        }]
-      })
-      return;
-    }
-
-    process.on('SIGTERM', await warnProcessStop)
-    process.on('SIGINT', await warnProcessStop)
-    process.on('exit', await warnProcessStop)*/
-
-    logger.info('⚡️Platform Support Bot is running! ⚡️');
-  })();
-
+if (missing.length) {
+  console.error("Error: Missing environment variables:\n • " + missing.join("\n • "));
+  process.exit(1);
 }
+
+// 2.  LOGGER
+const logger = require("pino")();
+logger.level = process.env.LOG_LEVEL || "info";
+
+// 3.  BOLT APP  (single instance!)
+const { App, LogLevel } = require("@slack/bolt");
+
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  socketMode: false,                       // using HTTPS endpoint, not websockets
+  appToken: process.env.SLACK_WEB_SOCKET_APP_TOKEN,
+  logLevel: LogLevel.DEBUG,               // switch to INFO in prod
+});
+
+// 4.  GLOBAL ERROR HANDLER
+app.error((error) => {
+  logger.error({ msg: "Bolt global error", error });
+});
+
+// 5.  HANDLERS ALREADY IN REPO
+const requestHandler  = require("./request-handler");
+const workflowHandler = require("./workflow-handler");
+requestHandler(app, logger);
+workflowHandler(app, logger);
+
+// 6.  PR-INSPECTOR LISTENER  (new)
+require("./pr-inspector")(app);           // ← nothing else needed
+
+// 7.  Expose bot’s own bot_id for listeners that need it
+(async () => {
+  try {
+    const { bot_id } = await app.client.auth.test({ token: process.env.SLACK_BOT_TOKEN });
+    process.env.SELF_BOT_ID = bot_id;     // used by pr-inspector to ignore itself
+    logger.info(`Self bot_id = ${bot_id}`);
+  } catch (e) {
+    logger.error("Failed to fetch bot_id with auth.test:", e);
+    process.exit(1);
+  }
+})();
+
+// 8.  SIMPLE HEALTH-CHECK HTTP SERVER  (unchanged)
+const http = require("http");
+http.createServer((_, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Hello, World!\n");
+}).listen(process.env.PORT || 7172, () =>
+  logger.info(`Health-check server on :${process.env.PORT || 7172}`)
+);
+
+// 9.  START BOLT (uses its own Express receiver underneath)
+(async () => {
+  await app.start(3000);                  // internal Slack events port
+  logger.info("⚡️ Platform Support Bot is running! ⚡️");
+})();
+
